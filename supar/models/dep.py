@@ -72,6 +72,8 @@ class BiaffineDependencyModel(Model):
             Label MLP size. Default: 100.
         mlp_dropout (float):
             The dropout ratio of MLP layers. Default: .33.
+        scale (float):
+            Scaling factor for affine scores. Default: 0.
         pad_index (int):
             The index of the padding token in the word vocabulary. Default: 0.
         unk_index (int):
@@ -105,6 +107,7 @@ class BiaffineDependencyModel(Model):
                  n_mlp_arc=500,
                  n_mlp_rel=100,
                  mlp_dropout=.33,
+                 scale=0,
                  pad_index=0,
                  unk_index=1,
                  **kwargs):
@@ -115,7 +118,7 @@ class BiaffineDependencyModel(Model):
         self.mlp_rel_d = MLP(n_in=self.args.n_hidden, n_out=n_mlp_rel, dropout=mlp_dropout)
         self.mlp_rel_h = MLP(n_in=self.args.n_hidden, n_out=n_mlp_rel, dropout=mlp_dropout)
 
-        self.arc_attn = Biaffine(n_in=n_mlp_arc, bias_x=True, bias_y=False)
+        self.arc_attn = Biaffine(n_in=n_mlp_arc, scale=scale, bias_x=True, bias_y=False)
         self.rel_attn = Biaffine(n_in=n_mlp_rel, n_out=n_rels, bias_x=True, bias_y=True)
         self.criterion = nn.CrossEntropyLoss()
 
@@ -274,6 +277,8 @@ class CRFDependencyModel(BiaffineDependencyModel):
             Label MLP size. Default: 100.
         mlp_dropout (float):
             The dropout ratio of MLP layers. Default: .33.
+        scale (float):
+            Scaling factor for affine scores. Default: 0.
         pad_index (int):
             The index of the padding token in the word vocabulary. Default: 0.
         unk_index (int):
@@ -386,6 +391,8 @@ class CRF2oDependencyModel(BiaffineDependencyModel):
             Label MLP size. Default: 100.
         mlp_dropout (float):
             The dropout ratio of MLP layers. Default: .33.
+        scale (float):
+            Scaling factor for affine scores. Default: 0.
         pad_index (int):
             The index of the padding token in the word vocabulary. Default: 0.
         unk_index (int):
@@ -417,6 +424,7 @@ class CRF2oDependencyModel(BiaffineDependencyModel):
                  n_mlp_sib=100,
                  n_mlp_rel=100,
                  mlp_dropout=.33,
+                 scale=0,
                  pad_index=0,
                  unk_index=1,
                  **kwargs):
@@ -430,8 +438,8 @@ class CRF2oDependencyModel(BiaffineDependencyModel):
         self.mlp_rel_d = MLP(n_in=self.args.n_hidden, n_out=n_mlp_rel, dropout=mlp_dropout)
         self.mlp_rel_h = MLP(n_in=self.args.n_hidden, n_out=n_mlp_rel, dropout=mlp_dropout)
 
-        self.arc_attn = Biaffine(n_in=n_mlp_arc, bias_x=True, bias_y=False)
-        self.sib_attn = Triaffine(n_in=n_mlp_sib, bias_x=True, bias_y=True)
+        self.arc_attn = Biaffine(n_in=n_mlp_arc, scale=scale, bias_x=True, bias_y=False)
+        self.sib_attn = Triaffine(n_in=n_mlp_sib, scale=scale, bias_x=True, bias_y=True)
         self.rel_attn = Biaffine(n_in=n_mlp_rel, n_out=n_rels, bias_x=True, bias_y=True)
         self.crf = CRF2oDependency()
         self.criterion = nn.CrossEntropyLoss()
@@ -611,6 +619,8 @@ class VIDependencyModel(BiaffineDependencyModel):
             Label MLP size. Default: 100.
         mlp_dropout (float):
             The dropout ratio of MLP layers. Default: .33.
+        scale (float):
+            Scaling factor for affine scores. Default: 0.
         max_iter (int):
             Max iteration times for Variational Inference. Default: 3.
         interpolation (int):
@@ -649,6 +659,7 @@ class VIDependencyModel(BiaffineDependencyModel):
                  n_mlp_sib=100,
                  n_mlp_rel=100,
                  mlp_dropout=.33,
+                 scale=0,
                  max_iter=3,
                  pad_index=0,
                  unk_index=1,
@@ -663,8 +674,8 @@ class VIDependencyModel(BiaffineDependencyModel):
         self.mlp_rel_d = MLP(n_in=self.args.n_hidden, n_out=n_mlp_rel, dropout=mlp_dropout)
         self.mlp_rel_h = MLP(n_in=self.args.n_hidden, n_out=n_mlp_rel, dropout=mlp_dropout)
 
-        self.arc_attn = Biaffine(n_in=n_mlp_arc, bias_x=True, bias_y=False)
-        self.sib_attn = Triaffine(n_in=n_mlp_sib, bias_x=True, bias_y=True)
+        self.arc_attn = Biaffine(n_in=n_mlp_arc, scale=scale, bias_x=True, bias_y=False)
+        self.sib_attn = Triaffine(n_in=n_mlp_sib, scale=scale, bias_x=True, bias_y=True)
         self.rel_attn = Biaffine(n_in=n_mlp_rel, n_out=n_rels, bias_x=True, bias_y=True)
         self.inference = MFVIDependency(max_iter)
         self.criterion = nn.CrossEntropyLoss()
