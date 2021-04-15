@@ -65,9 +65,9 @@ class CRFConstituencyModel(Model):
             The number of LSTM layers. Default: 3.
         encoder_dropout (float):
             The dropout ratio of LSTM. Default: .33.
-        n_mlp_span (int):
+        n_span_mlp (int):
             Span MLP size. Default: 500.
-        n_mlp_label  (int):
+        n_label_mlp  (int):
             Label MLP size. Default: 100.
         mlp_dropout (float):
             The dropout ratio of MLP layers. Default: .33.
@@ -101,21 +101,21 @@ class CRFConstituencyModel(Model):
                  n_lstm_hidden=400,
                  n_lstm_layers=3,
                  encoder_dropout=.33,
-                 n_mlp_span=500,
-                 n_mlp_label=100,
+                 n_span_mlp=500,
+                 n_label_mlp=100,
                  mlp_dropout=.33,
                  pad_index=0,
                  unk_index=1,
                  **kwargs):
         super().__init__(**Config().update(locals()))
 
-        self.mlp_span_l = MLP(n_in=self.args.n_hidden, n_out=n_mlp_span, dropout=mlp_dropout)
-        self.mlp_span_r = MLP(n_in=self.args.n_hidden, n_out=n_mlp_span, dropout=mlp_dropout)
-        self.mlp_label_l = MLP(n_in=self.args.n_hidden, n_out=n_mlp_label, dropout=mlp_dropout)
-        self.mlp_label_r = MLP(n_in=self.args.n_hidden, n_out=n_mlp_label, dropout=mlp_dropout)
+        self.span_mlp_l = MLP(n_in=self.args.n_hidden, n_out=n_span_mlp, dropout=mlp_dropout)
+        self.span_mlp_r = MLP(n_in=self.args.n_hidden, n_out=n_span_mlp, dropout=mlp_dropout)
+        self.label_mlp_l = MLP(n_in=self.args.n_hidden, n_out=n_label_mlp, dropout=mlp_dropout)
+        self.label_mlp_r = MLP(n_in=self.args.n_hidden, n_out=n_label_mlp, dropout=mlp_dropout)
 
-        self.span_attn = Biaffine(n_in=n_mlp_span, bias_x=True, bias_y=False)
-        self.label_attn = Biaffine(n_in=n_mlp_label, n_out=n_labels, bias_x=True, bias_y=True)
+        self.span_attn = Biaffine(n_in=n_span_mlp, bias_x=True, bias_y=False)
+        self.label_attn = Biaffine(n_in=n_label_mlp, n_out=n_labels, bias_x=True, bias_y=True)
         self.crf = CRFConstituency()
         self.criterion = nn.CrossEntropyLoss()
 
@@ -141,10 +141,10 @@ class CRFConstituencyModel(Model):
         x_f, x_b = x.chunk(2, -1)
         x = torch.cat((x_f[:, :-1], x_b[:, 1:]), -1)
 
-        span_l = self.mlp_span_l(x)
-        span_r = self.mlp_span_r(x)
-        label_l = self.mlp_label_l(x)
-        label_r = self.mlp_label_r(x)
+        span_l = self.span_mlp_l(x)
+        span_r = self.span_mlp_r(x)
+        label_l = self.label_mlp_l(x)
+        label_r = self.label_mlp_r(x)
 
         # [batch_size, seq_len, seq_len]
         s_span = self.span_attn(span_l, span_r)
@@ -255,11 +255,11 @@ class VIConstituencyModel(CRFConstituencyModel):
             The number of LSTM layers. Default: 3.
         encoder_dropout (float):
             The dropout ratio of LSTM. Default: .33.
-        n_mlp_span (int):
+        n_span_mlp (int):
             Span MLP size. Default: 500.
-        n_mlp_pair (int):
+        n_pair_mlp (int):
             Binary factor MLP size. Default: 100.
-        n_mlp_label  (int):
+        n_label_mlp  (int):
             Label MLP size. Default: 100.
         mlp_dropout (float):
             The dropout ratio of MLP layers. Default: .33.
@@ -297,9 +297,9 @@ class VIConstituencyModel(CRFConstituencyModel):
                  n_lstm_hidden=400,
                  n_lstm_layers=3,
                  encoder_dropout=.33,
-                 n_mlp_span=500,
-                 n_mlp_pair=100,
-                 n_mlp_label=100,
+                 n_span_mlp=500,
+                 n_pair_mlp=100,
+                 n_label_mlp=100,
                  mlp_dropout=.33,
                  max_iter=3,
                  interpolation=0.1,
@@ -308,17 +308,17 @@ class VIConstituencyModel(CRFConstituencyModel):
                  **kwargs):
         super().__init__(**Config().update(locals()))
 
-        self.mlp_span_l = MLP(n_in=self.args.n_hidden, n_out=n_mlp_span, dropout=mlp_dropout)
-        self.mlp_span_r = MLP(n_in=self.args.n_hidden, n_out=n_mlp_span, dropout=mlp_dropout)
-        self.mlp_pair_l = MLP(n_in=self.args.n_hidden, n_out=n_mlp_pair, dropout=mlp_dropout)
-        self.mlp_pair_r = MLP(n_in=self.args.n_hidden, n_out=n_mlp_pair, dropout=mlp_dropout)
-        self.mlp_pair_b = MLP(n_in=self.args.n_hidden, n_out=n_mlp_pair, dropout=mlp_dropout)
-        self.mlp_label_l = MLP(n_in=self.args.n_hidden, n_out=n_mlp_label, dropout=mlp_dropout)
-        self.mlp_label_r = MLP(n_in=self.args.n_hidden, n_out=n_mlp_label, dropout=mlp_dropout)
+        self.span_mlp_l = MLP(n_in=self.args.n_hidden, n_out=n_span_mlp, dropout=mlp_dropout)
+        self.span_mlp_r = MLP(n_in=self.args.n_hidden, n_out=n_span_mlp, dropout=mlp_dropout)
+        self.pair_mlp_l = MLP(n_in=self.args.n_hidden, n_out=n_pair_mlp, dropout=mlp_dropout)
+        self.pair_mlp_r = MLP(n_in=self.args.n_hidden, n_out=n_pair_mlp, dropout=mlp_dropout)
+        self.pair_mlp_b = MLP(n_in=self.args.n_hidden, n_out=n_pair_mlp, dropout=mlp_dropout)
+        self.label_mlp_l = MLP(n_in=self.args.n_hidden, n_out=n_label_mlp, dropout=mlp_dropout)
+        self.label_mlp_r = MLP(n_in=self.args.n_hidden, n_out=n_label_mlp, dropout=mlp_dropout)
 
-        self.span_attn = Biaffine(n_in=n_mlp_span, bias_x=True, bias_y=False)
-        self.pair_attn = Triaffine(n_in=n_mlp_pair, bias_x=True, bias_y=False)
-        self.label_attn = Biaffine(n_in=n_mlp_label, n_out=n_labels, bias_x=True, bias_y=True)
+        self.span_attn = Biaffine(n_in=n_span_mlp, bias_x=True, bias_y=False)
+        self.pair_attn = Triaffine(n_in=n_pair_mlp, bias_x=True, bias_y=False)
+        self.label_attn = Biaffine(n_in=n_label_mlp, n_out=n_labels, bias_x=True, bias_y=True)
         self.inference = MFVIConstituency(max_iter)
         self.criterion = nn.CrossEntropyLoss()
 
@@ -344,13 +344,13 @@ class VIConstituencyModel(CRFConstituencyModel):
         x_f, x_b = x.chunk(2, -1)
         x = torch.cat((x_f[:, :-1], x_b[:, 1:]), -1)
 
-        span_l = self.mlp_span_l(x)
-        span_r = self.mlp_span_r(x)
-        pair_l = self.mlp_pair_l(x)
-        pair_r = self.mlp_pair_r(x)
-        pair_b = self.mlp_pair_b(x)
-        label_l = self.mlp_label_l(x)
-        label_r = self.mlp_label_r(x)
+        span_l = self.span_mlp_l(x)
+        span_r = self.span_mlp_r(x)
+        pair_l = self.pair_mlp_l(x)
+        pair_r = self.pair_mlp_r(x)
+        pair_b = self.pair_mlp_b(x)
+        label_l = self.label_mlp_l(x)
+        label_r = self.label_mlp_r(x)
 
         # [batch_size, seq_len, seq_len]
         s_span = self.span_attn(span_l, span_r)

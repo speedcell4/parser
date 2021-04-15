@@ -66,9 +66,9 @@ class BiaffineDependencyModel(Model):
             The number of LSTM layers. Default: 3.
         encoder_dropout (float):
             The dropout ratio of LSTM. Default: .33.
-        n_mlp_arc (int):
+        n_arc_mlp (int):
             Arc MLP size. Default: 500.
-        n_mlp_rel  (int):
+        n_rel_mlp  (int):
             Label MLP size. Default: 100.
         mlp_dropout (float):
             The dropout ratio of MLP layers. Default: .33.
@@ -104,8 +104,8 @@ class BiaffineDependencyModel(Model):
                  n_lstm_hidden=400,
                  n_lstm_layers=3,
                  encoder_dropout=.33,
-                 n_mlp_arc=500,
-                 n_mlp_rel=100,
+                 n_arc_mlp=500,
+                 n_rel_mlp=100,
                  mlp_dropout=.33,
                  scale=0,
                  pad_index=0,
@@ -113,13 +113,13 @@ class BiaffineDependencyModel(Model):
                  **kwargs):
         super().__init__(**Config().update(locals()))
 
-        self.mlp_arc_d = MLP(n_in=self.args.n_hidden, n_out=n_mlp_arc, dropout=mlp_dropout)
-        self.mlp_arc_h = MLP(n_in=self.args.n_hidden, n_out=n_mlp_arc, dropout=mlp_dropout)
-        self.mlp_rel_d = MLP(n_in=self.args.n_hidden, n_out=n_mlp_rel, dropout=mlp_dropout)
-        self.mlp_rel_h = MLP(n_in=self.args.n_hidden, n_out=n_mlp_rel, dropout=mlp_dropout)
+        self.arc_mlp_d = MLP(n_in=self.args.n_hidden, n_out=n_arc_mlp, dropout=mlp_dropout)
+        self.arc_mlp_h = MLP(n_in=self.args.n_hidden, n_out=n_arc_mlp, dropout=mlp_dropout)
+        self.rel_mlp_d = MLP(n_in=self.args.n_hidden, n_out=n_rel_mlp, dropout=mlp_dropout)
+        self.rel_mlp_h = MLP(n_in=self.args.n_hidden, n_out=n_rel_mlp, dropout=mlp_dropout)
 
-        self.arc_attn = Biaffine(n_in=n_mlp_arc, scale=scale, bias_x=True, bias_y=False)
-        self.rel_attn = Biaffine(n_in=n_mlp_rel, n_out=n_rels, bias_x=True, bias_y=True)
+        self.arc_attn = Biaffine(n_in=n_arc_mlp, scale=scale, bias_x=True, bias_y=False)
+        self.rel_attn = Biaffine(n_in=n_rel_mlp, n_out=n_rels, bias_x=True, bias_y=True)
         self.criterion = nn.CrossEntropyLoss()
 
     def forward(self, words, feats=None):
@@ -142,10 +142,10 @@ class BiaffineDependencyModel(Model):
         x = self.encode(words, feats)
         mask = words.ne(self.args.pad_index) if len(words.shape) < 3 else words.ne(self.args.pad_index).any(-1)
 
-        arc_d = self.mlp_arc_d(x)
-        arc_h = self.mlp_arc_h(x)
-        rel_d = self.mlp_rel_d(x)
-        rel_h = self.mlp_rel_h(x)
+        arc_d = self.arc_mlp_d(x)
+        arc_h = self.arc_mlp_h(x)
+        rel_d = self.rel_mlp_d(x)
+        rel_h = self.rel_mlp_h(x)
 
         # [batch_size, seq_len, seq_len]
         s_arc = self.arc_attn(arc_d, arc_h).masked_fill_(~mask.unsqueeze(1), float('-inf'))
@@ -271,9 +271,9 @@ class CRFDependencyModel(BiaffineDependencyModel):
             The number of LSTM layers. Default: 3.
         encoder_dropout (float):
             The dropout ratio of LSTM. Default: .33.
-        n_mlp_arc (int):
+        n_arc_mlp (int):
             Arc MLP size. Default: 500.
-        n_mlp_rel  (int):
+        n_rel_mlp  (int):
             Label MLP size. Default: 100.
         mlp_dropout (float):
             The dropout ratio of MLP layers. Default: .33.
@@ -383,11 +383,11 @@ class CRF2oDependencyModel(BiaffineDependencyModel):
             The number of LSTM layers. Default: 3.
         encoder_dropout (float):
             The dropout ratio of LSTM. Default: .33.
-        n_mlp_arc (int):
+        n_arc_mlp (int):
             Arc MLP size. Default: 500.
-        n_mlp_sib (int):
+        n_sib_mlp (int):
             Sibling MLP size. Default: 100.
-        n_mlp_rel  (int):
+        n_rel_mlp  (int):
             Label MLP size. Default: 100.
         mlp_dropout (float):
             The dropout ratio of MLP layers. Default: .33.
@@ -420,9 +420,9 @@ class CRF2oDependencyModel(BiaffineDependencyModel):
                  n_lstm_hidden=400,
                  n_lstm_layers=3,
                  encoder_dropout=.33,
-                 n_mlp_arc=500,
-                 n_mlp_sib=100,
-                 n_mlp_rel=100,
+                 n_arc_mlp=500,
+                 n_sib_mlp=100,
+                 n_rel_mlp=100,
                  mlp_dropout=.33,
                  scale=0,
                  pad_index=0,
@@ -430,17 +430,17 @@ class CRF2oDependencyModel(BiaffineDependencyModel):
                  **kwargs):
         super().__init__(**Config().update(locals()))
 
-        self.mlp_arc_d = MLP(n_in=self.args.n_hidden, n_out=n_mlp_arc, dropout=mlp_dropout)
-        self.mlp_arc_h = MLP(n_in=self.args.n_hidden, n_out=n_mlp_arc, dropout=mlp_dropout)
-        self.mlp_sib_s = MLP(n_in=self.args.n_hidden, n_out=n_mlp_sib, dropout=mlp_dropout)
-        self.mlp_sib_d = MLP(n_in=self.args.n_hidden, n_out=n_mlp_sib, dropout=mlp_dropout)
-        self.mlp_sib_h = MLP(n_in=self.args.n_hidden, n_out=n_mlp_sib, dropout=mlp_dropout)
-        self.mlp_rel_d = MLP(n_in=self.args.n_hidden, n_out=n_mlp_rel, dropout=mlp_dropout)
-        self.mlp_rel_h = MLP(n_in=self.args.n_hidden, n_out=n_mlp_rel, dropout=mlp_dropout)
+        self.arc_mlp_d = MLP(n_in=self.args.n_hidden, n_out=n_arc_mlp, dropout=mlp_dropout)
+        self.arc_mlp_h = MLP(n_in=self.args.n_hidden, n_out=n_arc_mlp, dropout=mlp_dropout)
+        self.sib_mlp_s = MLP(n_in=self.args.n_hidden, n_out=n_sib_mlp, dropout=mlp_dropout)
+        self.sib_mlp_d = MLP(n_in=self.args.n_hidden, n_out=n_sib_mlp, dropout=mlp_dropout)
+        self.sib_mlp_h = MLP(n_in=self.args.n_hidden, n_out=n_sib_mlp, dropout=mlp_dropout)
+        self.rel_mlp_d = MLP(n_in=self.args.n_hidden, n_out=n_rel_mlp, dropout=mlp_dropout)
+        self.rel_mlp_h = MLP(n_in=self.args.n_hidden, n_out=n_rel_mlp, dropout=mlp_dropout)
 
-        self.arc_attn = Biaffine(n_in=n_mlp_arc, scale=scale, bias_x=True, bias_y=False)
-        self.sib_attn = Triaffine(n_in=n_mlp_sib, scale=scale, bias_x=True, bias_y=True)
-        self.rel_attn = Biaffine(n_in=n_mlp_rel, n_out=n_rels, bias_x=True, bias_y=True)
+        self.arc_attn = Biaffine(n_in=n_arc_mlp, scale=scale, bias_x=True, bias_y=False)
+        self.sib_attn = Triaffine(n_in=n_sib_mlp, scale=scale, bias_x=True, bias_y=True)
+        self.rel_attn = Biaffine(n_in=n_rel_mlp, n_out=n_rels, bias_x=True, bias_y=True)
         self.crf = CRF2oDependency()
         self.criterion = nn.CrossEntropyLoss()
 
@@ -464,13 +464,13 @@ class CRF2oDependencyModel(BiaffineDependencyModel):
         x = self.encode(words, feats)
         mask = words.ne(self.args.pad_index) if len(words.shape) < 3 else words.ne(self.args.pad_index).any(-1)
 
-        arc_d = self.mlp_arc_d(x)
-        arc_h = self.mlp_arc_h(x)
-        sib_s = self.mlp_sib_s(x)
-        sib_d = self.mlp_sib_d(x)
-        sib_h = self.mlp_sib_h(x)
-        rel_d = self.mlp_rel_d(x)
-        rel_h = self.mlp_rel_h(x)
+        arc_d = self.arc_mlp_d(x)
+        arc_h = self.arc_mlp_h(x)
+        sib_s = self.sib_mlp_s(x)
+        sib_d = self.sib_mlp_d(x)
+        sib_h = self.sib_mlp_h(x)
+        rel_d = self.rel_mlp_d(x)
+        rel_h = self.rel_mlp_h(x)
 
         # [batch_size, seq_len, seq_len]
         s_arc = self.arc_attn(arc_d, arc_h).masked_fill_(~mask.unsqueeze(1), float('-inf'))
@@ -611,11 +611,11 @@ class VIDependencyModel(BiaffineDependencyModel):
             The number of LSTM layers. Default: 3.
         encoder_dropout (float):
             The dropout ratio of LSTM. Default: .33.
-        n_mlp_arc (int):
+        n_arc_mlp (int):
             Arc MLP size. Default: 500.
-        n_mlp_sib (int):
+        n_sib_mlp (int):
             Binary factor MLP size. Default: 100.
-        n_mlp_rel  (int):
+        n_rel_mlp  (int):
             Label MLP size. Default: 100.
         mlp_dropout (float):
             The dropout ratio of MLP layers. Default: .33.
@@ -655,9 +655,9 @@ class VIDependencyModel(BiaffineDependencyModel):
                  n_lstm_hidden=400,
                  n_lstm_layers=3,
                  encoder_dropout=.33,
-                 n_mlp_arc=500,
-                 n_mlp_sib=100,
-                 n_mlp_rel=100,
+                 n_arc_mlp=500,
+                 n_sib_mlp=100,
+                 n_rel_mlp=100,
                  mlp_dropout=.33,
                  scale=0,
                  max_iter=3,
@@ -666,17 +666,17 @@ class VIDependencyModel(BiaffineDependencyModel):
                  **kwargs):
         super().__init__(**Config().update(locals()))
 
-        self.mlp_arc_d = MLP(n_in=self.args.n_hidden, n_out=n_mlp_arc, dropout=mlp_dropout)
-        self.mlp_arc_h = MLP(n_in=self.args.n_hidden, n_out=n_mlp_arc, dropout=mlp_dropout)
-        self.mlp_sib_s = MLP(n_in=self.args.n_hidden, n_out=n_mlp_sib, dropout=mlp_dropout)
-        self.mlp_sib_d = MLP(n_in=self.args.n_hidden, n_out=n_mlp_sib, dropout=mlp_dropout)
-        self.mlp_sib_h = MLP(n_in=self.args.n_hidden, n_out=n_mlp_sib, dropout=mlp_dropout)
-        self.mlp_rel_d = MLP(n_in=self.args.n_hidden, n_out=n_mlp_rel, dropout=mlp_dropout)
-        self.mlp_rel_h = MLP(n_in=self.args.n_hidden, n_out=n_mlp_rel, dropout=mlp_dropout)
+        self.arc_mlp_d = MLP(n_in=self.args.n_hidden, n_out=n_arc_mlp, dropout=mlp_dropout)
+        self.arc_mlp_h = MLP(n_in=self.args.n_hidden, n_out=n_arc_mlp, dropout=mlp_dropout)
+        self.sib_mlp_s = MLP(n_in=self.args.n_hidden, n_out=n_sib_mlp, dropout=mlp_dropout)
+        self.sib_mlp_d = MLP(n_in=self.args.n_hidden, n_out=n_sib_mlp, dropout=mlp_dropout)
+        self.sib_mlp_h = MLP(n_in=self.args.n_hidden, n_out=n_sib_mlp, dropout=mlp_dropout)
+        self.rel_mlp_d = MLP(n_in=self.args.n_hidden, n_out=n_rel_mlp, dropout=mlp_dropout)
+        self.rel_mlp_h = MLP(n_in=self.args.n_hidden, n_out=n_rel_mlp, dropout=mlp_dropout)
 
-        self.arc_attn = Biaffine(n_in=n_mlp_arc, scale=scale, bias_x=True, bias_y=False)
-        self.sib_attn = Triaffine(n_in=n_mlp_sib, scale=scale, bias_x=True, bias_y=True)
-        self.rel_attn = Biaffine(n_in=n_mlp_rel, n_out=n_rels, bias_x=True, bias_y=True)
+        self.arc_attn = Biaffine(n_in=n_arc_mlp, scale=scale, bias_x=True, bias_y=False)
+        self.sib_attn = Triaffine(n_in=n_sib_mlp, scale=scale, bias_x=True, bias_y=True)
+        self.rel_attn = Biaffine(n_in=n_rel_mlp, n_out=n_rels, bias_x=True, bias_y=True)
         self.inference = MFVIDependency(max_iter)
         self.criterion = nn.CrossEntropyLoss()
 
@@ -700,13 +700,13 @@ class VIDependencyModel(BiaffineDependencyModel):
         x = self.encode(words, feats)
         mask = words.ne(self.args.pad_index) if len(words.shape) < 3 else words.ne(self.args.pad_index).any(-1)
 
-        arc_d = self.mlp_arc_d(x)
-        arc_h = self.mlp_arc_h(x)
-        sib_s = self.mlp_sib_s(x)
-        sib_d = self.mlp_sib_d(x)
-        sib_h = self.mlp_sib_h(x)
-        rel_d = self.mlp_rel_d(x)
-        rel_h = self.mlp_rel_h(x)
+        arc_d = self.arc_mlp_d(x)
+        arc_h = self.arc_mlp_h(x)
+        sib_s = self.sib_mlp_s(x)
+        sib_d = self.sib_mlp_d(x)
+        sib_h = self.sib_mlp_h(x)
+        rel_d = self.rel_mlp_d(x)
+        rel_h = self.rel_mlp_h(x)
 
         # [batch_size, seq_len, seq_len]
         s_arc = self.arc_attn(arc_d, arc_h).masked_fill_(~mask.unsqueeze(1), float('-inf'))

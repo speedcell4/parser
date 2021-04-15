@@ -67,9 +67,9 @@ class BiaffineSemanticDependencyModel(Model):
             The number of LSTM layers. Default: 3.
         encoder_dropout (float):
             The dropout ratio of LSTM. Default: .33.
-        n_mlp_edge (int):
+        n_edge_mlp (int):
             Edge MLP size. Default: 600.
-        n_mlp_label  (int):
+        n_label_mlp  (int):
             Label MLP size. Default: 600.
         edge_mlp_dropout (float):
             The dropout ratio of edge MLP layers. Default: .25.
@@ -110,8 +110,8 @@ class BiaffineSemanticDependencyModel(Model):
                  n_lstm_hidden=600,
                  n_lstm_layers=3,
                  encoder_dropout=.33,
-                 n_mlp_edge=600,
-                 n_mlp_label=600,
+                 n_edge_mlp=600,
+                 n_label_mlp=600,
                  edge_mlp_dropout=.25,
                  label_mlp_dropout=.33,
                  interpolation=0.1,
@@ -120,13 +120,13 @@ class BiaffineSemanticDependencyModel(Model):
                  **kwargs):
         super().__init__(**Config().update(locals()))
 
-        self.mlp_edge_d = MLP(n_in=self.args.n_hidden, n_out=n_mlp_edge, dropout=edge_mlp_dropout, activation=False)
-        self.mlp_edge_h = MLP(n_in=self.args.n_hidden, n_out=n_mlp_edge, dropout=edge_mlp_dropout, activation=False)
-        self.mlp_label_d = MLP(n_in=self.args.n_hidden, n_out=n_mlp_label, dropout=label_mlp_dropout, activation=False)
-        self.mlp_label_h = MLP(n_in=self.args.n_hidden, n_out=n_mlp_label, dropout=label_mlp_dropout, activation=False)
+        self.edge_mlp_d = MLP(n_in=self.args.n_hidden, n_out=n_edge_mlp, dropout=edge_mlp_dropout, activation=False)
+        self.edge_mlp_h = MLP(n_in=self.args.n_hidden, n_out=n_edge_mlp, dropout=edge_mlp_dropout, activation=False)
+        self.label_mlp_d = MLP(n_in=self.args.n_hidden, n_out=n_label_mlp, dropout=label_mlp_dropout, activation=False)
+        self.label_mlp_h = MLP(n_in=self.args.n_hidden, n_out=n_label_mlp, dropout=label_mlp_dropout, activation=False)
 
-        self.edge_attn = Biaffine(n_in=n_mlp_edge, n_out=2, bias_x=True, bias_y=True)
-        self.label_attn = Biaffine(n_in=n_mlp_label, n_out=n_labels, bias_x=True, bias_y=True)
+        self.edge_attn = Biaffine(n_in=n_edge_mlp, n_out=2, bias_x=True, bias_y=True)
+        self.label_attn = Biaffine(n_in=n_label_mlp, n_out=n_labels, bias_x=True, bias_y=True)
         self.criterion = nn.CrossEntropyLoss()
 
     def forward(self, words, feats=None):
@@ -148,10 +148,10 @@ class BiaffineSemanticDependencyModel(Model):
 
         x = self.encode(words, feats)
 
-        edge_d = self.mlp_edge_d(x)
-        edge_h = self.mlp_edge_h(x)
-        label_d = self.mlp_label_d(x)
-        label_h = self.mlp_label_h(x)
+        edge_d = self.edge_mlp_d(x)
+        edge_h = self.edge_mlp_h(x)
+        label_d = self.label_mlp_d(x)
+        label_h = self.label_mlp_h(x)
 
         # [batch_size, seq_len, seq_len, 2]
         s_egde = self.edge_attn(edge_d, edge_h).permute(0, 2, 3, 1)
@@ -258,11 +258,11 @@ class VISemanticDependencyModel(BiaffineSemanticDependencyModel):
             The number of LSTM layers. Default: 3.
         encoder_dropout (float):
             The dropout ratio of LSTM. Default: .33.
-        n_mlp_edge (int):
+        n_edge_mlp (int):
             Unary factor MLP size. Default: 600.
-        n_mlp_pair (int):
+        n_pair_mlp (int):
             Binary factor MLP size. Default: 150.
-        n_mlp_label  (int):
+        n_label_mlp  (int):
             Label MLP size. Default: 600.
         edge_mlp_dropout (float):
             The dropout ratio of unary edge factor MLP layers. Default: .25.
@@ -309,9 +309,9 @@ class VISemanticDependencyModel(BiaffineSemanticDependencyModel):
                  n_lstm_hidden=600,
                  n_lstm_layers=3,
                  encoder_dropout=.33,
-                 n_mlp_edge=600,
-                 n_mlp_pair=150,
-                 n_mlp_label=600,
+                 n_edge_mlp=600,
+                 n_pair_mlp=150,
+                 n_label_mlp=600,
                  edge_mlp_dropout=.25,
                  pair_mlp_dropout=.25,
                  label_mlp_dropout=.33,
@@ -323,19 +323,19 @@ class VISemanticDependencyModel(BiaffineSemanticDependencyModel):
                  **kwargs):
         super().__init__(**Config().update(locals()))
 
-        self.mlp_edge_d = MLP(n_in=self.args.n_hidden, n_out=n_mlp_edge, dropout=edge_mlp_dropout, activation=False)
-        self.mlp_edge_h = MLP(n_in=self.args.n_hidden, n_out=n_mlp_edge, dropout=edge_mlp_dropout, activation=False)
-        self.mlp_pair_d = MLP(n_in=self.args.n_hidden, n_out=n_mlp_pair, dropout=pair_mlp_dropout, activation=False)
-        self.mlp_pair_h = MLP(n_in=self.args.n_hidden, n_out=n_mlp_pair, dropout=pair_mlp_dropout, activation=False)
-        self.mlp_pair_g = MLP(n_in=self.args.n_hidden, n_out=n_mlp_pair, dropout=pair_mlp_dropout, activation=False)
-        self.mlp_label_d = MLP(n_in=self.args.n_hidden, n_out=n_mlp_label, dropout=label_mlp_dropout, activation=False)
-        self.mlp_label_h = MLP(n_in=self.args.n_hidden, n_out=n_mlp_label, dropout=label_mlp_dropout, activation=False)
+        self.edge_mlp_d = MLP(n_in=self.args.n_hidden, n_out=n_edge_mlp, dropout=edge_mlp_dropout, activation=False)
+        self.edge_mlp_h = MLP(n_in=self.args.n_hidden, n_out=n_edge_mlp, dropout=edge_mlp_dropout, activation=False)
+        self.pair_mlp_d = MLP(n_in=self.args.n_hidden, n_out=n_pair_mlp, dropout=pair_mlp_dropout, activation=False)
+        self.pair_mlp_h = MLP(n_in=self.args.n_hidden, n_out=n_pair_mlp, dropout=pair_mlp_dropout, activation=False)
+        self.pair_mlp_g = MLP(n_in=self.args.n_hidden, n_out=n_pair_mlp, dropout=pair_mlp_dropout, activation=False)
+        self.label_mlp_d = MLP(n_in=self.args.n_hidden, n_out=n_label_mlp, dropout=label_mlp_dropout, activation=False)
+        self.label_mlp_h = MLP(n_in=self.args.n_hidden, n_out=n_label_mlp, dropout=label_mlp_dropout, activation=False)
 
-        self.edge_attn = Biaffine(n_in=n_mlp_edge, bias_x=True, bias_y=True)
-        self.sib_attn = Triaffine(n_in=n_mlp_pair, bias_x=True, bias_y=True)
-        self.cop_attn = Triaffine(n_in=n_mlp_pair, bias_x=True, bias_y=True)
-        self.grd_attn = Triaffine(n_in=n_mlp_pair, bias_x=True, bias_y=True)
-        self.label_attn = Biaffine(n_in=n_mlp_label, n_out=n_labels, bias_x=True, bias_y=True)
+        self.edge_attn = Biaffine(n_in=n_edge_mlp, bias_x=True, bias_y=True)
+        self.sib_attn = Triaffine(n_in=n_pair_mlp, bias_x=True, bias_y=True)
+        self.cop_attn = Triaffine(n_in=n_pair_mlp, bias_x=True, bias_y=True)
+        self.grd_attn = Triaffine(n_in=n_pair_mlp, bias_x=True, bias_y=True)
+        self.label_attn = Biaffine(n_in=n_label_mlp, n_out=n_labels, bias_x=True, bias_y=True)
         self.inference = (MFVISemanticDependency if inference == 'mfvi' else LBPSemanticDependency)(max_iter)
         self.criterion = nn.CrossEntropyLoss()
 
@@ -358,14 +358,14 @@ class VISemanticDependencyModel(BiaffineSemanticDependencyModel):
 
         x = self.encode(words, feats)
 
-        edge_d = self.mlp_edge_d(x)
-        edge_h = self.mlp_edge_h(x)
-        pair_d = self.mlp_pair_d(x)
-        pair_h = self.mlp_pair_h(x)
-        pair_g = self.mlp_pair_g(x)
-        label_h = self.mlp_label_h(x)
-        label_d = self.mlp_label_d(x)
-        label_h = self.mlp_label_h(x)
+        edge_d = self.edge_mlp_d(x)
+        edge_h = self.edge_mlp_h(x)
+        pair_d = self.pair_mlp_d(x)
+        pair_h = self.pair_mlp_h(x)
+        pair_g = self.pair_mlp_g(x)
+        label_h = self.label_mlp_h(x)
+        label_d = self.label_mlp_d(x)
+        label_h = self.label_mlp_h(x)
 
         # [batch_size, seq_len, seq_len]
         s_egde = self.edge_attn(edge_d, edge_h)
