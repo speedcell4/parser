@@ -48,138 +48,71 @@ English models are trained on Penn Treebank (PTB) with 39,832 training sentences
 The performance and parsing speed of these models are listed in the following table.
 Notably, punctuation is ignored in all evaluation metrics for PTB, but reserved for CTB7.
 
-<table>
-  <thead>
-    <tr>
-      <th>Dataset</th>
-      <th align="center">Type</th>
-      <th align="center">Name</th>
-      <th align="center">Metric</th>
-      <th align="center" colspan=2>Performance</th>
-      <th align="right">Speed (Sents/s)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td rowspan=7>PTB</td>
-      <td rowspan=5>Dependency</td>
-      <td><code>biaffine-dep-en</code></td>
-      <td align="center">UAS/LAS</td>
-      <td align="center">96.03</td><td align="center">94.37</td>
-      <td align="right">1826.77</td>
-    </tr>
-    <tr>
-      <td><code>biaffine-dep-bert-en</code></td>
-      <td align="center">UAS/LAS</td>
-      <td align="center">96.69</td><td align="center">95.15</td>
-      <td align="right">646.66</td>
-    </tr>
-    <tr>
-      <td><code>crfnp-dep-en</code></td>
-      <td align="center">UAS/LAS</td>
-      <td align="center">96.01</td><td align="center">94.42</td>
-      <td align="right">2197.15</td>
-    </tr>
-    <tr>
-      <td><code>crf-dep-en</code></td>
-      <td align="center">UAS/LAS</td>
-      <td align="center">96.12</td><td align="center">94.50</td>
-      <td align="right">652.41</td>
-    </tr>
-    <tr>
-      <td><code>crf2o-dep-en</a></code></td>
-      <td align="center">UAS/LAS</td>
-      <td align="center">96.14</td><td align="center">94.55</td>
-      <td align="right">465.64</td>
-    </tr>
-    <tr>
-      <td rowspan=2>Constituency</td>
-      <td><code>crf-con-en</a></code></td>
-      <td align="center">F<sub>1</sub></td>
-      <td align="center" colspan=2>94.18</td><td align="right">923.74</td>
-    </tr>
-    <tr>
-      <td><code>crf-con-bert-en</a></code></td>
-      <td align="center">F<sub>1</sub></td>
-      <td align="center" colspan=2>95.26</td><td align="right">503.99</td>
-    </tr>
-  </tbody>
-  <tbody>
-    <tr>
-      <td rowspan=7>CTB7</td>
-      <td rowspan=5>Dependency</td>
-      <td><code>biaffine-dep-zh</code></td>
-      <td align="center">UAS/LAS</td>
-      <td>88.77</td><td>85.63</td><td align="right">1155.50</td>
-    </tr>
-    <tr>
-      <td><code>biaffine-dep-bert-zh</code></td>
-      <td align="center">UAS/LAS</td>
-      <td>91.81</td><td>88.94</td><td align="right">395.28</td>
-    </tr>
-    <tr>
-      <td><code>crfnp-dep-zh</code></td>
-      <td align="center">UAS/LAS</td>
-      <td>88.78</td><td>85.64</td><td align="right">1323.75</td>
-    </tr>
-    <tr>
-      <td><code>crf-dep-zh</code></td>
-      <td align="center">UAS/LAS</td>
-      <td>88.98</td><td>85.84</td><td align="right">354.65</td>
-    </tr>
-    <tr>
-      <td><code>crf2o-dep-zh</code></td>
-      <td align="center">UAS/LAS</td>
-      <td>89.35</td><td>86.25</td><td align="right">217.09</td>
-    </tr>
-    <tr>
-      <td rowspan=2>Constituency</td>
-      <td><code>crf-con-zh</code></td>
-      <td align="center">F<sub>1</sub></td>
-      <td align="center" colspan=2>88.67</td>
-      <td align="right">639.27</td>
-    </tr>
-    <tr>
-      <td><code>crf-con-bert-zh</code></td>
-      <td align="center">F<sub>1</sub></td>
-      <td align="center" colspan=2>91.40</td>
-      <td align="right">300.15</td>
-    </tr>
-  </tbody>
-</table>
+All results are tested on the machine with Intel(R) Xeon(R) CPU E5-2650 v4 @ 2.20GHz and Nvidia GeForce GTX 1080 Ti GPU.
+
+### Dependency Darsing
+
+| Name                      |  UAS  |  LAS  | Sents/s |
+| ------------------------- | :---: | :---: | ------: |
+| `biaffine-dep-en`         | 96.01 | 94.41 | 1831.91 |
+| `crf-dep-en`              | 96.02 | 94.42 |  762.84 |
+| `crf2o-dep-en`            | 96.07 | 94.51 |  531.59 |
+| `biaffine-dep-roberta-en` | 97.33 | 95.86 |  271.80 |
+| `biaffine-dep-zh`         | 88.64 | 85.47 | 1180.57 |
+| `crf-dep-zh`              | 88.75 | 85.65 |  383.97 |
+| `crf2o-dep-zh`            | 89.22 | 86.15 |  237.40 |
+| `biaffine-dep-electra-zh` | 92.20 | 89.10 |  160.56 |
+
+
 
 We provide two pretrained multilingual models for dependency parsing and constituency parsing respectively.
 For dependency parsing, the model `biaffine-dep-xlmr` is trained on merged UD2.3 dataset using `xlm-roberta-large`.
 We use [ISO 639-1 Language Codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) to represent languages from UD2.3/SPMRL datasets.
-| Language Code |  UAS  |  LAS  | Sents/s |
-| ------------- | :---: | :---: | ------: |
-| `bg`          | 96.95 | 94.24 |  343.96 |
-| `ca`          | 95.57 | 94.20 |  184.88 |
-| `cs`          | 95.79 | 93.83 |  245.68 |
-| `de`          | 89.74 | 85.59 |  283.53 |
-| `en`          | 93.37 | 91.27 |  269.16 |
-| `es`          | 94.78 | 93.29 |  192.00 |
-| `fr`          | 94.56 | 91.90 |  219.35 |
-| `it`          | 96.29 | 94.47 |  254.82 |
-| `nl`          | 96.04 | 93.76 |  268.57 |
-| `no`          | 95.64 | 94.45 |  318.00 |
-| `ro`          | 94.59 | 89.79 |  216.45 |
-| `ru`          | 96.37 | 95.24 |  243.56 |
+
+| Language |  UAS  |  LAS  | Sents/s |
+| -------- | :---: | :---: | ------: |
+| `bg`     | 96.95 | 94.24 |  343.96 |
+| `ca`     | 95.57 | 94.20 |  184.88 |
+| `cs`     | 95.79 | 93.83 |  245.68 |
+| `de`     | 89.74 | 85.59 |  283.53 |
+| `en`     | 93.37 | 91.27 |  269.16 |
+| `es`     | 94.78 | 93.29 |  192.00 |
+| `fr`     | 94.56 | 91.90 |  219.35 |
+| `it`     | 96.29 | 94.47 |  254.82 |
+| `nl`     | 96.04 | 93.76 |  268.57 |
+| `no`     | 95.64 | 94.45 |  318.00 |
+| `ro`     | 94.59 | 89.79 |  216.45 |
+| `ru`     | 96.37 | 95.24 |  243.56 |
+
+### Constituency Darsing
+
+| Name                 |   P   |   R   | F<sub>1 | Sents/s |
+| -------------------- | :---: | :---: | :-----: | ------: |
+| `crf-con-en`         | 94.16 | 93.98 |  94.07  |  841.88 |
+| `crf-con-roberta-en` | 96.44 | 96.05 |  96.25  |  233.34 |
+| `crf-con-zh`         | 88.82 | 88.42 |  88.62  |  590.05 |
+| `crf-con-electra-zh` | 92.15 | 91.56 |  91.85  |  140.45 |
+
 
 For constituency parsing, the model `crf-con-xlmr` is trained on merged SPMRL dataset using `xlm-roberta-large`.
 
-| Language Code |   P   |   R   |   F   | Sents/s |
-| ------------- | :---: | :---: | :---: | ------: |
-| `eu`          | 93.40 | 94.19 | 93.79 |  266.96 |
-| `fr`          | 88.77 | 88.84 | 88.81 |  149.34 |
-| `de`          | 93.68 | 92.18 | 92.92 |  200.31 |
-| `he`          | 94.65 | 95.20 | 94.93 |  172.50 |
-| `hu`          | 96.70 | 96.81 | 96.76 |  186.58 |
-| `ko`          | 91.75 | 92.46 | 92.11 |  234.86 |
-| `pl`          | 97.33 | 97.27 | 97.30 |  310.86 |
-| `sv`          | 92.51 | 92.50 | 92.50 |  235.49 |
+| Language |   P   |   R   | F<sub>1 | Sents/s |
+| -------- | :---: | :---: | :-----: | ------: |
+| `eu`     | 93.40 | 94.19 |  93.79  |  266.96 |
+| `fr`     | 88.77 | 88.84 |  88.81  |  149.34 |
+| `de`     | 93.68 | 92.18 |  92.92  |  200.31 |
+| `he`     | 94.65 | 95.20 |  94.93  |  172.50 |
+| `hu`     | 96.70 | 96.81 |  96.76  |  186.58 |
+| `ko`     | 91.75 | 92.46 |  92.11  |  234.86 |
+| `pl`     | 97.33 | 97.27 |  97.30  |  310.86 |
+| `sv`     | 92.51 | 92.50 |  92.50  |  235.49 |
 
-All results are tested on the machine with Intel(R) Xeon(R) CPU E5-2650 v4 @ 2.20GHz and Nvidia GeForce GTX 1080 Ti GPU.
+### Semantic Dependency Darsing
+
+| Name              |   P   |   R   | F<sub>1 | Sents/s |
+| ----------------- | :---: | :---: | :-----: | ------: |
+| `biaffine-sdp-en` | 94.27 | 93.31 |  93.78  | 1067.06 |
+| `vi-sdp-en`       | 94.27 | 93.81 |  94.04  |  821.73 |
 
 ## Usage
 

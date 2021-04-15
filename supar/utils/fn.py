@@ -99,6 +99,7 @@ def download(url, reload=False):
             members = f.infolist()
             if len(members) != 1:
                 raise RuntimeError('Only one file(not dir) is allowed in the zipfile.')
-            f.extractall(os.path.dirname(path))
+            if reload:
+                f.extractall(os.path.dirname(path))
         path = os.path.join(os.path.dirname(path), members[0].filename)
     return path
