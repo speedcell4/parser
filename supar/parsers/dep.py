@@ -20,7 +20,7 @@ logger = get_logger(__name__)
 
 class BiaffineDependencyParser(Parser):
     r"""
-    The implementation of Biaffine Dependency Parser (:cite:`dozat-etal-2017-biaffine`).
+    The implementation of Biaffine Dependency Parser :cite:`dozat-etal-2017-biaffine`.
     """
 
     NAME = 'biaffine-dependency'
@@ -296,7 +296,7 @@ class BiaffineDependencyParser(Parser):
 
 class CRFDependencyParser(BiaffineDependencyParser):
     r"""
-    The implementation of first-order CRF Dependency Parser (:cite:`zhang-etal-2020-efficient`).
+    The implementation of first-order CRF Dependency Parser :cite:`zhang-etal-2020-efficient`.
     """
 
     NAME = 'crf-dependency'
@@ -484,7 +484,7 @@ class CRFDependencyParser(BiaffineDependencyParser):
 
 class CRF2oDependencyParser(BiaffineDependencyParser):
     r"""
-    The implementation of second-order CRF Dependency Parser (:cite:`zhang-etal-2020-efficient`).
+    The implementation of second-order CRF Dependency Parser :cite:`zhang-etal-2020-efficient`.
     """
 
     NAME = 'crf2o-dependency'

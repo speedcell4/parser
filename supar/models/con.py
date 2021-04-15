@@ -11,7 +11,7 @@ from supar.utils.alg import cky
 
 class CRFConstituencyModel(Model):
     r"""
-    The implementation of CRF Constituency Parser (:cite:`zhang-etal-2020-fast`),
+    The implementation of CRF Constituency Parser :cite:`zhang-etal-2020-fast`,
     also called FANCY (abbr. of Fast and Accurate Neural Crf constituencY) Parser.
 
     Args:

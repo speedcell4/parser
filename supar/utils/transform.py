@@ -133,7 +133,7 @@ class Sentence(object):
 
 class CoNLL(Transform):
     r"""
-    The CoNLL object holds ten fields required for CoNLL-X data format (:cite:`buchholz-marsi-2006-conll`).
+    The CoNLL object holds ten fields required for CoNLL-X data format :cite:`buchholz-marsi-2006-conll`.
     Each field can be binded with one or more :class:`Field` objects. For example,
     ``FORM`` can contain both :class:`Field` and :class:`SubwordField` to produce tensors for words and subwords.
 

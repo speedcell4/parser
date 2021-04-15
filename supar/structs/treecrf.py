@@ -9,7 +9,7 @@ from supar.utils.fn import stripe
 class MatrixTree(nn.Module):
     r"""
     MatrixTree for calculating partitions and marginals of directed spanning trees (a.k.a. non-projective trees)
-    in :math:`O(n^3)` by an adaptation of Kirchhoff's MatrixTree Theorem (:cite:`koo-etal-2007-structured`).
+    in :math:`O(n^3)` by an adaptation of Kirchhoff's MatrixTree Theorem :cite:`koo-etal-2007-structured`.
 
     It differs from the original paper in that marginals are computed via back-propagation rather than matrix inversion.
     """
@@ -89,7 +89,7 @@ class MatrixTree(nn.Module):
 class CRFDependency(nn.Module):
     r"""
     First-order TreeCRF for calculating partitions and marginals of projective dependency trees
-    in :math:`O(n^3)` (:cite:`zhang-etal-2020-efficient`).
+    in :math:`O(n^3)` :cite:`zhang-etal-2020-efficient`.
     """
 
     def __init__(self, multiroot=False):
@@ -200,7 +200,7 @@ class CRFDependency(nn.Module):
 class CRF2oDependency(nn.Module):
     r"""
     Second-order TreeCRF for calculating partitions and marginals of projective dependency trees
-    in :math:`O(n^3)` (:cite:`zhang-etal-2020-efficient`).
+    in :math:`O(n^3)` :cite:`zhang-etal-2020-efficient`.
     """
 
     def __init__(self, multiroot=False):
@@ -342,7 +342,7 @@ class CRF2oDependency(nn.Module):
 
 class CRFConstituency(nn.Module):
     r"""
-    TreeCRF for calculating partitions and marginals of constituency trees in :math:`O(n^3)` (:cite:`zhang-etal-2020-fast`).
+    TreeCRF for calculating partitions and marginals of constituency trees in :math:`O(n^3)` :cite:`zhang-etal-2020-fast`.
     """
 
     @torch.enable_grad()

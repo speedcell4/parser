@@ -135,7 +135,7 @@ def tarjan(sequence):
 
 def chuliu_edmonds(s):
     r"""
-    ChuLiu/Edmonds algorithm for non-projective decoding (:cite:`mcdonald-etal-2005-non`).
+    ChuLiu/Edmonds algorithm for non-projective decoding :cite:`mcdonald-etal-2005-non`.
 
     Some code is borrowed from `tdozat's implementation`_.
     Descriptions of notations and formulas can be found in :cite:`mcdonald-etal-2005-non`.
@@ -286,7 +286,7 @@ def mst(scores, mask, multiroot=False):
 
 def eisner(scores, mask, multiroot=False):
     r"""
-    First-order Eisner algorithm for projective decoding (:cite:`mcdonald-etal-2005-online`).
+    First-order Eisner algorithm for projective decoding :cite:`mcdonald-etal-2005-online`.
 
     Args:
         scores (~torch.Tensor): ``[batch_size, seq_len, seq_len]``.
@@ -375,7 +375,7 @@ def eisner(scores, mask, multiroot=False):
 
 def eisner2o(scores, mask, multiroot=False):
     r"""
-    Second-order Eisner algorithm for projective decoding (:cite:`mcdonald-pereira-2006-online`).
+    Second-order Eisner algorithm for projective decoding :cite:`mcdonald-pereira-2006-online`.
     This is an extension of the first-order one that further incorporates sibling scores into tree scoring.
 
     Args:
@@ -525,7 +525,7 @@ def eisner2o(scores, mask, multiroot=False):
 
 def cky(scores, mask):
     r"""
-    The implementation of `Cocke-Kasami-Younger`_ (CKY) algorithm to parse constituency trees (:cite:`zhang-etal-2020-fast`).
+    The implementation of `Cocke-Kasami-Younger`_ (CKY) algorithm to parse constituency trees :cite:`zhang-etal-2020-fast`.
 
     Args:
         scores (~torch.Tensor): ``[batch_size, seq_len, seq_len]``.

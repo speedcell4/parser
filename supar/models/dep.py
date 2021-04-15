@@ -13,7 +13,7 @@ from supar.utils.transform import CoNLL
 
 class BiaffineDependencyModel(Model):
     r"""
-    The implementation of Biaffine Dependency Parser (:cite:`dozat-etal-2017-biaffine`).
+    The implementation of Biaffine Dependency Parser :cite:`dozat-etal-2017-biaffine`.
 
     Args:
         n_words (int):
@@ -330,7 +330,7 @@ class CRFDependencyModel(BiaffineDependencyModel):
 
 class CRF2oDependencyModel(BiaffineDependencyModel):
     r"""
-    The implementation of second-order CRF Dependency Parser (:cite:`zhang-etal-2020-efficient`).
+    The implementation of second-order CRF Dependency Parser :cite:`zhang-etal-2020-efficient`.
 
     Args:
         n_words (int):
@@ -558,7 +558,7 @@ class CRF2oDependencyModel(BiaffineDependencyModel):
 
 class VIDependencyModel(BiaffineDependencyModel):
     r"""
-    The implementation of Dependency Parser using Variational Inference (:cite:`wang-tu-2020-second`).
+    The implementation of Dependency Parser using Variational Inference :cite:`wang-tu-2020-second`.
 
     Args:
         n_words (int):

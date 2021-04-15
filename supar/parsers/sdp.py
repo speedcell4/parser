@@ -20,7 +20,7 @@ logger = get_logger(__name__)
 
 class BiaffineSemanticDependencyParser(Parser):
     r"""
-    The implementation of Biaffine Semantic Dependency Parser (:cite:`dozat-etal-2018-simpler`).
+    The implementation of Biaffine Semantic Dependency Parser :cite:`dozat-etal-2018-simpler`.
     """
 
     NAME = 'biaffine-semantic-dependency'
@@ -266,7 +266,7 @@ class BiaffineSemanticDependencyParser(Parser):
 
 class VISemanticDependencyParser(BiaffineSemanticDependencyParser):
     r"""
-    The implementation of Semantic Dependency Parser using Variational Inference (:cite:`wang-etal-2019-second`).
+    The implementation of Semantic Dependency Parser using Variational Inference :cite:`wang-etal-2019-second`.
     """
 
     NAME = 'vi-semantic-dependency'

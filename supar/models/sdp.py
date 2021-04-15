@@ -9,7 +9,7 @@ from supar.utils import Config
 
 class BiaffineSemanticDependencyModel(Model):
     r"""
-    The implementation of Biaffine Semantic Dependency Parser (:cite:`dozat-etal-2018-simpler`).
+    The implementation of Biaffine Semantic Dependency Parser :cite:`dozat-etal-2018-simpler`.
 
     Args:
         n_words (int):
@@ -200,7 +200,7 @@ class BiaffineSemanticDependencyModel(Model):
 
 class VISemanticDependencyModel(BiaffineSemanticDependencyModel):
     r"""
-    The implementation of Semantic Dependency Parser using Variational Inference (:cite:`wang-etal-2019-second`).
+    The implementation of Semantic Dependency Parser using Variational Inference :cite:`wang-etal-2019-second`.
 
     Args:
         n_words (int):

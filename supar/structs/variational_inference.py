@@ -8,7 +8,7 @@ import torch.nn.functional as F
 class MFVIDependency(nn.Module):
     r"""
     Mean Field Variational Inference for approximately calculating marginals
-    of dependency trees (:cite:`wang-tu-2020-second`).
+    of dependency trees :cite:`wang-tu-2020-second`.
     """
 
     def __init__(self, max_iter=3):
@@ -77,7 +77,7 @@ class MFVIDependency(nn.Module):
 class MFVIConstituency(nn.Module):
     r"""
     Mean Field Variational Inference for approximately calculating marginals
-    of dependency trees (:cite:`wang-tu-2020-second`).
+    of dependency trees :cite:`wang-tu-2020-second`.
     """
 
     def __init__(self, max_iter=3):
@@ -144,7 +144,7 @@ class MFVIConstituency(nn.Module):
 class MFVISemanticDependency(nn.Module):
     r"""
     Mean Field Variational Inference for approximately calculating marginals
-    of semantic dependency trees (:cite:`wang-etal-2019-second`).
+    of semantic dependency trees :cite:`wang-etal-2019-second`.
     """
 
     def __init__(self, max_iter=3):
@@ -217,7 +217,7 @@ class MFVISemanticDependency(nn.Module):
 class LBPSemanticDependency(nn.Module):
     r"""
     Loopy Belief Propagation for approximately calculating marginals
-    of semantic dependency trees (:cite:`wang-etal-2019-second`).
+    of semantic dependency trees :cite:`wang-etal-2019-second`.
     """
 
     def __init__(self, max_iter=3):

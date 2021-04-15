@@ -7,8 +7,8 @@ from supar.utils.parallel import init_device
 
 
 def parse(parser):
-    parser.add_argument('--conf', '-c', help='path to config file')
     parser.add_argument('--path', '-p', help='path to model file')
+    parser.add_argument('--conf', '-c', default='', help='path to config file')
     parser.add_argument('--device', '-d', default='-1', help='ID of GPU to use')
     parser.add_argument('--seed', '-s', default=1, type=int, help='seed for generating random numbers')
     parser.add_argument('--threads', '-t', default=16, type=int, help='max num of threads')

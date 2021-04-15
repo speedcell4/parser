@@ -49,8 +49,10 @@ class Config(object):
         kwargs.update(kwargs.pop('kwargs', dict()))
         for name, value in kwargs.items():
             setattr(self, name, value)
-
         return self
+
+    def get(self, key, default=None):
+        return getattr(self, key) if hasattr(self, key) else default
 
     def pop(self, key, val=None):
         return self.__dict__.pop(key, val)

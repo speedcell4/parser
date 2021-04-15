@@ -18,7 +18,7 @@ logger = get_logger(__name__)
 
 class CRFConstituencyParser(Parser):
     r"""
-    The implementation of CRF Constituency Parser (:cite:`zhang-etal-2020-fast`).
+    The implementation of CRF Constituency Parser :cite:`zhang-etal-2020-fast`.
     """
 
     NAME = 'crf-constituency'

@@ -83,7 +83,7 @@ class CharLSTM(nn.Module):
 
 class VariationalLSTM(nn.Module):
     r"""
-    VariationalLSTM (:cite:`yarin-etal-2016-dropout`) is an variant of the vanilla bidirectional LSTM
+    VariationalLSTM :cite:`yarin-etal-2016-dropout` is an variant of the vanilla bidirectional LSTM
     adopted by Biaffine Parser with the only difference of the dropout strategy.
     It drops nodes in the LSTM layers (input and recurrent connections)
     and applies the same dropout mask at every recurrent timesteps.

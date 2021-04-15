@@ -148,6 +148,37 @@ Notably, punctuation is ignored in all evaluation metrics for PTB, but reserved 
   </tbody>
 </table>
 
+We provide two pretrained multilingual models for dependency parsing and constituency parsing respectively.
+For dependency parsing, the model `biaffine-dep-xlmr` is trained on merged UD2.3 dataset using `xlm-roberta-large`.
+We use [ISO 639-1 Language Codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) to represent languages from UD2.3/SPMRL datasets.
+| Language Code |  UAS  |  LAS  | Sents/s |
+| ------------- | :---: | :---: | ------: |
+| `bg`          | 96.95 | 94.24 |  343.96 |
+| `ca`          | 95.57 | 94.20 |  184.88 |
+| `cs`          | 95.79 | 93.83 |  245.68 |
+| `de`          | 89.74 | 85.59 |  283.53 |
+| `en`          | 93.37 | 91.27 |  269.16 |
+| `es`          | 94.78 | 93.29 |  192.00 |
+| `fr`          | 94.56 | 91.90 |  219.35 |
+| `it`          | 96.29 | 94.47 |  254.82 |
+| `nl`          | 96.04 | 93.76 |  268.57 |
+| `no`          | 95.64 | 94.45 |  318.00 |
+| `ro`          | 94.59 | 89.79 |  216.45 |
+| `ru`          | 96.37 | 95.24 |  243.56 |
+
+For constituency parsing, the model `crf-con-xlmr` is trained on merged SPMRL dataset using `xlm-roberta-large`.
+
+| Language Code |   P   |   R   |   F   | Sents/s |
+| ------------- | :---: | :---: | :---: | ------: |
+| `eu`          | 93.40 | 94.19 | 93.79 |  266.96 |
+| `fr`          | 88.77 | 88.84 | 88.81 |  149.34 |
+| `de`          | 93.68 | 92.18 | 92.92 |  200.31 |
+| `he`          | 94.65 | 95.20 | 94.93 |  172.50 |
+| `hu`          | 96.70 | 96.81 | 96.76 |  186.58 |
+| `ko`          | 91.75 | 92.46 | 92.11 |  234.86 |
+| `pl`          | 97.33 | 97.27 | 97.30 |  310.86 |
+| `sv`          | 92.51 | 92.50 | 92.50 |  235.49 |
+
 All results are tested on the machine with Intel(R) Xeon(R) CPU E5-2650 v4 @ 2.20GHz and Nvidia GeForce GTX 1080 Ti GPU.
 
 ## Usage
