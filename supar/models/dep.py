@@ -5,7 +5,7 @@ import torch.nn as nn
 from supar.models.model import Model
 from supar.modules import MLP, Biaffine, Triaffine
 from supar.structs import (CRF2oDependency, CRFDependency, MatrixTree,
-                           MFVIDependency)
+                           MFVIDependency, LBPDependency)
 from supar.utils import Config
 from supar.utils.alg import eisner, eisner2o, mst
 from supar.utils.transform import CoNLL
@@ -621,6 +621,8 @@ class VIDependencyModel(BiaffineDependencyModel):
             The dropout ratio of MLP layers. Default: .33.
         scale (float):
             Scaling factor for affine scores. Default: 0.
+        inference (str):
+            Approximate inference methods. Default: 'mfvi'.
         max_iter (int):
             Max iteration times for Variational Inference. Default: 3.
         interpolation (int):
@@ -660,6 +662,7 @@ class VIDependencyModel(BiaffineDependencyModel):
                  n_rel_mlp=100,
                  mlp_dropout=.33,
                  scale=0,
+                 inference='mfvi',
                  max_iter=3,
                  pad_index=0,
                  unk_index=1,
@@ -677,7 +680,7 @@ class VIDependencyModel(BiaffineDependencyModel):
         self.arc_attn = Biaffine(n_in=n_arc_mlp, scale=scale, bias_x=True, bias_y=False)
         self.sib_attn = Triaffine(n_in=n_sib_mlp, scale=scale, bias_x=True, bias_y=True)
         self.rel_attn = Biaffine(n_in=n_rel_mlp, n_out=n_rels, bias_x=True, bias_y=True)
-        self.inference = MFVIDependency(max_iter)
+        self.inference = (MFVIDependency if inference == 'mfvi' else LBPDependency)(max_iter)
         self.criterion = nn.CrossEntropyLoss()
 
     def forward(self, words, feats=None):

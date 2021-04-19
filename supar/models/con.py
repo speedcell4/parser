@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 from supar.models.model import Model
 from supar.modules import MLP, Biaffine, Triaffine
-from supar.structs import CRFConstituency, MFVIConstituency
+from supar.structs import CRFConstituency, LBPConstituency, MFVIConstituency
 from supar.utils import Config
 from supar.utils.alg import cky
 
@@ -263,6 +263,8 @@ class VIConstituencyModel(CRFConstituencyModel):
             Label MLP size. Default: 100.
         mlp_dropout (float):
             The dropout ratio of MLP layers. Default: .33.
+        inference (str):
+            Approximate inference methods. Default: 'mfvi'.
         max_iter (int):
             Max iteration times for Variational Inference. Default: 3.
         interpolation (int):
@@ -301,6 +303,7 @@ class VIConstituencyModel(CRFConstituencyModel):
                  n_pair_mlp=100,
                  n_label_mlp=100,
                  mlp_dropout=.33,
+                 inference='mfvi',
                  max_iter=3,
                  interpolation=0.1,
                  pad_index=0,
@@ -319,7 +322,7 @@ class VIConstituencyModel(CRFConstituencyModel):
         self.span_attn = Biaffine(n_in=n_span_mlp, bias_x=True, bias_y=False)
         self.pair_attn = Triaffine(n_in=n_pair_mlp, bias_x=True, bias_y=False)
         self.label_attn = Biaffine(n_in=n_label_mlp, n_out=n_labels, bias_x=True, bias_y=True)
-        self.inference = MFVIConstituency(max_iter)
+        self.inference = (MFVIConstituency if inference == 'mfvi' else LBPConstituency)(max_iter)
         self.criterion = nn.CrossEntropyLoss()
 
     def forward(self, words, feats):
