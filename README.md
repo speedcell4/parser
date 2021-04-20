@@ -6,10 +6,12 @@
 [![downloads](https://pepy.tech/badge/supar)](https://pepy.tech/project/supar)
 [![LICENSE](https://img.shields.io/github/license/yzhangcs/parser)](https://github.com/yzhangcs/parser/blob/master/LICENSE)
 
-`SuPar` provides a collection of state-of-the-art syntactic/semantic parsing models:
+A Python package including many state-of-the-art syntactic/semantic parsers (with pretrained models for more than 19 languages), as well as implementations of several well-known, effective and highly-batchified structured prediction algorithms.
+
+---
+
 * Biaffine Dependency Parser ([Dozat and Manning, 2017](https://parser.readthedocs.io/en/latest/references.html#dozat-2017-biaffine))
-* CRF Dependency Parser ([Zhang et al., 2020a](https://parser.readthedocs.io/en/latest/references.html#dozat-2018-simpler); [Koo et al., 2007](https://parser.readthedocs.io/en/latest/references.html#koo-2007-structured); [Ma and Hovy, 2017](https://parser.readthedocs.io/en/latest/references.html#ma-2017-neural))
-* CRF2o Dependency Parser ([Zhang et al, 2020a](https://parser.readthedocs.io/en/latest/references.html#zhang-2020-efficient))
+* CRF/CRF2o Dependency Parser ([Koo et al., 2007](https://parser.readthedocs.io/en/latest/references.html#koo-2007-structured); [Ma and Hovy, 2017](https://parser.readthedocs.io/en/latest/references.html#ma-2017-neural); [Zhang et al., 2020a](https://parser.readthedocs.io/en/latest/references.html#dozat-2018-simpler))
 * CRF Constituency Parser ([Zhang et al, 2020b](https://parser.readthedocs.io/en/latest/references.html#zhang-2020-fast))
 * Biaffine Semantic Dependency Parser ([Dozat and Manning, 2018](https://parser.readthedocs.io/en/latest/references.html#wang-2019-second))
 * VI Semantic Dependency Parser ([Wang et al, 2019](https://parser.readthedocs.io/en/latest/references.html#wang-2019-second))
@@ -116,15 +118,15 @@ For constituency parsing, the model `crf-con-xlmr` is trained on merged SPMRL da
 
 ## Usage
 
-`SuPar` is very easy to use. You can download the pretrained model and run syntactic parsing over sentences with a few lines of code:
+`SuPar` allows you to download the pretrained model and parse sentences with a few lines of code:
 ```py
 >>> from supar import Parser
 >>> parser = Parser.load('biaffine-dep-en')
->>> dataset = parser.predict([['She', 'enjoys', 'playing', 'tennis', '.']], prob=True, verbose=False)
+>>> dataset = parser.predict('She enjoys playing tennis.', prob=True, verbose=False)
 100%|####################################| 1/1 00:00<00:00, 85.15it/s
 ```
-The call to `parser.predict` will return an instance of `supar.utils.Dataset` containing the predicted syntactic trees.
-For dependency parsing, you can either access each sentence held in `dataset` or an individual field of all the trees.
+The call to `parser.predict` will return an instance of `supar.utils.Dataset` containing the predicted results.
+You can either access each sentence held in `dataset` or an individual field of all results.
 ```py
 >>> print(dataset.sentences[0])
 1       She     _       _       _       _       2       nsubj   _       _
@@ -141,9 +143,8 @@ rels:  ['nsubj', 'root', 'xcomp', 'dobj', 'punct']
 probs: tensor([1.0000, 0.9999, 0.9642, 0.9686, 0.9996])
 ```
 Probabilities can be returned along with the results if `prob=True`.
-As for CRF parsers, marginals are available if `mbr=True`, i.e., using MBR decoding.
+For CRF parsers, marginals are available if `mbr=True`, i.e., using MBR decoding.
 
-Note that `SuPar` requires pre-tokenized sentences as inputs.
 If you'd like to parse un-tokenized raw texts, you can call `nltk.word_tokenize` to do the tokenization first:
 ```py
 >>> import nltk
