@@ -6,24 +6,13 @@
 [![downloads](https://pepy.tech/badge/supar)](https://pepy.tech/project/supar)
 [![LICENSE](https://img.shields.io/github/license/yzhangcs/parser)](https://github.com/yzhangcs/parser/blob/master/LICENSE)
 
-A Python package including many state-of-the-art syntactic/semantic parsers (with pretrained models for more than 19 languages), as well as implementations of several well-known, effective and highly-batchified structured prediction algorithms.
-
----
+A Python package including many state-of-the-art syntactic/semantic parsers (with pretrained models for more than 19 languages), as well as highly-batchified implementations of several well-known and effective structured prediction algorithms.
 
 * Biaffine Dependency Parser ([Dozat and Manning, 2017](https://parser.readthedocs.io/en/latest/references.html#dozat-2017-biaffine))
 * CRF/CRF2o Dependency Parser ([Koo et al., 2007](https://parser.readthedocs.io/en/latest/references.html#koo-2007-structured); [Ma and Hovy, 2017](https://parser.readthedocs.io/en/latest/references.html#ma-2017-neural); [Zhang et al., 2020a](https://parser.readthedocs.io/en/latest/references.html#dozat-2018-simpler))
 * CRF Constituency Parser ([Zhang et al, 2020b](https://parser.readthedocs.io/en/latest/references.html#zhang-2020-fast))
 * Biaffine Semantic Dependency Parser ([Dozat and Manning, 2018](https://parser.readthedocs.io/en/latest/references.html#wang-2019-second))
 * VI Semantic Dependency Parser ([Wang et al, 2019](https://parser.readthedocs.io/en/latest/references.html#wang-2019-second))
-
-You can load released pretrained models for the above parsers and obtain dependency/constituency parsing trees very conveniently, as detailed in [Usage](##Usage).
-
-The implementations of several popular and well-known algorithms, like MST (ChuLiu/Edmonds), Eisner, CKY, MatrixTree, TreeCRF, MFVI and LBP, are also integrated in this package.
-
-Besides POS Tag embeddings used by the vanilla Biaffine Parser as auxiliary inputs to the encoder, optionally, `SuPar` also allows to utilize CharLSTM/BERT layers to produce character/subword-level features.
-Among them, CharLSTM is taken as the default option, which avoids additional requirements for generating POS tags, as well as the inefficiency of BERT.
-The BERT module in `SuPar` extracts BERT representations from the pretrained model in [`transformers`](https://github.com/huggingface/transformers).
-It is also compatiable with other language models like XLNet, RoBERTa and ELECTRA, etc.
 
 ## Installation
 
