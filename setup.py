@@ -7,7 +7,7 @@ setup(
     version='1.1.0',
     author='Yu Zhang',
     author_email='yzhang.cs@outlook.com',
-    description='Syntactic Parsing Models',
+    description='Syntactic/Semantic Parsing Models',
     long_description=open('README.md', 'r').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/yzhangcs/parser',

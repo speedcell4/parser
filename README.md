@@ -37,15 +37,14 @@ As a prerequisite, the following requirements should be satisfied:
 
 ## Performance
 
-Currently, `SuPar` provides pretrained models for English and Chinese.
-English models are trained on Penn Treebank (PTB) with 39,832 training sentences, while Chinese models are trained on Penn Chinese Treebank version 7 (CTB7) with 46,572 training sentences.
-
-The performance and parsing speed of these models are listed in the following table.
-Notably, punctuation is ignored in all evaluation metrics for PTB, but reserved for CTB7.
-
+`SuPar` provides pretrained models for English, Chinese and 17 other languages.
+The tables below list the performance and parsing speed of pretrained models for different tasks.
 All results are tested on the machine with Intel(R) Xeon(R) CPU E5-2650 v4 @ 2.20GHz and Nvidia GeForce GTX 1080 Ti GPU.
 
 ### Dependency Darsing
+
+English and Chinese dependency parsing models are trained on PTB and CTB7 respectively.
+During evaluation, punctuation is ignored in all metrics for PTB.
 
 | Name                      |  UAS  |  LAS  | Sents/s |
 | ------------------------- | :---: | :---: | ------: |
@@ -58,11 +57,9 @@ All results are tested on the machine with Intel(R) Xeon(R) CPU E5-2650 v4 @ 2.2
 | `crf2o-dep-zh`            | 89.22 | 86.15 |  237.40 |
 | `biaffine-dep-electra-zh` | 92.20 | 89.10 |  160.56 |
 
-
-
-We provide two pretrained multilingual models for dependency parsing and constituency parsing respectively.
-For dependency parsing, the model `biaffine-dep-xlmr` is trained on merged UD2.3 dataset using `xlm-roberta-large`.
-We use [ISO 639-1 Language Codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) to represent languages from UD2.3/SPMRL datasets.
+The multilingual dependency parsing model, named as `biaffine-dep-xlmr`, is trained on the merged 12 selected treebanks from Universal Dependencies (UD) v2.3 dataset by finetuning `xlm-roberta-large` from [Hugingface Transformers](https://github.com/huggingface/transformers).
+The following table lists the results of each language.
+We use [ISO 639-1 Language Codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) to represent these languages.
 
 | Language |  UAS  |  LAS  | Sents/s |
 | -------- | :---: | :---: | ------: |
@@ -88,8 +85,9 @@ We use [ISO 639-1 Language Codes](https://en.wikipedia.org/wiki/List_of_ISO_639-
 | `crf-con-zh`         | 88.82 | 88.42 |  88.62  |  590.05 |
 | `crf-con-electra-zh` | 92.15 | 91.56 |  91.85  |  140.45 |
 
-
-For constituency parsing, the model `crf-con-xlmr` is trained on merged SPMRL dataset using `xlm-roberta-large`.
+Following [Benepar](https://github.com/nikitakit/self-attentive-parser), the multilingual model `crf-con-xlmr` is trained on SPMRL dataset by finetuning `xlm-roberta-large`.
+For simplicity, we directly merge the train/dev/test treebanks of all languages in SPMRL into big ones.
+The results of each treebank are as follows. 
 
 | Language |   P   |   R   | F<sub>1 | Sents/s |
 | -------- | :---: | :---: | :-----: | ------: |

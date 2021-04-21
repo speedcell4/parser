@@ -8,8 +8,7 @@ SuPar
 
 |build| |docs| |release| |downloads| |LICENSE|
 
-
-:mod:`SuPar` is a package that provides a collection of state-of-the-art syntactic/semantic parsing models.
+A Python package that includes many state-of-the-art syntactic/semantic parsers (with pretrained models for more than 19 languages), as well as highly-parallelized implementations of several well-known and effective structured prediction algorithms.
 
 .. toctree::
    :maxdepth: 2
