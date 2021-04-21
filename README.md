@@ -58,7 +58,7 @@ During evaluation, punctuation is ignored in all metrics for PTB.
 | `biaffine-dep-electra-zh` | 92.20 | 89.10 |  160.56 |
 
 The multilingual dependency parsing model, named as `biaffine-dep-xlmr`, is trained on the merged 12 selected treebanks from Universal Dependencies (UD) v2.3 dataset by finetuning `xlm-roberta-large` from [Hugingface Transformers](https://github.com/huggingface/transformers).
-The following table lists the results of each language.
+The following table lists the results of each treebank.
 We use [ISO 639-1 Language Codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) to represent these languages.
 
 | Language |  UAS  |  LAS  | Sents/s |
@@ -102,10 +102,11 @@ The results of each treebank are as follows.
 
 ### Semantic Dependency Darsing
 
-| Name              |   P   |   R   | F<sub>1 | Sents/s |
-| ----------------- | :---: | :---: | :-----: | ------: |
-| `biaffine-sdp-en` | 94.27 | 93.31 |  93.78  | 1067.06 |
-| `vi-sdp-en`       | 94.27 | 93.81 |  94.04  |  821.73 |
+| Name                      |   P   |   R   | F<sub>1 | Sents/s |
+| ------------------------- | :---: | :---: | :-----: | ------: |
+| `biaffine-sdp-en`         | 94.35 | 93.12 |  93.73  | 1067.06 |
+| `vi-sdp-en`               | 94.36 | 93.52 |  93.94  |  821.73 |
+| `biaffine-sdp-roberta-en` | 95.22 | 95.05 |  95.13  |  821.73 |
 
 ## Usage
 
