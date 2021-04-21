@@ -6,13 +6,17 @@
 [![downloads](https://pepy.tech/badge/supar)](https://pepy.tech/project/supar)
 [![LICENSE](https://img.shields.io/github/license/yzhangcs/parser)](https://github.com/yzhangcs/parser/blob/master/LICENSE)
 
-A Python package including many state-of-the-art syntactic/semantic parsers (with pretrained models for more than 19 languages), as well as highly-batchified implementations of several well-known and effective structured prediction algorithms.
+A Python package that includes many state-of-the-art syntactic/semantic parsers (with pretrained models for more than 19 languages), as well as highly-parallelized implementations of several well-known and effective structured prediction algorithms.
 
-* Biaffine Dependency Parser ([Dozat and Manning, 2017](https://parser.readthedocs.io/en/latest/references.html#dozat-2017-biaffine))
-* CRF/CRF2o Dependency Parser ([Koo et al., 2007](https://parser.readthedocs.io/en/latest/references.html#koo-2007-structured); [Ma and Hovy, 2017](https://parser.readthedocs.io/en/latest/references.html#ma-2017-neural); [Zhang et al., 2020a](https://parser.readthedocs.io/en/latest/references.html#dozat-2018-simpler))
-* CRF Constituency Parser ([Zhang et al, 2020b](https://parser.readthedocs.io/en/latest/references.html#zhang-2020-fast))
-* Biaffine Semantic Dependency Parser ([Dozat and Manning, 2018](https://parser.readthedocs.io/en/latest/references.html#wang-2019-second))
-* VI Semantic Dependency Parser ([Wang et al, 2019](https://parser.readthedocs.io/en/latest/references.html#wang-2019-second))
+* Dependency Parser
+  * Biaffine ([Dozat and Manning, 2017](https://parser.readthedocs.io/en/latest/refs.html#dozat-2017-biaffine))
+  * CRF/MatrixTree ([Koo et al., 2007](https://parser.readthedocs.io/en/latest/refs.html#koo-2007-structured); [Ma and Hovy, 2017](https://parser.readthedocs.io/en/latest/refs.html#ma-2017-neural))
+  * CRF2o ([Zhang et al., 2020a](https://parser.readthedocs.io/en/latest/refs.html#zhang-2020-efficient))
+* Constituency Parser
+  * CRF ([Zhang et al., 2020b](https://parser.readthedocs.io/en/latest/refs.html#zhang-2020-fast))
+* Semantic Dependency Parser
+  * Biaffine ([Dozat and Manning, 2018](https://parser.readthedocs.io/en/latest/refs.html#wang-2019-second))
+  * MFVI/LBP ([Wang et al, 2019](https://parser.readthedocs.io/en/latest/refs.html#wang-2019-second))
 
 ## Installation
 
