@@ -129,6 +129,13 @@ class BiaffineSemanticDependencyModel(Model):
         self.label_attn = Biaffine(n_in=n_label_mlp, n_out=n_labels, bias_x=True, bias_y=True)
         self.criterion = nn.CrossEntropyLoss()
 
+    def load_pretrained(self, embed=None):
+        if embed is not None:
+            self.pretrained = nn.Embedding.from_pretrained(embed.to(self.args.device))
+            if embed.shape[1] != self.args.n_pretrained:
+                self.embed_proj = nn.Linear(embed.shape[1], self.args.n_pretrained).to(self.args.device)
+        return self
+
     def forward(self, words, feats=None):
         r"""
         Args:
@@ -363,7 +370,6 @@ class VISemanticDependencyModel(BiaffineSemanticDependencyModel):
         pair_d = self.pair_mlp_d(x)
         pair_h = self.pair_mlp_h(x)
         pair_g = self.pair_mlp_g(x)
-        label_h = self.label_mlp_h(x)
         label_d = self.label_mlp_d(x)
         label_h = self.label_mlp_h(x)
 

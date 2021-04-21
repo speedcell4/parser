@@ -19,7 +19,7 @@ class Biaffine(nn.Module):
         n_out (int):
             The number of output channels.
         scale (float):
-            Factor to scale the biaffine scores. Default: 0.
+            Factor to scale the scores. Default: 0.
         bias_x (bool):
             If ``True``, adds a bias term for tensor :math:`x`. Default: ``True``.
         bias_y (bool):
@@ -93,7 +93,7 @@ class Triaffine(nn.Module):
         n_out (int):
             The number of output channels.
         scale (float):
-            Factor to scale the biaffine scores. Default: 0.
+            Factor to scale the scores. Default: 0.
         bias_x (bool):
             If ``True``, adds a bias term for tensor :math:`x`. Default: ``False``.
         bias_y (bool):

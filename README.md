@@ -242,14 +242,6 @@ Dataset(n_sentences=2416, n_batches=13, n_buckets=8)
 2020-07-25 18:21:36 INFO Saving predicted results to pred.pid
 2020-07-25 18:21:36 INFO 0:00:02.455740s elapsed, 983.82 Sents/s
 ```
-
-Analogous to dependency parsing, a sentence can be transformed to an empty `nltk.Tree` conveniently:
-```py
->>> from supar.utils import Tree
->>> print(Tree.totree(['She', 'enjoys', 'playing', 'tennis', '.'], root='TOP'))
-(TOP (_ She) (_ enjoys) (_ playing) (_ tennis) (_ .))
-```
-
 ### Training
 
 To train a model from scratch, it is preferred to use the command-line option, which is more flexible and customizable.
