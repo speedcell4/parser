@@ -18,7 +18,7 @@ def test_parse():
                        'ru': ['Она', 'любит', 'играть', 'в', 'теннис', '.'],
                        'he': ['היא', 'נהנית', 'לשחק', 'טניס', '.']}
     for name in supar.MODEL:
-        parser = Parser.load(name)
+        parser = Parser.load(name, reload=True)
         if name.endswith(('en', 'zh')):
             lang = name[-2:]
             parser.predict(sents[lang], prob=True, lang=lang)
