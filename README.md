@@ -106,7 +106,7 @@ The results of each treebank are as follows.
 | ------------------------- | :---: | :---: | :-----: | ------: |
 | `biaffine-sdp-en`         | 94.35 | 93.12 |  93.73  | 1067.06 |
 | `vi-sdp-en`               | 94.36 | 93.52 |  93.94  |  821.73 |
-| `biaffine-sdp-roberta-en` | 95.22 | 95.05 |  95.13  |  821.73 |
+| `biaffine-sdp-roberta-en` | 94.97 | 95.22 |  95.09  |  266.44 |
 
 ## Usage
 
