@@ -44,22 +44,25 @@ All results are tested on the machine with Intel(R) Xeon(R) CPU E5-2650 v4 @ 2.2
 ### Dependency Darsing
 
 English and Chinese dependency parsing models are trained on PTB and CTB7 respectively.
+For each parser, we provide pretrained models that take BiLSTM as encoder.
+We also provide models finetuned on pretrained language models from [Hugingface Transformers](https://github.com/huggingface/transformers).
+We use [`robert-large`](https://huggingface.co/roberta-large) for English and [`hfl/chinese-electra-180g-large-discriminator`](https://huggingface.co/hfl/chinese-electra-180g-large-discriminator) for Chinese.
 During evaluation, punctuation is ignored in all metrics for PTB.
 
-| Name                      |  UAS  |  LAS  | Sents/s |
-| ------------------------- | :---: | :---: | ------: |
+| Name                      |  UAS  |   LAS | Sents/s |
+| ------------------------- | :---: | ----: | :-----: |
 | `biaffine-dep-en`         | 96.01 | 94.41 | 1831.91 |
-| `crf-dep-en`              | 96.02 | 94.42 |  762.84 |
-| `crf2o-dep-en`            | 96.07 | 94.51 |  531.59 |
-| `biaffine-dep-roberta-en` | 97.33 | 95.86 |  271.80 |
+| `crf-dep-en`              | 96.02 | 94.42 | 762.84  |
+| `crf2o-dep-en`            | 96.07 | 94.51 | 531.59  |
+| `biaffine-dep-roberta-en` | 97.33 | 95.86 | 271.80  |
 | `biaffine-dep-zh`         | 88.64 | 85.47 | 1180.57 |
-| `crf-dep-zh`              | 88.75 | 85.65 |  383.97 |
-| `crf2o-dep-zh`            | 89.22 | 86.15 |  237.40 |
-| `biaffine-dep-electra-zh` | 92.20 | 89.10 |  160.56 |
+| `crf-dep-zh`              | 88.75 | 85.65 | 383.97  |
+| `crf2o-dep-zh`            | 89.22 | 86.15 | 237.40  |
+| `biaffine-dep-electra-zh` | 92.20 | 89.10 | 160.56  |
 
-The multilingual dependency parsing model, named as `biaffine-dep-xlmr`, is trained on the merged 12 selected treebanks from Universal Dependencies (UD) v2.3 dataset by finetuning `xlm-roberta-large` from [Hugingface Transformers](https://github.com/huggingface/transformers).
+The multilingual dependency parsing model, named as `biaffine-dep-xlmr`, is trained on the merged 12 selected treebanks from Universal Dependencies (UD) v2.3 dataset by finetuning [`xlm-roberta-large`](https://huggingface.co/xlm-roberta-large).
 The following table lists the results of each treebank.
-We use [ISO 639-1 Language Codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) to represent these languages.
+Languages are represented by [ISO 639-1 Language Codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes).
 
 | Language |  UAS  |  LAS  | Sents/s |
 | -------- | :---: | :---: | ------: |
@@ -78,6 +81,9 @@ We use [ISO 639-1 Language Codes](https://en.wikipedia.org/wiki/List_of_ISO_639-
 
 ### Constituency Darsing
 
+We use PTB and CTB7 datasets to train English and Chinese constituency parsing models.
+Below are the results.
+
 | Name                 |   P   |   R   | F<sub>1 | Sents/s |
 | -------------------- | :---: | :---: | :-----: | ------: |
 | `crf-con-en`         | 94.16 | 93.98 |  94.07  |  841.88 |
@@ -85,8 +91,9 @@ We use [ISO 639-1 Language Codes](https://en.wikipedia.org/wiki/List_of_ISO_639-
 | `crf-con-zh`         | 88.82 | 88.42 |  88.62  |  590.05 |
 | `crf-con-electra-zh` | 92.15 | 91.56 |  91.85  |  140.45 |
 
-Following [Benepar](https://github.com/nikitakit/self-attentive-parser), the multilingual model `crf-con-xlmr` is trained on SPMRL dataset by finetuning `xlm-roberta-large`.
-For simplicity, we directly merge the train/dev/test treebanks of all languages in SPMRL into big ones.
+The multilingual model `crf-con-xlmr` is trained on SPMRL dataset by finetuning `xlm-roberta-large`.
+We follow instructions of [Benepar](https://github.com/nikitakit/self-attentive-parser) to preprocess the data.
+For simplicity, we then directly merge train/dev/test treebanks of all languages in SPMRL into big ones to train the model.
 The results of each treebank are as follows. 
 
 | Language |   P   |   R   | F<sub>1 | Sents/s |
