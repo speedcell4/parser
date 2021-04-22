@@ -42,8 +42,11 @@ NAME = {
     'crf-con-electra-zh': 'ctb7.crf.con.electra',
     'crf-con-xlmr': 'spmrl.crf.con.xlmr',
     'biaffine-sdp-en': 'dm.biaffine.sdp.lstm.tag-char-lemma',
+    'biaffine-sdp-zh': 'semeval16.biaffine.sdp.lstm.tag-char-lemma',
     'vi-sdp-en': 'dm.vi.sdp.lstm.tag-char-lemma',
+    'vi-sdp-zh': 'semeval16.vi.sdp.lstm.tag-char-lemma',
     'biaffine-sdp-roberta-en': 'dm.biaffine.sdp.roberta',
+    'biaffine-sdp-electra-zh': 'semeval16.biaffine.sdp.electra'
 }
 
 MODEL = {n: f'{SRC}/v{__version__}/{m}.zip' for n, m in NAME.items()}
