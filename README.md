@@ -107,7 +107,7 @@ The results of each treebank are as follows.
 
 ### Semantic Dependency Darsing
 
-English semantic dependency parsing models are trained on [DM datasets introduced in SemEval-2014 task 8](https://catalog.ldc.upenn.edu/LDC2016T10), while Chinese models are trained on [NEWS domain data of Chinese Semantic Dependency corpora from SemEval-2016 Task 9](https://github.com/HIT-SCIR/SemEval-2016).
+English semantic dependency parsing models are trained on [DM data introduced in SemEval-2014 task 8](https://catalog.ldc.upenn.edu/LDC2016T10), while Chinese models are trained on [NEWS domain data of corpora from SemEval-2016 Task 9](https://github.com/HIT-SCIR/SemEval-2016).
 
 | Name                      |   P   |   R   | F<sub>1 | Sents/s |
 | ------------------------- | :---: | :---: | :-----: | ------: |

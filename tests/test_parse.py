@@ -20,7 +20,7 @@ def test_parse():
                        'ru': ['Она', 'любит', 'играть', 'в', 'теннис', '.'],
                        'he': ['היא', 'נהנית', 'לשחק', 'טניס', '.']}
     for name, model in supar.NAME.items():
-        if 'xlmr' in name or 'roberta' in name:
+        if 'xlmr' in name or 'roberta' in name or 'electra' in name:
             pass
         parser = Parser.load(name, reload=True)
         if name.endswith(('en', 'zh')):
