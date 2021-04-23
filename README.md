@@ -58,8 +58,8 @@ During evaluation, punctuation is ignored in all metrics for PTB.
 | `crf2o-dep-zh`            | 89.22 | 86.15 | 237.40  |
 | `biaffine-dep-electra-zh` | 92.20 | 89.10 | 160.56  |
 
-The multilingual dependency parsing model, named as `biaffine-dep-xlmr`, is trained on the merged 12 selected treebanks from Universal Dependencies (UD) v2.3 dataset by finetuning [`xlm-roberta-large`](https://huggingface.co/xlm-roberta-large).
-The following table lists the results of each treebank.
+The multilingual dependency parsing model, named `biaffine-dep-xlmr`, is trained on merged 12 selected treebanks from Universal Dependencies (UD) v2.3 dataset by finetuning [`xlm-roberta-large`](https://huggingface.co/xlm-roberta-large).
+The following table lists results of each treebank.
 Languages are represented by [ISO 639-1 Language Codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes).
 
 | Language |  UAS  |  LAS  | Sents/s |
@@ -107,7 +107,7 @@ The results of each treebank are as follows.
 
 ### Semantic Dependency Darsing
 
-English models are trained on , while Chinese models are trained on Chinese SDP datasets (NEWS domain) from [SemEval-2016 Task 9](https://github.com/HIT-SCIR/SemEval-2016).
+English semantic dependency parsing models are trained on [DM datasets introduced in SemEval-2014 task 8](https://catalog.ldc.upenn.edu/LDC2016T10), while Chinese models are trained on [NEWS domain data of Chinese Semantic Dependency corpora from SemEval-2016 Task 9](https://github.com/HIT-SCIR/SemEval-2016).
 
 | Name                      |   P   |   R   | F<sub>1 | Sents/s |
 | ------------------------- | :---: | :---: | :-----: | ------: |
