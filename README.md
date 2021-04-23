@@ -108,6 +108,7 @@ The results of each treebank are as follows.
 ### Semantic Dependency Darsing
 
 English semantic dependency parsing models are trained on [DM data introduced in SemEval-2014 task 8](https://catalog.ldc.upenn.edu/LDC2016T10), while Chinese models are trained on [NEWS domain data of corpora from SemEval-2016 Task 9](https://github.com/HIT-SCIR/SemEval-2016).
+Our data preprocessing steps follow [Second_Order_SDP](https://github.com/wangxinyu0922/Second_Order_SDP).
 
 | Name                      |   P   |   R   | F<sub>1 | Sents/s |
 | ------------------------- | :---: | :---: | :-----: | ------: |
@@ -145,7 +146,6 @@ rels:  ['nsubj', 'root', 'xcomp', 'dobj', 'punct']
 probs: tensor([1.0000, 0.9999, 0.9642, 0.9686, 0.9996])
 ```
 Probabilities can be returned along with the results if `prob=True`.
-For CRF parsers, marginals are available if `mbr=True`, i.e., using MBR decoding.
 
 If you'd like to parse un-tokenized raw texts, you can call `nltk.word_tokenize` to do the tokenization first:
 ```py
@@ -250,6 +250,15 @@ Dataset(n_sentences=2416, n_batches=13, n_buckets=8)
 100%|####################################| 13/13 00:02<00:00,  5.30it/s
 2020-07-25 18:21:36 INFO Saving predicted results to pred.pid
 2020-07-25 18:21:36 INFO 0:00:02.455740s elapsed, 983.82 Sents/s
+```
+
+```py
+>>> parser.predict([[('She', 'she', 'PRP'), ('enjoys', 'enjoy', 'VBZ'), ('playing', 'play', 'VBG'), ('tennis', 'tennis', 'NN'), ('.', '_', '.')]]).sentences[0]
+1       She     she     PRP     _       _       _       _       2:ARG1  _
+2       enjoys  enjoy   VBZ     _       _       _       _       0:root  _
+3       playing play    VBG     _       _       _       _       2:ARG2  _
+4       tennis  tennis  NN      _       _       _       _       3:compound      _
+5       .       _       .       _       _       _       _       _       _
 ```
 ### Training
 

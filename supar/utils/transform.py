@@ -256,11 +256,15 @@ class CoNLL(Transform):
             4       tennis  _       _       _       _       _       _       _       _
             5       .       _       _       _       _       _       _       _       _
 
-            >>> print(CoNLL.toconll([('She', 'PRP'), ('enjoys', 'VBZ'), ('playing', 'VBG'), ('tennis', 'NN'), ('.', '.')]))
-            1       She     _       PRP     _       _       _       _       _       _
-            2       enjoys  _       VBZ     _       _       _       _       _       _
-            3       playing _       VBG     _       _       _       _       _       _
-            4       tennis  _       NN      _       _       _       _       _       _
+            >>> print(CoNLL.toconll([('She',     'she',    'PRP'),
+                                     ('enjoys',  'enjoy',  'VBZ'),
+                                     ('playing', 'play',   'VBG'),
+                                     ('tennis',  'tennis', 'NN'),
+                                     ('.',       '_',      '.')]))
+            1       She     she     PRP     _       _       _       _       _       _
+            2       enjoys  enjoy   VBZ     _       _       _       _       _       _
+            3       playing play    VBG     _       _       _       _       _       _
+            4       tennis  tennis  NN      _       _       _       _       _       _
             5       .       _       .       _       _       _       _       _       _
 
         """
