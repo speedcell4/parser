@@ -29,8 +29,6 @@ SRC = 'http://hlt.suda.edu.cn/LA/yzhang/supar'
 NAME = {
     'biaffine-dep-en': 'ptb.biaffine.dep.lstm.char',
     'biaffine-dep-zh': 'ctb7.biaffine.dep.lstm.char',
-    'crf-dep-en': 'ptb.crf.dep.lstm.char',
-    'crf-dep-zh': 'ctb7.crf.dep.lstm.char',
     'crf2o-dep-en': 'ptb.crf2o.dep.lstm.char',
     'crf2o-dep-zh': 'ctb7.crf2o.dep.lstm.char',
     'biaffine-dep-roberta-en': 'ptb.biaffine.dep.roberta',

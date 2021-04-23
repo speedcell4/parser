@@ -52,11 +52,9 @@ During evaluation, punctuation is ignored in all metrics for PTB.
 | Name                      |  UAS  |   LAS | Sents/s |
 | ------------------------- | :---: | ----: | :-----: |
 | `biaffine-dep-en`         | 96.01 | 94.41 | 1831.91 |
-| `crf-dep-en`              | 96.02 | 94.42 | 762.84  |
 | `crf2o-dep-en`            | 96.07 | 94.51 | 531.59  |
 | `biaffine-dep-roberta-en` | 97.33 | 95.86 | 271.80  |
 | `biaffine-dep-zh`         | 88.64 | 85.47 | 1180.57 |
-| `crf-dep-zh`              | 88.75 | 85.65 | 383.97  |
 | `crf2o-dep-zh`            | 89.22 | 86.15 | 237.40  |
 | `biaffine-dep-electra-zh` | 92.20 | 89.10 | 160.56  |
 

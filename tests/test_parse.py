@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 import supar
 from supar import Parser
 
@@ -17,7 +19,7 @@ def test_parse():
                        'fr': ['Elle', 'aime', 'jouer', 'au', 'tennis', '.'],
                        'ru': ['Она', 'любит', 'играть', 'в', 'теннис', '.'],
                        'he': ['היא', 'נהנית', 'לשחק', 'טניס', '.']}
-    for name in supar.MODEL:
+    for name, model in supar.MODEL.items():
         parser = Parser.load(name, reload=True)
         if name.endswith(('en', 'zh')):
             lang = name[-2:]
@@ -27,3 +29,4 @@ def test_parse():
             for lang in sents:
                 parser.predict(sents[lang], prob=True, lang=lang)
             parser.predict(list(tokenized_sents.values()), prob=True, lang=None)
+        os.remove(os.path.join(os.path.expanduser('~/.cache/supar'), model))
