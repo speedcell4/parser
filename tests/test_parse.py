@@ -19,7 +19,7 @@ def test_parse():
                        'fr': ['Elle', 'aime', 'jouer', 'au', 'tennis', '.'],
                        'ru': ['Она', 'любит', 'играть', 'в', 'теннис', '.'],
                        'he': ['היא', 'נהנית', 'לשחק', 'טניס', '.']}
-    for name, model in supar.MODEL.items():
+    for name, model in supar.NAME.items():
         parser = Parser.load(name, reload=True)
         if name.endswith(('en', 'zh')):
             lang = name[-2:]
