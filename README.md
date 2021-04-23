@@ -91,7 +91,7 @@ Below are the results.
 | `crf-con-zh`         | 88.82 | 88.42 |  88.62  |  590.05 |
 | `crf-con-electra-zh` | 92.15 | 91.56 |  91.85  |  140.45 |
 
-The multilingual model `crf-con-xlmr` is trained on SPMRL dataset by finetuning `xlm-roberta-large`.
+The multilingual model `crf-con-xlmr` is trained on SPMRL dataset by finetuning [`xlm-roberta-large`](https://huggingface.co/xlm-roberta-large).
 We follow instructions of [Benepar](https://github.com/nikitakit/self-attentive-parser) to preprocess the data.
 For simplicity, we then directly merge train/dev/test treebanks of all languages in SPMRL into big ones to train the model.
 The results of each treebank are as follows. 
@@ -108,6 +108,8 @@ The results of each treebank are as follows.
 | `sv`     | 92.51 | 92.50 |  92.50  |  235.49 |
 
 ### Semantic Dependency Darsing
+
+English models are trained on , while Chinese models are trained on Chinese SDP datasets (NEWS domain) from [SemEval-2016 Task 9](https://github.com/HIT-SCIR/SemEval-2016).
 
 | Name                      |   P   |   R   | F<sub>1 | Sents/s |
 | ------------------------- | :---: | :---: | :-----: | ------: |
