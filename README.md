@@ -127,8 +127,12 @@ Our data preprocessing steps follow [Second_Order_SDP](https://github.com/wangxi
 >>> parser = Parser.load('biaffine-dep-en')
 >>> dataset = parser.predict('I saw Sarah with a telescope.', lang='en', prob=True, verbose=False)
 ```
+By default, we use [`stanza`](https://github.com/stanfordnlp/stanza) internally to tokenize plain texts for parsing.
+You only need to specify the language code `lang` for tokenization.
+
 The call to `parser.predict` will return an instance of `supar.utils.Dataset` containing the predicted results.
 You can either access each sentence held in `dataset` or an individual field of all results.
+Probabilities can be returned along with the results if `prob=True`.
 ```py
 >>> dataset[0]
 1       I       _       _       _       _       2       nsubj   _       _
@@ -146,17 +150,14 @@ arcs:  [2, 0, 2, 2, 6, 4, 2]
 rels:  ['nsubj', 'root', 'dobj', 'prep', 'det', 'pobj', 'punct']
 probs: tensor([1.0000, 0.9999, 0.9966, 0.8944, 1.0000, 1.0000, 0.9999])
 ```
-Probabilities can be returned along with the results if `prob=True`.
-By default, we use [`stanza`](https://github.com/stanfordnlp/stanza) internally to tokenize plain texts for parsing.
-You only need to specify the language code `lang` for tokenization.
 
-`SuPar` also supports parsing from lists or from file.
+`SuPar` also supports parsing from tokenized sentences or from file.
 For semantic dependency parsing, lemmas and POS tags are needed.
 
 ```py
 >>> import os
 >>> import tempfile
->>> Parser.load('biaffine-dep-en').predict(['I', 'saw', 'Sarah', 'with', 'a', 'telescope', '.'], prob=True, verbose=False)[0]
+>>> Parser.load('biaffine-dep-en').predict(['I', 'saw', 'Sarah', 'with', 'a', 'telescope', '.'], verbose=False)[0]
 1       I       _       _       _       _       2       nsubj   _       _
 2       saw     _       _       _       _       0       root    _       _
 3       Sarah   _       _       _       _       2       dobj    _       _
@@ -202,7 +203,11 @@ For semantic dependency parsing, lemmas and POS tags are needed.
 
 >>> Parser.load('crf-con-en').predict(['I', 'saw', 'Sarah', 'with', 'a', 'telescope', '.'], verbose=False)[0]
 (TOP (S (NP (_ I)) (VP (_ saw) (NP (_ Sarah)) (PP (_ with) (NP (_ a) (_ telescope)))) (_ .)))
->>> Parser.load('biaffine-sdp-en').predict([[('I','I','PRP'), ('saw','see','VBD'), ('Sarah','Sarah','NNP'), ('with','with','IN'), ('a','a','DT'), ('telescope','telescope','NN'), ('.','_','.')]], verbose=False)[0]
+>>> Parser.load('biaffine-sdp-en').predict([[('I','I','PRP'), ('saw','see','VBD'),  
+                                             ('Sarah','Sarah','NNP'), ('with','with','IN'), 
+                                             ('a','a','DT'), ('telescope','telescope','NN'),
+                                             ('.','_','.')]],
+                                           verbose=False)[0]
 1       I       I       PRP     _       _       _       _       2:ARG1  _
 2       saw     see     VBD     _       _       _       _       0:root|4:ARG1   _
 3       Sarah   Sarah   NNP     _       _       _       _       2:ARG2  _
@@ -216,50 +221,22 @@ For semantic dependency parsing, lemmas and POS tags are needed.
 ### Training
 
 To train a model from scratch, it is preferred to use the command-line option, which is more flexible and customizable.
-Here are some training examples:
+Below is a training example for Biaffine Dependency Parser:
 ```sh
-# Biaffine Dependency Parser
-# some common and default arguments are stored in config.ini
-$ python -m supar.cmds.biaffine_dependency train -b -d 0  \
-    -c config.ini  \
-    -p exp/ptb.biaffine.dependency.char/model  \
-    -f char
-# to use BERT, `-f` and `--bert` (default to bert-base-cased) should be specified
-# if you'd like to use XLNet, you can type `--bert xlnet-base-cased`
-$ python -m supar.cmds.biaffine_dependency train -b -d 0  \
-    -p exp/ptb.biaffine.dependency.bert/model  \
-    -f bert  \
-    --bert bert-base-cased
-
-# CRF Dependency Parser
-# for CRF dependency parsers, you should use `--proj` to discard all non-projective training instances
-# optionally, you can use `--mbr` to perform MBR decoding
-$ python -m supar.cmds.crf_dependency train -b -d 0  \
-    -p exp/ptb.crf.dependency.char/model  \
-    -f char  \
-    --mbr  \
-    --proj
-
-# CRF Constituency Parser
-# the training of CRF constituency parser behaves like dependency parsers
-$ python -m supar.cmds.crf_constituency train -b -d 0  \
-    -p exp/ptb.crf.constituency.char/model -f char  \
-    --mbr
+$ python -m supar.cmds.biaffine_dep train -b -d 0 -c biaffine-dep-en -p exp/ptb.biaffine.dep.char/model -f char
 ```
 
-For more instructions on training, please type `python -m supar.cmds.<parser> train -h`.
-
 Alternatively, `SuPar` provides some equivalent command entry points registered in `setup.py`:
-`biaffine-dependency`, `crfnp-dependency`, `crf-dependency`, `crf2o-dependency` and `crf-constituency`.
+`biaffine-dep`, `crf2o-dep`, `crf-con` and `biaffine-sdp`, etc.
 ```sh
-$ biaffine-dependency train -b -d 0 -c config.ini -p exp/ptb.biaffine.dependency.char/model -f char
+$ biaffine-dep train -b -d 0 -c biaffine-dep-en -p exp/ptb.biaffine.dep.char/model -f char
 ```
 
 To accommodate large models, distributed training is also supported:
 ```sh
 $ python -m torch.distributed.launch --nproc_per_node=4 --master_port=10000  \
-    -m supar.cmds.biaffine_dependency train -b -d 0,1,2,3  \
-    -p exp/ptb.biaffine.dependency.char/model  \
+    -m supar.cmds.biaffine_dep train -b -d 0,1,2,3  \
+    -p exp/ptb.biaffine.dep.char/model  \
     -f char
 ```
 You can consult the PyTorch [documentation](https://pytorch.org/docs/stable/notes/ddp.html) and [tutorials](https://pytorch.org/tutorials/intermediate/ddp_tutorial.html) for more details.
@@ -268,15 +245,12 @@ You can consult the PyTorch [documentation](https://pytorch.org/docs/stable/note
 
 The evaluation process resembles prediction:
 ```py
->>> parser = Parser.load('biaffine-dep-en')
->>> loss, metric = parser.evaluate('data/ptb/test.conllx')
-2020-07-25 20:59:17 INFO Loading the data
-2020-07-25 20:59:19 INFO
-Dataset(n_sentences=2416, n_batches=11, n_buckets=8)
-2020-07-25 20:59:19 INFO Evaluating the dataset
-2020-07-25 20:59:20 INFO loss: 0.2326 - UCM: 61.34% LCM: 50.21% UAS: 96.03% LAS: 94.37%
-2020-07-25 20:59:20 INFO 0:00:01.253601s elapsed, 1927.25 Sents/s
+>>> loss, metric = Parser.load('biaffine-dep-en').evaluate('data/ptb/test.conllx', verbose=False)
+>>> print(loss, metric)
+0.24214034126355097 UCM: 60.51% LCM: 50.37% UAS: 96.01% LAS: 94.41%
 ```
+
+See [EXAMPLES.md](https://github.com/yzhangcs/parser/blob/main/EXAMPLES.md) for more instructions on training and evaluation.
 
 ## Citation
 
