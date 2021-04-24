@@ -71,7 +71,7 @@ class VISemanticRoleLabelingParser(Parser):
 
         return super().evaluate(**Config().update(locals()))
 
-    def predict(self, data, pred=None, lang='en', buckets=8, batch_size=5000, verbose=True, **kwargs):
+    def predict(self, data, pred=None, lang=None, buckets=8, batch_size=5000, verbose=True, **kwargs):
         r"""
         Args:
             data (list[list] or str):
@@ -81,7 +81,7 @@ class VISemanticRoleLabelingParser(Parser):
             lang (str):
                 Language code (e.g., 'en') or language name (e.g., 'English') for the text to tokenize.
                 ``None`` if tokenization is not required.
-                Default: ``en``.
+                Default: ``None``.
             buckets (int):
                 The number of buckets that sentences are assigned to. Default: 32.
             batch_size (int):

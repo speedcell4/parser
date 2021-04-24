@@ -367,7 +367,7 @@ class CoNLL(Transform):
             lang (str):
                 Language code (e.g., 'en') or language name (e.g., 'English') for the text to tokenize.
                 ``None`` if tokenization is not required.
-                Default: None.
+                Default: ``None``.
             proj (bool):
                 If ``True``, discards all non-projective sentences. Default: ``False``.
             max_len (int):
@@ -711,7 +711,7 @@ class Tree(Transform):
             lang (str):
                 Language code (e.g., 'en') or language name (e.g., 'English') for the text to tokenize.
                 ``None`` if tokenization is not required.
-                Default: None.
+                Default: ``None``.
             max_len (int):
                 Sentences exceeding the length will be discarded. Default: ``None``.
 

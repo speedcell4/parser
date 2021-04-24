@@ -97,9 +97,9 @@ def download(url, reload=False):
     if zipfile.is_zipfile(path):
         with zipfile.ZipFile(path) as f:
             members = f.infolist()
+            path = os.path.join(os.path.dirname(path), members[0].filename)
             if len(members) != 1:
                 raise RuntimeError('Only one file(not dir) is allowed in the zipfile.')
-            if reload:
+            if reload or not os.path.exists(path):
                 f.extractall(os.path.dirname(path))
-        path = os.path.join(os.path.dirname(path), members[0].filename)
     return path

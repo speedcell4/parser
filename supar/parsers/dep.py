@@ -90,7 +90,7 @@ class BiaffineDependencyParser(Parser):
 
         return super().evaluate(**Config().update(locals()))
 
-    def predict(self, data, pred=None, lang='en', buckets=8, batch_size=5000, prob=False,
+    def predict(self, data, pred=None, lang=None, buckets=8, batch_size=5000, prob=False,
                 tree=True, proj=False, verbose=True, **kwargs):
         r"""
         Args:
@@ -101,7 +101,7 @@ class BiaffineDependencyParser(Parser):
             lang (str):
                 Language code (e.g., 'en') or language name (e.g., 'English') for the text to tokenize.
                 ``None`` if tokenization is not required.
-                Default: ``en``.
+                Default: ``None``.
             buckets (int):
                 The number of buckets that sentences are assigned to. Default: 32.
             batch_size (int):
@@ -366,7 +366,7 @@ class CRFDependencyParser(BiaffineDependencyParser):
 
         return super().evaluate(**Config().update(locals()))
 
-    def predict(self, data, pred=None, lang='en', buckets=8, batch_size=5000, prob=False,
+    def predict(self, data, pred=None, lang=None, buckets=8, batch_size=5000, prob=False,
                 mbr=True, tree=True, proj=True, verbose=True, **kwargs):
         r"""
         Args:
@@ -377,7 +377,7 @@ class CRFDependencyParser(BiaffineDependencyParser):
             lang (str):
                 Language code (e.g., 'en') or language name (e.g., 'English') for the text to tokenize.
                 ``None`` if tokenization is not required.
-                Default: ``en``.
+                Default: ``None``.
             buckets (int):
                 The number of buckets that sentences are assigned to. Default: 32.
             batch_size (int):
@@ -554,7 +554,7 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
 
         return super().evaluate(**Config().update(locals()))
 
-    def predict(self, data, pred=None, lang='en', buckets=8, batch_size=5000, prob=False,
+    def predict(self, data, pred=None, lang=None, buckets=8, batch_size=5000, prob=False,
                 mbr=True, tree=True, proj=True, verbose=True, **kwargs):
         r"""
         Args:
@@ -565,7 +565,7 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
             lang (str):
                 Language code (e.g., 'en') or language name (e.g., 'English') for the text to tokenize.
                 ``None`` if tokenization is not required.
-                Default: ``en``.
+                Default: ``None``.
             buckets (int):
                 The number of buckets that sentences are assigned to. Default: 32.
             batch_size (int):
@@ -830,7 +830,7 @@ class VIDependencyParser(BiaffineDependencyParser):
 
         return super().evaluate(**Config().update(locals()))
 
-    def predict(self, data, pred=None, lang='en', buckets=8, batch_size=5000, prob=False,
+    def predict(self, data, pred=None, lang=None, buckets=8, batch_size=5000, prob=False,
                 tree=True, proj=True, verbose=True, **kwargs):
         r"""
         Args:
@@ -841,7 +841,7 @@ class VIDependencyParser(BiaffineDependencyParser):
             lang (str):
                 Language code (e.g., 'en') or language name (e.g., 'English') for the text to tokenize.
                 ``None`` if tokenization is not required.
-                Default: ``en``.
+                Default: ``None``.
             buckets (int):
                 The number of buckets that sentences are assigned to. Default: 32.
             batch_size (int):

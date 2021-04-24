@@ -110,7 +110,7 @@ class Parser(object):
 
         return loss, metric
 
-    def predict(self, data, pred=None, lang='en', buckets=8, batch_size=5000, prob=False, **kwargs):
+    def predict(self, data, pred=None, lang=None, buckets=8, batch_size=5000, prob=False, **kwargs):
         args = self.args.update(locals())
         init_logger(logger, verbose=args.verbose)
 
