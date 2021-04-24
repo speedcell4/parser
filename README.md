@@ -223,23 +223,19 @@ For semantic dependency parsing, lemmas and POS tags are needed.
 To train a model from scratch, it is preferred to use the command-line option, which is more flexible and customizable.
 Below is an example of training Biaffine Dependency Parser:
 ```sh
-$ python -m supar.cmds.biaffine_dep train -b -d 0 -c biaffine-dep-en  \
-    -p exp/ptb.biaffine.dep.char/model  \
-    -f char
+$ python -m supar.cmds.biaffine_dep train -b -d 0 -c biaffine-dep-en -p model -f char
 ```
 
 Alternatively, `SuPar` provides some equivalent command entry points registered in `setup.py`:
 `biaffine-dep`, `crf2o-dep`, `crf-con` and `biaffine-sdp`, etc.
 ```sh
-$ biaffine-dep train -b -d 0 -c biaffine-dep-en -p exp/ptb.biaffine.dep.char/model -f char
+$ biaffine-dep train -b -d 0 -c biaffine-dep-en -p model -f char
 ```
 
 To accommodate large models, distributed training is also supported:
 ```sh
 $ python -m torch.distributed.launch --nproc_per_node=4 --master_port=10000  \
-    -m supar.cmds.biaffine_dep train -b -c biaffine-dep-en -d 0,1,2,3  \
-    -p exp/ptb.biaffine.dep.char/model  \
-    -f char
+    -m supar.cmds.biaffine_dep train -b -c biaffine-dep-en -d 0,1,2,3 -p model -f char
 ```
 You can consult the PyTorch [documentation](https://pytorch.org/docs/stable/notes/ddp.html) and [tutorials](https://pytorch.org/tutorials/intermediate/ddp_tutorial.html) for more details.
 
@@ -252,7 +248,7 @@ The evaluation process resembles prediction:
 0.24214034126355097 UCM: 60.51% LCM: 50.37% UAS: 96.01% LAS: 94.41%
 ```
 
-See [EXAMPLES.md](https://github.com/yzhangcs/parser/blob/main/EXAMPLES.md) for more instructions on training and evaluation.
+See [EXAMPLES](EXAMPLES.md) for more instructions on training and evaluation.
 
 ## Citation
 
