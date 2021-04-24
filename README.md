@@ -131,7 +131,7 @@ Our data preprocessing steps follow [Second_Order_SDP](https://github.com/wangxi
 The call to `parser.predict` will return an instance of `supar.utils.Dataset` containing the predicted results.
 You can either access each sentence held in `dataset` or an individual field of all results.
 ```py
->>> print(dataset.sentences[0])
+>>> print(dataset[0])
 1       She     _       _       _       _       2       nsubj   _       _
 2       enjoys  _       _       _       _       0       root    _       _
 3       playing _       _       _       _       2       xcomp   _       _
@@ -151,7 +151,7 @@ If you'd like to parse un-tokenized raw texts, you can call `nltk.word_tokenize`
 ```py
 >>> import nltk
 >>> text = nltk.word_tokenize('She enjoys playing tennis.')
->>> print(parser.predict([text], verbose=False).sentences[0])
+>>> print(parser.predict([text], verbose=False)[0])
 100%|####################################| 1/1 00:00<00:00, 74.20it/s
 1       She     _       _       _       _       2       nsubj   _       _
 2       enjoys  _       _       _       _       0       root    _       _
@@ -210,7 +210,7 @@ For Universial Dependencies (UD), the CoNLL-U file is also allowed, while commen
 >>> with open(path, 'w') as f:
 ...     f.write(text)
 ...
->>> print(parser.predict(path, verbose=False).sentences[0])
+>>> print(parser.predict(path, verbose=False)[0])
 100%|####################################| 1/1 00:00<00:00, 68.60it/s
 # text = But I found the location wonderful and the neighbors very kind.
 1       But     _       _       _       _       3       cc      _       _
@@ -253,7 +253,7 @@ Dataset(n_sentences=2416, n_batches=13, n_buckets=8)
 ```
 
 ```py
->>> parser.predict([[('She', 'she', 'PRP'), ('enjoys', 'enjoy', 'VBZ'), ('playing', 'play', 'VBG'), ('tennis', 'tennis', 'NN'), ('.', '_', '.')]]).sentences[0]
+>>> parser.predict([[('She', 'she', 'PRP'), ('enjoys', 'enjoy', 'VBZ'), ('playing', 'play', 'VBG'), ('tennis', 'tennis', 'NN'), ('.', '_', '.')]])[0]
 1       She     she     PRP     _       _       _       _       2:ARG1  _
 2       enjoys  enjoy   VBZ     _       _       _       _       0:root  _
 3       playing play    VBG     _       _       _       _       2:ARG2  _

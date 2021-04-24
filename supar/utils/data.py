@@ -54,10 +54,7 @@ class Dataset(torch.utils.data.Dataset):
         return len(self.sentences)
 
     def __getitem__(self, index):
-        if not hasattr(self, 'fields'):
-            raise RuntimeError("The fields are not numericalized. Please build the dataset first.")
-        for d in self.fields.values():
-            yield d[index]
+        return self.sentences[index]
 
     def __getattr__(self, name):
         if name in self.__dict__:
@@ -81,19 +78,17 @@ class Dataset(torch.utils.data.Dataset):
         self.__dict__.update(state)
 
     def collate_fn(self, batch):
-        return {f: d for f, d in zip(self.fields.keys(), zip(*batch))}
+        if not hasattr(self, 'fields'):
+            raise RuntimeError("The fields are not numericalized yet. Please build the dataset first.")
+        return {f: [s.transformed[f.name] for s in batch] for f in self.fields}
 
     def build(self, batch_size, n_buckets=1, shuffle=False, distributed=False):
         # numericalize all fields
         self.fields = self.transform(self.sentences)
         # NOTE: the final bucket count is roughly equal to n_buckets
-        self.lengths = [len(i) for i in self.fields[next(iter(self.fields))]]
-        self.buckets = dict(zip(*kmeans(self.lengths, n_buckets)))
+        self.buckets = dict(zip(*kmeans([len(s.transformed[self.fields[0].name]) for s in self], n_buckets)))
         self.loader = DataLoader(dataset=self,
-                                 batch_sampler=Sampler(buckets=self.buckets,
-                                                       batch_size=batch_size,
-                                                       shuffle=shuffle,
-                                                       distributed=distributed),
+                                 batch_sampler=Sampler(self.buckets, batch_size, shuffle, distributed),
                                  collate_fn=self.collate_fn)
 
 
@@ -153,8 +148,7 @@ class Sampler(torch.utils.data.Sampler):
         total, count = 0, 0
         # TODO: more elegant way to deal with uneven data, which we directly discard right now
         for i in range_fn(len(self.buckets)).tolist():
-            split_sizes = [(len(self.buckets[i]) - j - 1) // self.chunks[i] + 1
-                           for j in range(self.chunks[i])]
+            split_sizes = [(len(self.buckets[i]) - j - 1) // self.chunks[i] + 1 for j in range(self.chunks[i])]
             # DON'T use `torch.chunk` which may return wrong number of chunks
             for batch in range_fn(len(self.buckets[i])).split(split_sizes):
                 if count == self.samples:

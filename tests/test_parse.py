@@ -19,9 +19,11 @@ def test_parse():
                        'fr': ['Elle', 'aime', 'jouer', 'au', 'tennis', '.'],
                        'ru': ['Она', 'любит', 'играть', 'в', 'теннис', '.'],
                        'he': ['היא', 'נהנית', 'לשחק', 'טניס', '.']}
+    import torch
+    torch.cuda.set_device('cuda:7')
     for name, model in supar.NAME.items():
         if 'xlmr' in name or 'roberta' in name or 'electra' in name:
-            pass
+            continue
         parser = Parser.load(name, reload=True)
         if name.endswith(('en', 'zh')):
             lang = name[-2:]

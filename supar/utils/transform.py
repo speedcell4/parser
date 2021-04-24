@@ -6,6 +6,7 @@ from collections.abc import Iterable
 import nltk
 from supar.utils.logging import get_logger, progress_bar
 from supar.utils.tokenizer import Tokenizer
+from torch.distributions.utils import lazy_property
 
 logger = get_logger(__name__)
 
@@ -27,18 +28,27 @@ class Transform(object):
     def __init__(self):
         self.training = True
 
+    def __len__(self):
+        return len(self.fields)
+
     def __repr__(self):
-        s = '\n'
-        for i, field in enumerate(self):
-            if not isinstance(field, Iterable):
-                field = [field]
-            for f in field:
-                if f is not None:
-                    s += f"  {f}\n"
+        s = '\n' + '\n'.join([f" {f}" for f in self.flattened_fields]) + '\n'
         return f"{self.__class__.__name__}({s})"
 
     def __call__(self, sentences):
-        pairs = dict()
+        # numericalize the specified field of each sentence and set the value as sentence attribute
+        for f in self.flattened_fields:
+            values = f.transform([getattr(i, f.name) for i in sentences])
+            for s, v in zip(sentences, values):
+                s.transformed[f.name] = v
+        return self.flattened_fields
+
+    def __getitem__(self, index):
+        return getattr(self, self.fields[index])
+
+    @lazy_property
+    def flattened_fields(self):
+        flattened = []
         for field in self:
             if field not in self.src and field not in self.tgt:
                 continue
@@ -48,12 +58,8 @@ class Transform(object):
                 field = [field]
             for f in field:
                 if f is not None:
-                    pairs[f] = f.transform([getattr(i, f.name) for i in sentences])
-
-        return pairs
-
-    def __getitem__(self, index):
-        return getattr(self, self.fields[index])
+                    flattened.append(f)
+        return flattened
 
     def train(self, training=True):
         self.training = training
@@ -90,8 +96,6 @@ class Sentence(object):
         self.maps = dict()
         # names of each field
         self.keys = set()
-        # values of each position
-        self.values = []
         for i, field in enumerate(self.transform):
             if not isinstance(field, Iterable):
                 field = [field]
@@ -99,9 +103,9 @@ class Sentence(object):
                 if f is not None:
                     self.maps[f.name] = i
                     self.keys.add(f.name)
-
-    def __len__(self):
-        return len(self.values[0])
+        # original values and numericalized values of each position
+        self.values = []
+        self.transformed = {key: None for key in self.keys}
 
     def __contains__(self, key):
         return key in self.keys
