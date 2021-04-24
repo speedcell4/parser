@@ -125,72 +125,49 @@ Our data preprocessing steps follow [Second_Order_SDP](https://github.com/wangxi
 ```py
 >>> from supar import Parser
 >>> parser = Parser.load('biaffine-dep-en')
->>> dataset = parser.predict('She enjoys playing tennis.', prob=True, verbose=False)
-100%|####################################| 1/1 00:00<00:00, 85.15it/s
+>>> dataset = parser.predict('I saw Sarah with a telescope.', lang='en', prob=True, verbose=False)
 ```
 The call to `parser.predict` will return an instance of `supar.utils.Dataset` containing the predicted results.
 You can either access each sentence held in `dataset` or an individual field of all results.
 ```py
->>> print(dataset[0])
-1       She     _       _       _       _       2       nsubj   _       _
-2       enjoys  _       _       _       _       0       root    _       _
-3       playing _       _       _       _       2       xcomp   _       _
-4       tennis  _       _       _       _       3       dobj    _       _
-5       .       _       _       _       _       2       punct   _       _
+>>> dataset[0]
+1       I       _       _       _       _       2       nsubj   _       _
+2       saw     _       _       _       _       0       root    _       _
+3       Sarah   _       _       _       _       2       dobj    _       _
+4       with    _       _       _       _       2       prep    _       _
+5       a       _       _       _       _       6       det     _       _
+6       telescope       _       _       _       _       4       pobj    _       _
+7       .       _       _       _       _       2       punct   _       _
 
 >>> print(f"arcs:  {dataset.arcs[0]}\n"
           f"rels:  {dataset.rels[0]}\n"
           f"probs: {dataset.probs[0].gather(1,torch.tensor(dataset.arcs[0]).unsqueeze(1)).squeeze(-1)}")
-arcs:  [2, 0, 2, 3, 2]
-rels:  ['nsubj', 'root', 'xcomp', 'dobj', 'punct']
-probs: tensor([1.0000, 0.9999, 0.9642, 0.9686, 0.9996])
+arcs:  [2, 0, 2, 2, 6, 4, 2]
+rels:  ['nsubj', 'root', 'dobj', 'prep', 'det', 'pobj', 'punct']
+probs: tensor([1.0000, 0.9999, 0.9966, 0.8944, 1.0000, 1.0000, 0.9999])
 ```
 Probabilities can be returned along with the results if `prob=True`.
+By default, we use [`stanza`](https://github.com/stanfordnlp/stanza) internally to tokenize plain texts for parsing.
+You only need to specify the language code `lang` for tokenization.
 
-If you'd like to parse un-tokenized raw texts, you can call `nltk.word_tokenize` to do the tokenization first:
-```py
->>> import nltk
->>> text = nltk.word_tokenize('She enjoys playing tennis.')
->>> print(parser.predict([text], verbose=False)[0])
-100%|####################################| 1/1 00:00<00:00, 74.20it/s
-1       She     _       _       _       _       2       nsubj   _       _
-2       enjoys  _       _       _       _       0       root    _       _
-3       playing _       _       _       _       2       xcomp   _       _
-4       tennis  _       _       _       _       3       dobj    _       _
-5       .       _       _       _       _       2       punct   _       _
+`SuPar` also supports parsing from lists or from file.
+For semantic dependency parsing, lemmas and POS tags are needed.
 
-```
-
-If there are a plenty of sentences to parse, `SuPar` also supports for loading them from file, and save to the `pred` file if specified.
-```py
->>> dataset = parser.predict('data/ptb/test.conllx', pred='pred.conllx')
-2020-07-25 18:13:50 INFO Loading the data
-2020-07-25 18:13:52 INFO
-Dataset(n_sentences=2416, n_batches=13, n_buckets=8)
-2020-07-25 18:13:52 INFO Making predictions on the dataset
-100%|####################################| 13/13 00:01<00:00, 10.58it/s
-2020-07-25 18:13:53 INFO Saving predicted results to pred.conllx
-2020-07-25 18:13:54 INFO 0:00:01.335261s elapsed, 1809.38 Sents/s
-```
-
-Please make sure the file is in CoNLL-X format. If some fields are missing, you can use underscores as placeholders.
-An interface is provided for the transformation from text to CoNLL-X format string.
-```py
->>> from supar.utils import CoNLL
->>> print(CoNLL.toconll(['She', 'enjoys', 'playing', 'tennis', '.']))
-1       She     _       _       _       _       _       _       _       _
-2       enjoys  _       _       _       _       _       _       _       _
-3       playing _       _       _       _       _       _       _       _
-4       tennis  _       _       _       _       _       _       _       _
-5       .       _       _       _       _       _       _       _       _
-
-```
-
-For Universial Dependencies (UD), the CoNLL-U file is also allowed, while comment lines in the file can be reserved before prediction and recovered during post-processing.
 ```py
 >>> import os
 >>> import tempfile
->>> text = '''# text = But I found the location wonderful and the neighbors very kind.
+>>> Parser.load('biaffine-dep-en').predict(['I', 'saw', 'Sarah', 'with', 'a', 'telescope', '.'], prob=True, verbose=False)[0]
+1       I       _       _       _       _       2       nsubj   _       _
+2       saw     _       _       _       _       0       root    _       _
+3       Sarah   _       _       _       _       2       dobj    _       _
+4       with    _       _       _       _       2       prep    _       _
+5       a       _       _       _       _       6       det     _       _
+6       telescope       _       _       _       _       4       pobj    _       _
+7       .       _       _       _       _       2       punct   _       _
+
+>>> path = os.path.join(tempfile.mkdtemp(), 'data.conllx')
+>>> with open(path, 'w') as f:
+...     f.write('''# text = But I found the location wonderful and the neighbors very kind.
 1\tBut\t_\t_\t_\t_\t_\t_\t_\t_
 2\tI\t_\t_\t_\t_\t_\t_\t_\t_
 3\tfound\t_\t_\t_\t_\t_\t_\t_\t_
@@ -205,13 +182,9 @@ For Universial Dependencies (UD), the CoNLL-U file is also allowed, while commen
 11\tkind\t_\t_\t_\t_\t_\t_\t_\t_
 12\t.\t_\t_\t_\t_\t_\t_\t_\t_
 
-'''
->>> path = os.path.join(tempfile.mkdtemp(), 'data.conllx')
->>> with open(path, 'w') as f:
-...     f.write(text)
-...
->>> print(parser.predict(path, verbose=False)[0])
-100%|####################################| 1/1 00:00<00:00, 68.60it/s
+''')
+... 
+>>> Parser.load('biaffine-dep-en').predict(path, pred='pred.conllx', verbose=False)[0]
 # text = But I found the location wonderful and the neighbors very kind.
 1       But     _       _       _       _       3       cc      _       _
 2       I       _       _       _       _       3       nsubj   _       _
@@ -227,39 +200,19 @@ For Universial Dependencies (UD), the CoNLL-U file is also allowed, while commen
 11      kind    _       _       _       _       6       conj    _       _
 12      .       _       _       _       _       3       punct   _       _
 
+>>> Parser.load('crf-con-en').predict(['I', 'saw', 'Sarah', 'with', 'a', 'telescope', '.'], verbose=False)[0]
+(TOP (S (NP (_ I)) (VP (_ saw) (NP (_ Sarah)) (PP (_ with) (NP (_ a) (_ telescope)))) (_ .)))
+>>> Parser.load('biaffine-sdp-en').predict([[('I','I','PRP'), ('saw','see','VBD'), ('Sarah','Sarah','NNP'), ('with','with','IN'), ('a','a','DT'), ('telescope','telescope','NN'), ('.','_','.')]], verbose=False)[0]
+1       I       I       PRP     _       _       _       _       2:ARG1  _
+2       saw     see     VBD     _       _       _       _       0:root|4:ARG1   _
+3       Sarah   Sarah   NNP     _       _       _       _       2:ARG2  _
+4       with    with    IN      _       _       _       _       _       _
+5       a       a       DT      _       _       _       _       _       _
+6       telescope       telescope       NN      _       _       _       _       4:ARG2|5:BV     _
+7       .       _       .       _       _       _       _       _       _
+
 ```
 
-Constituency trees can be parsed in a similar manner.
-The returned `dataset` holds all predicted trees represented using `nltk.Tree` objects.
-```py
->>> parser = Parser.load('crf-con-en')
->>> dataset = parser.predict([['She', 'enjoys', 'playing', 'tennis', '.']], verbose=False)
-100%|####################################| 1/1 00:00<00:00, 75.86it/s
->>> print(f"trees:\n{dataset.trees[0]}")
-trees:
-(TOP
-  (S
-    (NP (_ She))
-    (VP (_ enjoys) (S (VP (_ playing) (NP (_ tennis)))))
-    (_ .)))
->>> dataset = parser.predict('data/ptb/test.pid', pred='pred.pid')
-2020-07-25 18:21:28 INFO Loading the data
-2020-07-25 18:21:33 INFO
-Dataset(n_sentences=2416, n_batches=13, n_buckets=8)
-2020-07-25 18:21:33 INFO Making predictions on the dataset
-100%|####################################| 13/13 00:02<00:00,  5.30it/s
-2020-07-25 18:21:36 INFO Saving predicted results to pred.pid
-2020-07-25 18:21:36 INFO 0:00:02.455740s elapsed, 983.82 Sents/s
-```
-
-```py
->>> parser.predict([[('She', 'she', 'PRP'), ('enjoys', 'enjoy', 'VBZ'), ('playing', 'play', 'VBG'), ('tennis', 'tennis', 'NN'), ('.', '_', '.')]])[0]
-1       She     she     PRP     _       _       _       _       2:ARG1  _
-2       enjoys  enjoy   VBZ     _       _       _       _       0:root  _
-3       playing play    VBG     _       _       _       _       2:ARG2  _
-4       tennis  tennis  NN      _       _       _       _       3:compound      _
-5       .       _       .       _       _       _       _       _       _
-```
 ### Training
 
 To train a model from scratch, it is preferred to use the command-line option, which is more flexible and customizable.
