@@ -92,7 +92,7 @@ Below are the results.
 The multilingual model `crf-con-xlmr` is trained on SPMRL dataset by finetuning [`xlm-roberta-large`](https://huggingface.co/xlm-roberta-large).
 We follow instructions of [Benepar](https://github.com/nikitakit/self-attentive-parser) to preprocess the data.
 For simplicity, we then directly merge train/dev/test treebanks of all languages in SPMRL into big ones to train the model.
-The results of each treebank are as follows. 
+The results of each treebank are as follows.
 
 | Language |   P   |   R   | F<sub>1 | Sents/s |
 | -------- | :---: | :---: | :-----: | ------: |
@@ -157,7 +157,7 @@ For semantic dependency parsing, lemmas and POS tags are needed.
 ```py
 >>> import os
 >>> import tempfile
->>> Parser.load('biaffine-dep-en').predict(['I', 'saw', 'Sarah', 'with', 'a', 'telescope', '.'], verbose=False)[0]
+>>> Parser.load('biaffine-dep-en').predict(['I','saw','Sarah','with','a','telescope','.'], verbose=False)[0]
 1       I       _       _       _       _       2       nsubj   _       _
 2       saw     _       _       _       _       0       root    _       _
 3       Sarah   _       _       _       _       2       dobj    _       _
@@ -184,7 +184,7 @@ For semantic dependency parsing, lemmas and POS tags are needed.
 12\t.\t_\t_\t_\t_\t_\t_\t_\t_
 
 ''')
-... 
+...
 >>> Parser.load('biaffine-dep-en').predict(path, pred='pred.conllx', verbose=False)[0]
 # text = But I found the location wonderful and the neighbors very kind.
 1       But     _       _       _       _       3       cc      _       _
@@ -201,10 +201,10 @@ For semantic dependency parsing, lemmas and POS tags are needed.
 11      kind    _       _       _       _       6       conj    _       _
 12      .       _       _       _       _       3       punct   _       _
 
->>> Parser.load('crf-con-en').predict(['I', 'saw', 'Sarah', 'with', 'a', 'telescope', '.'], verbose=False)[0]
+>>> Parser.load('crf-con-en').predict(['I','saw','Sarah','with','a','telescope','.'], verbose=False)[0]
 (TOP (S (NP (_ I)) (VP (_ saw) (NP (_ Sarah)) (PP (_ with) (NP (_ a) (_ telescope)))) (_ .)))
->>> Parser.load('biaffine-sdp-en').predict([[('I','I','PRP'), ('saw','see','VBD'),  
-                                             ('Sarah','Sarah','NNP'), ('with','with','IN'), 
+>>> Parser.load('biaffine-sdp-en').predict([[('I','I','PRP'), ('saw','see','VBD'),
+                                             ('Sarah','Sarah','NNP'), ('with','with','IN'),
                                              ('a','a','DT'), ('telescope','telescope','NN'),
                                              ('.','_','.')]],
                                            verbose=False)[0]
@@ -221,9 +221,11 @@ For semantic dependency parsing, lemmas and POS tags are needed.
 ### Training
 
 To train a model from scratch, it is preferred to use the command-line option, which is more flexible and customizable.
-Below is a training example for Biaffine Dependency Parser:
+Below is an example of training Biaffine Dependency Parser:
 ```sh
-$ python -m supar.cmds.biaffine_dep train -b -d 0 -c biaffine-dep-en -p exp/ptb.biaffine.dep.char/model -f char
+$ python -m supar.cmds.biaffine_dep train -b -d 0 -c biaffine-dep-en  \
+    -p exp/ptb.biaffine.dep.char/model  \
+    -f char
 ```
 
 Alternatively, `SuPar` provides some equivalent command entry points registered in `setup.py`:
@@ -235,7 +237,7 @@ $ biaffine-dep train -b -d 0 -c biaffine-dep-en -p exp/ptb.biaffine.dep.char/mod
 To accommodate large models, distributed training is also supported:
 ```sh
 $ python -m torch.distributed.launch --nproc_per_node=4 --master_port=10000  \
-    -m supar.cmds.biaffine_dep train -b -d 0,1,2,3  \
+    -m supar.cmds.biaffine_dep train -b -c biaffine-dep-en -d 0,1,2,3  \
     -p exp/ptb.biaffine.dep.char/model  \
     -f char
 ```
