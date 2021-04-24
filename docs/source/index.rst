@@ -6,7 +6,21 @@
 SuPar
 ===============================================================================
 
-|build| |docs| |release| |downloads| |LICENSE|
+.. image:: https://github.com/yzhangcs/parser/workflows/build/badge.svg
+   :alt: build
+   :target: https://github.com/yzhangcs/parser/actions
+.. image:: https://readthedocs.org/projects/parser/badge/?version=latest
+   :alt: docs
+   :target: https://parser.readthedocs.io/en/latest
+.. image:: https://img.shields.io/pypi/v/supar
+   :alt: release
+   :target: https://github.com/yzhangcs/parser/releases
+.. image:: https://img.shields.io/github/downloads/yzhangcs/parser/total
+   :alt: downloads
+   :target: https://pypistats.org/packages/supar
+.. image:: https://img.shields.io/github/license/yzhangcs/parser
+   :alt: LICENSE
+   :target: https://github.com/yzhangcs/parser/blob/master/LICENSE
 
 A Python package that includes many state-of-the-art syntactic/semantic parsers (with pretrained models for more than 19 languages), as well as highly-parallelized implementations of several well-known and effective structured prediction algorithms.
 
@@ -29,18 +43,3 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-.. |build| image:: https://github.com/yzhangcs/parser/workflows/build/badge.svg
-    :alt: build
-    :target: https://github.com/yzhangcs/parser/actions
-.. |docs| image:: https://readthedocs.org/projects/parser/badge/?version=latest
-    :alt: docs
-    :target: https://parser.readthedocs.io/en/latest
-.. |release| image:: https://img.shields.io/pypi/v/supar
-    :alt: release
-    :target: https://github.com/yzhangcs/parser/releases
-.. |downloads| image:: https://pepy.tech/badge/supar
-    :alt: downloads
-    :target: https://pepy.tech/project/supar
-.. |LICENSE| image:: https://img.shields.io/github/license/yzhangcs/parser
-    :alt: LICENSE
-    :target: https://github.com/yzhangcs/parser/blob/master/LICENSE
