@@ -46,7 +46,7 @@ class BiaffineDependencyParser(Parser):
             update_steps (int):
                 Gradient accumulation steps. Default: 1.
             punct (bool):
-                If ``False``, ignores the punctuations during evaluation. Default: ``False``.
+                If ``False``, ignores the punctuation during evaluation. Default: ``False``.
             tree (bool):
                 If ``True``, ensures to output well-formed trees. Default: ``False``.
             proj (bool):
@@ -56,7 +56,7 @@ class BiaffineDependencyParser(Parser):
             verbose (bool):
                 If ``True``, increases the output verbosity. Default: ``True``.
             kwargs (dict):
-                A dict holding the unconsumed arguments for updating training configurations.
+                A dict holding unconsumed arguments for updating training configs.
         """
 
         return super().train(**Config().update(locals()))
@@ -72,7 +72,7 @@ class BiaffineDependencyParser(Parser):
             batch_size (int):
                 The number of tokens in each batch. Default: 5000.
             punct (bool):
-                If ``False``, ignores the punctuations during evaluation. Default: ``False``.
+                If ``False``, ignores the punctuation during evaluation. Default: ``False``.
             tree (bool):
                 If ``True``, ensures to output well-formed trees. Default: ``False``.
             proj (bool):
@@ -82,7 +82,7 @@ class BiaffineDependencyParser(Parser):
             verbose (bool):
                 If ``True``, increases the output verbosity. Default: ``True``.
             kwargs (dict):
-                A dict holding the unconsumed arguments that can be used to update the configurations for evaluation.
+                A dict holding unconsumed arguments for updating evaluation configs.
 
         Returns:
             The loss scalar and evaluation results.
@@ -99,7 +99,7 @@ class BiaffineDependencyParser(Parser):
             pred (str):
                 If specified, the predicted results will be saved to the file. Default: ``None``.
             lang (str):
-                Language code (e.g., 'en') or language name (e.g., 'English') for the text to tokenize.
+                Language code (e.g., ``en``) or language name (e.g., ``English``) for the text to tokenize.
                 ``None`` if tokenization is not required.
                 Default: ``None``.
             buckets (int):
@@ -115,13 +115,36 @@ class BiaffineDependencyParser(Parser):
             verbose (bool):
                 If ``True``, increases the output verbosity. Default: ``True``.
             kwargs (dict):
-                A dict holding the unconsumed arguments that can be used to update the configurations for prediction.
+                A dict holding unconsumed arguments for updating prediction configs.
 
         Returns:
             A :class:`~supar.utils.Dataset` object that stores the predicted results.
         """
 
         return super().predict(**Config().update(locals()))
+
+    @classmethod
+    def load(cls, path, reload=False, **kwargs):
+        r"""
+        Loads a parser with data fields and pretrained model parameters.
+
+        Args:
+            path (str):
+                - a string with the shortcut name of a pretrained model defined in ``supar.MODEL``
+                  to load from cache or download, e.g., ``'biaffine-dep-en'``.
+                - a local path to a pretrained model, e.g., ``./<path>/model``.
+            reload (bool):
+                Whether to discard the existing cache and force a fresh download. Default: ``False``.
+            kwargs (dict):
+                A dict holding unconsumed arguments for updating training configs and initializing the model.
+
+        Examples:
+            >>> from supar import Parser
+            >>> parser = Parser.load('biaffine-dep-en')
+            >>> parser = Parser.load('./ptb.biaffine.dep.lstm.char')
+        """
+
+        return super().load(path, reload, **kwargs)
 
     def _train(self, loader):
         self.model.train()
@@ -318,9 +341,9 @@ class CRFDependencyParser(BiaffineDependencyParser):
             update_steps (int):
                 Gradient accumulation steps. Default: 1.
             punct (bool):
-                If ``False``, ignores the punctuations during evaluation. Default: ``False``.
+                If ``False``, ignores the punctuation during evaluation. Default: ``False``.
             mbr (bool):
-                If ``True``, returns marginals for MBR decoding. Default: ``True``.
+                If ``True``, performs MBR decoding. Default: ``True``.
             tree (bool):
                 If ``True``, ensures to output well-formed trees. Default: ``False``.
             proj (bool):
@@ -330,7 +353,7 @@ class CRFDependencyParser(BiaffineDependencyParser):
             verbose (bool):
                 If ``True``, increases the output verbosity. Default: ``True``.
             kwargs (dict):
-                A dict holding the unconsumed arguments for updating training configurations.
+                A dict holding unconsumed arguments for updating training configs.
         """
 
         return super().train(**Config().update(locals()))
@@ -346,9 +369,9 @@ class CRFDependencyParser(BiaffineDependencyParser):
             batch_size (int):
                 The number of tokens in each batch. Default: 5000.
             punct (bool):
-                If ``False``, ignores the punctuations during evaluation. Default: ``False``.
+                If ``False``, ignores the punctuation during evaluation. Default: ``False``.
             mbr (bool):
-                If ``True``, returns marginals for MBR decoding. Default: ``True``.
+                If ``True``, performs MBR decoding. Default: ``True``.
             tree (bool):
                 If ``True``, ensures to output well-formed trees. Default: ``False``.
             proj (bool):
@@ -358,7 +381,7 @@ class CRFDependencyParser(BiaffineDependencyParser):
             verbose (bool):
                 If ``True``, increases the output verbosity. Default: ``True``.
             kwargs (dict):
-                A dict holding the unconsumed arguments that can be used to update the configurations for evaluation.
+                A dict holding unconsumed arguments for updating evaluation configs.
 
         Returns:
             The loss scalar and evaluation results.
@@ -375,7 +398,7 @@ class CRFDependencyParser(BiaffineDependencyParser):
             pred (str):
                 If specified, the predicted results will be saved to the file. Default: ``None``.
             lang (str):
-                Language code (e.g., 'en') or language name (e.g., 'English') for the text to tokenize.
+                Language code (e.g., ``en``) or language name (e.g., ``English``) for the text to tokenize.
                 ``None`` if tokenization is not required.
                 Default: ``None``.
             buckets (int):
@@ -385,7 +408,7 @@ class CRFDependencyParser(BiaffineDependencyParser):
             prob (bool):
                 If ``True``, outputs the probabilities. Default: ``False``.
             mbr (bool):
-                If ``True``, returns marginals for MBR decoding. Default: ``True``.
+                If ``True``, performs MBR decoding. Default: ``True``.
             tree (bool):
                 If ``True``, ensures to output well-formed trees. Default: ``False``.
             proj (bool):
@@ -393,13 +416,36 @@ class CRFDependencyParser(BiaffineDependencyParser):
             verbose (bool):
                 If ``True``, increases the output verbosity. Default: ``True``.
             kwargs (dict):
-                A dict holding the unconsumed arguments that can be used to update the configurations for prediction.
+                A dict holding unconsumed arguments for updating prediction configs.
 
         Returns:
             A :class:`~supar.utils.Dataset` object that stores the predicted results.
         """
 
         return super().predict(**Config().update(locals()))
+
+    @classmethod
+    def load(cls, path, reload=False, **kwargs):
+        r"""
+        Loads a parser with data fields and pretrained model parameters.
+
+        Args:
+            path (str):
+                - a string with the shortcut name of a pretrained model defined in ``supar.MODEL``
+                  to load from cache or download, e.g., ``'crf-dep-en'``.
+                - a local path to a pretrained model, e.g., ``./<path>/model``.
+            reload (bool):
+                Whether to discard the existing cache and force a fresh download. Default: ``False``.
+            kwargs (dict):
+                A dict holding unconsumed arguments for updating training configs and initializing the model.
+
+        Examples:
+            >>> from supar import Parser
+            >>> parser = Parser.load('crf-dep-en')
+            >>> parser = Parser.load('./ptb.crf.dep.lstm.char')
+        """
+
+        return super().load(path, reload, **kwargs)
 
     def _train(self, loader):
         self.model.train()
@@ -506,9 +552,9 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
             update_steps (int):
                 Gradient accumulation steps. Default: 1.
             punct (bool):
-                If ``False``, ignores the punctuations during evaluation. Default: ``False``.
+                If ``False``, ignores the punctuation during evaluation. Default: ``False``.
             mbr (bool):
-                If ``True``, returns marginals for MBR decoding. Default: ``True``.
+                If ``True``, performs MBR decoding. Default: ``True``.
             tree (bool):
                 If ``True``, ensures to output well-formed trees. Default: ``False``.
             proj (bool):
@@ -518,7 +564,7 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
             verbose (bool):
                 If ``True``, increases the output verbosity. Default: ``True``.
             kwargs (dict):
-                A dict holding the unconsumed arguments for updating training configurations.
+                A dict holding unconsumed arguments for updating training configs.
         """
 
         return super().train(**Config().update(locals()))
@@ -534,9 +580,9 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
             batch_size (int):
                 The number of tokens in each batch. Default: 5000.
             punct (bool):
-                If ``False``, ignores the punctuations during evaluation. Default: ``False``.
+                If ``False``, ignores the punctuation during evaluation. Default: ``False``.
             mbr (bool):
-                If ``True``, returns marginals for MBR decoding. Default: ``True``.
+                If ``True``, performs MBR decoding. Default: ``True``.
             tree (bool):
                 If ``True``, ensures to output well-formed trees. Default: ``False``.
             proj (bool):
@@ -546,7 +592,7 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
             verbose (bool):
                 If ``True``, increases the output verbosity. Default: ``True``.
             kwargs (dict):
-                A dict holding the unconsumed arguments that can be used to update the configurations for evaluation.
+                A dict holding unconsumed arguments for updating evaluation configs.
 
         Returns:
             The loss scalar and evaluation results.
@@ -563,7 +609,7 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
             pred (str):
                 If specified, the predicted results will be saved to the file. Default: ``None``.
             lang (str):
-                Language code (e.g., 'en') or language name (e.g., 'English') for the text to tokenize.
+                Language code (e.g., ``en``) or language name (e.g., ``English``) for the text to tokenize.
                 ``None`` if tokenization is not required.
                 Default: ``None``.
             buckets (int):
@@ -573,7 +619,7 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
             prob (bool):
                 If ``True``, outputs the probabilities. Default: ``False``.
             mbr (bool):
-                If ``True``, returns marginals for MBR decoding. Default: ``True``.
+                If ``True``, performs MBR decoding. Default: ``True``.
             tree (bool):
                 If ``True``, ensures to output well-formed trees. Default: ``False``.
             proj (bool):
@@ -581,13 +627,36 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
             verbose (bool):
                 If ``True``, increases the output verbosity. Default: ``True``.
             kwargs (dict):
-                A dict holding the unconsumed arguments that can be used to update the configurations for prediction.
+                A dict holding unconsumed arguments for updating prediction configs.
 
         Returns:
             A :class:`~supar.utils.Dataset` object that stores the predicted results.
         """
 
         return super().predict(**Config().update(locals()))
+
+    @classmethod
+    def load(cls, path, reload=False, **kwargs):
+        r"""
+        Loads a parser with data fields and pretrained model parameters.
+
+        Args:
+            path (str):
+                - a string with the shortcut name of a pretrained model defined in ``supar.MODEL``
+                  to load from cache or download, e.g., ``'crf2o-dep-en'``.
+                - a local path to a pretrained model, e.g., ``./<path>/model``.
+            reload (bool):
+                Whether to discard the existing cache and force a fresh download. Default: ``False``.
+            kwargs (dict):
+                A dict holding unconsumed arguments for updating training configs and initializing the model.
+
+        Examples:
+            >>> from supar import Parser
+            >>> parser = Parser.load('crf2o-dep-en')
+            >>> parser = Parser.load('./ptb.crf2o.dep.lstm.char')
+        """
+
+        return super().load(path, reload, **kwargs)
 
     def _train(self, loader):
         self.model.train()
@@ -786,7 +855,7 @@ class VIDependencyParser(BiaffineDependencyParser):
             update_steps (int):
                 Gradient accumulation steps. Default: 1.
             punct (bool):
-                If ``False``, ignores the punctuations during evaluation. Default: ``False``.
+                If ``False``, ignores the punctuation during evaluation. Default: ``False``.
             tree (bool):
                 If ``True``, ensures to output well-formed trees. Default: ``False``.
             proj (bool):
@@ -796,7 +865,7 @@ class VIDependencyParser(BiaffineDependencyParser):
             verbose (bool):
                 If ``True``, increases the output verbosity. Default: ``True``.
             kwargs (dict):
-                A dict holding the unconsumed arguments for updating training configurations.
+                A dict holding unconsumed arguments for updating training configs.
         """
 
         return super().train(**Config().update(locals()))
@@ -812,7 +881,7 @@ class VIDependencyParser(BiaffineDependencyParser):
             batch_size (int):
                 The number of tokens in each batch. Default: 5000.
             punct (bool):
-                If ``False``, ignores the punctuations during evaluation. Default: ``False``.
+                If ``False``, ignores the punctuation during evaluation. Default: ``False``.
             tree (bool):
                 If ``True``, ensures to output well-formed trees. Default: ``False``.
             proj (bool):
@@ -822,7 +891,7 @@ class VIDependencyParser(BiaffineDependencyParser):
             verbose (bool):
                 If ``True``, increases the output verbosity. Default: ``True``.
             kwargs (dict):
-                A dict holding the unconsumed arguments that can be used to update the configurations for evaluation.
+                A dict holding unconsumed arguments for updating evaluation configs.
 
         Returns:
             The loss scalar and evaluation results.
@@ -839,7 +908,7 @@ class VIDependencyParser(BiaffineDependencyParser):
             pred (str):
                 If specified, the predicted results will be saved to the file. Default: ``None``.
             lang (str):
-                Language code (e.g., 'en') or language name (e.g., 'English') for the text to tokenize.
+                Language code (e.g., ``en``) or language name (e.g., ``English``) for the text to tokenize.
                 ``None`` if tokenization is not required.
                 Default: ``None``.
             buckets (int):
@@ -855,13 +924,36 @@ class VIDependencyParser(BiaffineDependencyParser):
             verbose (bool):
                 If ``True``, increases the output verbosity. Default: ``True``.
             kwargs (dict):
-                A dict holding the unconsumed arguments that can be used to update the configurations for prediction.
+                A dict holding unconsumed arguments for updating prediction configs.
 
         Returns:
             A :class:`~supar.utils.Dataset` object that stores the predicted results.
         """
 
         return super().predict(**Config().update(locals()))
+
+    @classmethod
+    def load(cls, path, reload=False, **kwargs):
+        r"""
+        Loads a parser with data fields and pretrained model parameters.
+
+        Args:
+            path (str):
+                - a string with the shortcut name of a pretrained model defined in ``supar.MODEL``
+                  to load from cache or download, e.g., ``'vi-dep-en'``.
+                - a local path to a pretrained model, e.g., ``./<path>/model``.
+            reload (bool):
+                Whether to discard the existing cache and force a fresh download. Default: ``False``.
+            kwargs (dict):
+                A dict holding unconsumed arguments for updating training configs and initializing the model.
+
+        Examples:
+            >>> from supar import Parser
+            >>> parser = Parser.load('vi-dep-en')
+            >>> parser = Parser.load('./ptb.vi.dep.lstm.char')
+        """
+
+        return super().load(path, reload, **kwargs)
 
     def _train(self, loader):
         self.model.train()

@@ -17,11 +17,11 @@ class BiaffineSemanticDependencyModel(Model):
         n_labels (int):
             The number of labels in the treebank.
         n_tags (int):
-            The number of POS tags, needed if POS tag embeddings are used. Default: ``None``.
+            The number of POS tags, required if POS tag embeddings are used. Default: ``None``.
         n_chars (int):
-            The number of characters, needed if character-level representations are used. Default: ``None``.
+            The number of characters, required if character-level representations are used. Default: ``None``.
         n_lemmas (int):
-            The number of lemmas, needed if lemma embeddings are used. Default: ``None``.
+            The number of lemmas, required if lemma embeddings are used. Default: ``None``.
         feat (list[str]):
             Additional features to use.
             ``'tag'``: POS tag embeddings.
@@ -36,29 +36,30 @@ class BiaffineSemanticDependencyModel(Model):
         n_feat_embed (int):
             The size of feature representations. Default: 100.
         n_char_embed (int):
-            The size of character embeddings serving as inputs of CharLSTM, required if ``feat='char'``. Default: 50.
+            The size of character embeddings serving as inputs of CharLSTM, required if using CharLSTM. Default: 50.
         n_char_hidden (int):
-            The size of hidden states of CharLSTM, required if ``feat='char'``. Default: 100.
+            The size of hidden states of CharLSTM, required if using CharLSTM. Default: 100.
         char_pad_index (int):
-            The index of the padding token in the character vocabulary. Default: 0.
+            The index of the padding token in the character vocabulary, required if using CharLSTM. Default: 0.
         bert (str):
             Specifies which kind of language model to use, e.g., ``'bert-base-cased'`` and ``'xlnet-base-cased'``.
-            This is required if ``feat='bert'``. The full list can be found in `transformers`_.
+            This is required if ``encoder='bert'`` or using  BERT features. The full list can be found in `transformers`_.
             Default: ``None``.
         n_bert_layers (int):
-            Specifies how many last layers to use. Required if ``feat='bert'``.
-            The final outputs would be the weight sum of the hidden states of these layers.
+            Specifies how many last layers to use, required if ``encoder='bert'`` or using  BERT features.
+            The final outputs would be weighted sum of the hidden states of these layers.
             Default: 4.
         mix_dropout (float):
-            The dropout ratio of BERT layers. Required if ``feat='bert'``. Default: .0.
+            The dropout ratio of BERT layers, required if ``encoder='bert'`` or using  BERT features. Default: .0.
         bert_pooling (str):
             Pooling way to get token embeddings.
-            Either take the first subtoken ('first'), the last subtoken ('last'), or a mean over all ('mean').
-            Default: 'mean'.
+            ``first``: take the first subtoken. ``last``: take the last subtoken. ``mean``: take a mean over all.
+            Default: ``mean``.
         bert_pad_index (int):
-            The index of the padding token in the BERT vocabulary. Default: 0.
+            The index of the padding token in BERT vocabulary, required if ``encoder='bert'`` or using BERT features.
+            Default: 0.
         freeze (bool):
-            If ``True``, freezes bert layers. Default: ``True``.
+            If ``True``, freezes BERT parameters, required if using BERT features. Default: ``True``.
         embed_dropout (float):
             The dropout ratio of input embeddings. Default: .2.
         n_lstm_hidden (int):
@@ -66,7 +67,7 @@ class BiaffineSemanticDependencyModel(Model):
         n_lstm_layers (int):
             The number of LSTM layers. Default: 3.
         encoder_dropout (float):
-            The dropout ratio of LSTM. Default: .33.
+            The dropout ratio of encoder layer. Default: .33.
         n_edge_mlp (int):
             Edge MLP size. Default: 600.
         n_label_mlp  (int):
@@ -143,8 +144,9 @@ class BiaffineSemanticDependencyModel(Model):
                 Word indices.
             feats (list[~torch.LongTensor]):
                 A list of feat indices.
-                The size of indices is ``[batch_size, seq_len, fix_len]`` if feat is ``'char'`` or ``'bert'``,
+                The size is either ``[batch_size, seq_len, fix_len]`` if ``feat`` is ``'char'`` or ``'bert'``,
                 or ``[batch_size, seq_len]`` otherwise.
+                Default: ``None``.
 
         Returns:
             ~torch.Tensor, ~torch.Tensor:
@@ -215,11 +217,11 @@ class VISemanticDependencyModel(BiaffineSemanticDependencyModel):
         n_labels (int):
             The number of labels in the treebank.
         n_tags (int):
-            The number of POS tags, needed if POS tag embeddings are used. Default: ``None``.
+            The number of POS tags, required if POS tag embeddings are used. Default: ``None``.
         n_chars (int):
-            The number of characters, needed if character-level representations are used. Default: ``None``.
+            The number of characters, required if character-level representations are used. Default: ``None``.
         n_lemmas (int):
-            The number of lemmas, needed if lemma embeddings are used. Default: ``None``.
+            The number of lemmas, required if lemma embeddings are used. Default: ``None``.
         feat (list[str]):
             Additional features to use.
             ``'tag'``: POS tag embeddings.
@@ -234,29 +236,30 @@ class VISemanticDependencyModel(BiaffineSemanticDependencyModel):
         n_feat_embed (int):
             The size of feature representations. Default: 100.
         n_char_embed (int):
-            The size of character embeddings serving as inputs of CharLSTM, required if ``feat='char'``. Default: 50.
+            The size of character embeddings serving as inputs of CharLSTM, required if using CharLSTM. Default: 50.
         n_char_hidden (int):
-            The size of hidden states of CharLSTM, required if ``feat='char'``. Default: 100.
+            The size of hidden states of CharLSTM, required if using CharLSTM. Default: 100.
         char_pad_index (int):
-            The index of the padding token in the character vocabulary. Default: 0.
+            The index of the padding token in the character vocabulary, required if using CharLSTM. Default: 0.
         bert (str):
             Specifies which kind of language model to use, e.g., ``'bert-base-cased'`` and ``'xlnet-base-cased'``.
-            This is required if ``feat='bert'``. The full list can be found in `transformers`_.
+            This is required if ``encoder='bert'`` or using  BERT features. The full list can be found in `transformers`_.
             Default: ``None``.
         n_bert_layers (int):
-            Specifies how many last layers to use. Required if ``feat='bert'``.
-            The final outputs would be the weight sum of the hidden states of these layers.
+            Specifies how many last layers to use, required if ``encoder='bert'`` or using  BERT features.
+            The final outputs would be weighted sum of the hidden states of these layers.
             Default: 4.
         mix_dropout (float):
-            The dropout ratio of BERT layers. Required if ``feat='bert'``. Default: .0.
+            The dropout ratio of BERT layers, required if ``encoder='bert'`` or using  BERT features. Default: .0.
         bert_pooling (str):
             Pooling way to get token embeddings.
-            Either take the first subtoken ('first'), the last subtoken ('last'), or a mean over all ('mean').
-            Default: 'mean'.
+            ``first``: take the first subtoken. ``last``: take the last subtoken. ``mean``: take a mean over all.
+            Default: ``mean``.
         bert_pad_index (int):
-            The index of the padding token in the BERT vocabulary. Default: 0.
+            The index of the padding token in BERT vocabulary, required if ``encoder='bert'`` or using BERT features.
+            Default: 0.
         freeze (bool):
-            If ``True``, freezes bert layers. Default: ``True``.
+            If ``True``, freezes BERT parameters, required if using BERT features. Default: ``True``.
         embed_dropout (float):
             The dropout ratio of input embeddings. Default: .2.
         n_lstm_hidden (int):
@@ -264,7 +267,7 @@ class VISemanticDependencyModel(BiaffineSemanticDependencyModel):
         n_lstm_layers (int):
             The number of LSTM layers. Default: 3.
         encoder_dropout (float):
-            The dropout ratio of LSTM. Default: .33.
+            The dropout ratio of encoder layer. Default: .33.
         n_edge_mlp (int):
             Unary factor MLP size. Default: 600.
         n_pair_mlp (int):
@@ -278,9 +281,9 @@ class VISemanticDependencyModel(BiaffineSemanticDependencyModel):
         label_mlp_dropout (float):
             The dropout ratio of label MLP layers. Default: .33.
         inference (str):
-            Approximate inference methods. Default: 'mfvi'.
+            Approximate inference methods. Default: ``mfvi``.
         max_iter (int):
-            Max iteration times for Variational Inference. Default: 3.
+            Max iteration times for inference. Default: 3.
         interpolation (int):
             Constant to even out the label/edge loss. Default: .1.
         pad_index (int):
@@ -353,14 +356,17 @@ class VISemanticDependencyModel(BiaffineSemanticDependencyModel):
                 Word indices.
             feats (list[~torch.LongTensor]):
                 A list of feat indices.
-                The size of indices is ``[batch_size, seq_len, fix_len]`` if feat is ``'char'`` or ``'bert'``,
+                The size is either ``[batch_size, seq_len, fix_len]`` if ``feat`` is ``'char'`` or ``'bert'``,
                 or ``[batch_size, seq_len]`` otherwise.
+                Default: ``None``.
 
         Returns:
-            ~torch.Tensor, ~torch.Tensor, ~torch.Tensor:
-                Scores of all possible edges of shape ``[batch_size, seq_len, seq_len]``,
-                dependent-head-sibling triples of shape ``[batch_size, seq_len, seq_len, seq_len]`` and
-                all possible labels on each edge of shape ``[batch_size, seq_len, seq_len, n_labels]``.
+            ~torch.Tensor, ~torch.Tensor, ~torch.Tensor, ~torch.Tensor, ~torch.Tensor:
+                The first and last are scores of all possible edges of shape ``[batch_size, seq_len, seq_len]``
+                and possible labels on each edge of shape ``[batch_size, seq_len, seq_len, n_labels]``.
+                Others are scores of second-order sibling, coparent and grandparent factors
+                (``[batch_size, seq_len, seq_len, seq_len]``).
+
         """
 
         x = self.encode(words, feats)
@@ -407,8 +413,8 @@ class VISemanticDependencyModel(BiaffineSemanticDependencyModel):
                 The mask for covering the unpadded tokens.
 
         Returns:
-            ~torch.Tensor:
-                The training loss.
+            ~torch.Tensor, ~torch.Tensor:
+                The training loss and marginals of shape ``[batch_size, seq_len, seq_len]``.
         """
 
         edge_mask = labels.ge(0) & mask

@@ -154,25 +154,6 @@ class Parser(object):
 
     @classmethod
     def load(cls, path, reload=False, **kwargs):
-        r"""
-        Loads a parser with data fields and pretrained model parameters.
-
-        Args:
-            path (str):
-                - a string with the shortcut name of a pretrained parser defined in ``supar.MODEL``
-                  to load from cache or download, e.g., ``'crf-dep-en'``.
-                - a path to a directory containing a pre-trained parser, e.g., `./<path>/model`.
-            reload (bool):
-                Whether to discard the existing cache and force a fresh download. Default: ``False``.
-            kwargs (dict):
-                A dict holding the unconsumed arguments that can be used to update the configurations and initiate the model.
-
-        Examples:
-            >>> from supar import Parser
-            >>> parser = Parser.load('biaffine-dep-en')
-            >>> parser = Parser.load('./ptb.biaffine.dep.char')
-        """
-
         args = Config(**locals())
         args.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         state = torch.load(path if os.path.exists(path) else download(supar.MODEL.get(path, path), reload=reload))

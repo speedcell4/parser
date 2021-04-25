@@ -26,10 +26,10 @@ class TransformerEmbedding(nn.Module):
             with a window size of ``stride``. Default: 10.
         pooling (str):
             Pooling way to get from token piece embeddings to token embedding.
-            Either take the first subtoken ('first'), the last subtoken ('last'), or a mean over all ('mean').
-            Default: 'mean'.
+            ``first``: take the first subtoken. ``last``: take the last subtoken. ``mean``: take a mean over all.
+            Default: ``mean``.
         pad_index (int):
-            The index of the padding token in the BERT vocabulary. Default: 0.
+            The index of the padding token in BERT vocabulary. Default: 0.
         dropout (float):
             The dropout ratio of BERT layers. Default: 0.
             This value will be passed into the :class:`ScalarMix` layer.

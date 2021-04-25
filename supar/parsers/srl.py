@@ -46,7 +46,7 @@ class VISemanticRoleLabelingParser(Parser):
             verbose (bool):
                 If ``True``, increases the output verbosity. Default: ``True``.
             kwargs (dict):
-                A dict holding the unconsumed arguments for updating training configurations.
+                A dict holding unconsumed arguments for updating training configs.
         """
 
         return super().train(**Config().update(locals()))
@@ -63,7 +63,7 @@ class VISemanticRoleLabelingParser(Parser):
             verbose (bool):
                 If ``True``, increases the output verbosity. Default: ``True``.
             kwargs (dict):
-                A dict holding the unconsumed arguments that can be used to update the configurations for evaluation.
+                A dict holding unconsumed arguments for updating evaluation configs.
 
         Returns:
             The loss scalar and evaluation results.
@@ -79,7 +79,7 @@ class VISemanticRoleLabelingParser(Parser):
             pred (str):
                 If specified, the predicted results will be saved to the file. Default: ``None``.
             lang (str):
-                Language code (e.g., 'en') or language name (e.g., 'English') for the text to tokenize.
+                Language code (e.g., ``en``) or language name (e.g., ``English``) for the text to tokenize.
                 ``None`` if tokenization is not required.
                 Default: ``None``.
             buckets (int):
@@ -91,13 +91,36 @@ class VISemanticRoleLabelingParser(Parser):
             verbose (bool):
                 If ``True``, increases the output verbosity. Default: ``True``.
             kwargs (dict):
-                A dict holding the unconsumed arguments that can be used to update the configurations for prediction.
+                A dict holding unconsumed arguments for updating prediction configs.
 
         Returns:
             A :class:`~supar.utils.Dataset` object that stores the predicted results.
         """
 
         return super().predict(**Config().update(locals()))
+
+    @classmethod
+    def load(cls, path, reload=False, **kwargs):
+        r"""
+        Loads a parser with data fields and pretrained model parameters.
+
+        Args:
+            path (str):
+                - a string with the shortcut name of a pretrained model defined in ``supar.MODEL``
+                  to load from cache or download, e.g., ``'vi-srl-en'``.
+                - a local path to a pretrained model, e.g., ``./<path>/model``.
+            reload (bool):
+                Whether to discard the existing cache and force a fresh download. Default: ``False``.
+            kwargs (dict):
+                A dict holding unconsumed arguments for updating training configs and initializing the model.
+
+        Examples:
+            >>> from supar import Parser
+            >>> parser = Parser.load('vi-srl-en')
+            >>> parser = Parser.load('./ptb.vi.srl.lstm.char')
+        """
+
+        return super().load(path, reload, **kwargs)
 
     def _train(self, loader):
         self.model.train()

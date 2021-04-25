@@ -365,7 +365,7 @@ class CoNLL(Transform):
             data (list[list] or str):
                 A list of instances or a filename.
             lang (str):
-                Language code (e.g., 'en') or language name (e.g., 'English') for the text to tokenize.
+                Language code (e.g., ``en``) or language name (e.g., ``English``) for the text to tokenize.
                 ``None`` if tokenization is not required.
                 Default: ``None``.
             proj (bool):
@@ -709,7 +709,7 @@ class Tree(Transform):
             data (list[list] or str):
                 A list of instances or a filename.
             lang (str):
-                Language code (e.g., 'en') or language name (e.g., 'English') for the text to tokenize.
+                Language code (e.g., ``en``) or language name (e.g., ``English``) for the text to tokenize.
                 ``None`` if tokenization is not required.
                 Default: ``None``.
             max_len (int):

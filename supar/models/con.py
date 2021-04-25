@@ -20,9 +20,9 @@ class CRFConstituencyModel(Model):
         n_rels (int):
             The number of labels in the treebank.
         n_tags (int):
-            The number of POS tags, needed if POS tag embeddings are used. Default: ``None``.
+            The number of POS tags, required if POS tag embeddings are used. Default: ``None``.
         n_chars (int):
-            The number of characters, needed if character-level representations are used. Default: ``None``.
+            The number of characters, required if character-level representations are used. Default: ``None``.
         feat (list[str]):
             Additional features to use.
             ``'tag'``: POS tag embeddings.
@@ -34,29 +34,30 @@ class CRFConstituencyModel(Model):
         n_feat_embed (int):
             The size of feature representations. Default: 100.
         n_char_embed (int):
-            The size of character embeddings serving as inputs of CharLSTM, required if ``feat='char'``. Default: 50.
+            The size of character embeddings serving as inputs of CharLSTM, required if using CharLSTM. Default: 50.
         n_char_hidden (int):
-            The size of hidden states of CharLSTM, required if ``feat='char'``. Default: 100.
+            The size of hidden states of CharLSTM, required if using CharLSTM. Default: 100.
         char_pad_index (int):
-            The index of the padding token in the character vocabulary. Default: 0.
+            The index of the padding token in the character vocabulary, required if using CharLSTM. Default: 0.
         bert (str):
             Specifies which kind of language model to use, e.g., ``'bert-base-cased'`` and ``'xlnet-base-cased'``.
-            This is required if ``feat='bert'``. The full list can be found in `transformers`_.
+            This is required if ``encoder='bert'`` or using  BERT features. The full list can be found in `transformers`_.
             Default: ``None``.
         n_bert_layers (int):
-            Specifies how many last layers to use. Required if ``feat='bert'``.
-            The final outputs would be the weight sum of the hidden states of these layers.
+            Specifies how many last layers to use, required if ``encoder='bert'`` or using  BERT features.
+            The final outputs would be weighted sum of the hidden states of these layers.
             Default: 4.
         mix_dropout (float):
-            The dropout ratio of BERT layers. Required if ``feat='bert'``. Default: .0.
+            The dropout ratio of BERT layers, required if ``encoder='bert'`` or using  BERT features. Default: .0.
         bert_pooling (str):
             Pooling way to get token embeddings.
-            Either take the first subtoken ('first'), the last subtoken ('last'), or a mean over all ('mean').
-            Default: 'mean'.
+            ``first``: take the first subtoken. ``last``: take the last subtoken. ``mean``: take a mean over all.
+            Default: ``mean``.
         bert_pad_index (int):
-            The index of the padding token in the BERT vocabulary. Default: 0.
+            The index of the padding token in BERT vocabulary, required if ``encoder='bert'`` or using BERT features.
+            Default: 0.
         freeze (bool):
-            If ``True``, freezes bert layers. Default: ``True``.
+            If ``True``, freezes BERT parameters, required if using BERT features. Default: ``True``.
         embed_dropout (float):
             The dropout ratio of input embeddings. Default: .33.
         n_lstm_hidden (int):
@@ -64,7 +65,7 @@ class CRFConstituencyModel(Model):
         n_lstm_layers (int):
             The number of LSTM layers. Default: 3.
         encoder_dropout (float):
-            The dropout ratio of LSTM. Default: .33.
+            The dropout ratio of encoder layer. Default: .33.
         n_span_mlp (int):
             Span MLP size. Default: 500.
         n_label_mlp  (int):
@@ -126,8 +127,9 @@ class CRFConstituencyModel(Model):
                 Word indices.
             feats (list[~torch.LongTensor]):
                 A list of feat indices.
-                The size of indices is ``[batch_size, seq_len, fix_len]`` if feat is ``'char'`` or ``'bert'``,
+                The size is either ``[batch_size, seq_len, fix_len]`` if ``feat`` is ``'char'`` or ``'bert'``,
                 or ``[batch_size, seq_len]`` otherwise.
+                Default: ``None``.
 
         Returns:
             ~torch.Tensor, ~torch.Tensor:
@@ -161,7 +163,7 @@ class CRFConstituencyModel(Model):
             s_label (~torch.Tensor): ``[batch_size, seq_len, seq_len, n_labels]``.
                 Scores of all labels on each constituent.
             charts (~torch.LongTensor): ``[batch_size, seq_len, seq_len]``.
-                The tensor of gold-standard labels, in which positions without labels are filled with -1.
+                The tensor of gold-standard labels. Positions without labels are filled with -1.
             mask (~torch.BoolTensor): ``[batch_size, seq_len, seq_len]``.
                 The mask for covering the unpadded tokens in each chart.
             mbr (bool):
@@ -210,9 +212,9 @@ class VIConstituencyModel(CRFConstituencyModel):
         n_rels (int):
             The number of labels in the treebank.
         n_tags (int):
-            The number of POS tags, needed if POS tag embeddings are used. Default: ``None``.
+            The number of POS tags, required if POS tag embeddings are used. Default: ``None``.
         n_chars (int):
-            The number of characters, needed if character-level representations are used. Default: ``None``.
+            The number of characters, required if character-level representations are used. Default: ``None``.
         feat (list[str]):
             Additional features to use.
             ``'tag'``: POS tag embeddings.
@@ -224,29 +226,30 @@ class VIConstituencyModel(CRFConstituencyModel):
         n_feat_embed (int):
             The size of feature representations. Default: 100.
         n_char_embed (int):
-            The size of character embeddings serving as inputs of CharLSTM, required if ``feat='char'``. Default: 50.
+            The size of character embeddings serving as inputs of CharLSTM, required if using CharLSTM. Default: 50.
         n_char_hidden (int):
-            The size of hidden states of CharLSTM, required if ``feat='char'``. Default: 100.
+            The size of hidden states of CharLSTM, required if using CharLSTM. Default: 100.
         char_pad_index (int):
-            The index of the padding token in the character vocabulary. Default: 0.
+            The index of the padding token in the character vocabulary, required if using CharLSTM. Default: 0.
         bert (str):
             Specifies which kind of language model to use, e.g., ``'bert-base-cased'`` and ``'xlnet-base-cased'``.
-            This is required if ``feat='bert'``. The full list can be found in `transformers`_.
+            This is required if ``encoder='bert'`` or using  BERT features. The full list can be found in `transformers`_.
             Default: ``None``.
         n_bert_layers (int):
-            Specifies how many last layers to use. Required if ``feat='bert'``.
-            The final outputs would be the weight sum of the hidden states of these layers.
+            Specifies how many last layers to use, required if ``encoder='bert'`` or using  BERT features.
+            The final outputs would be weighted sum of the hidden states of these layers.
             Default: 4.
         mix_dropout (float):
-            The dropout ratio of BERT layers. Required if ``feat='bert'``. Default: .0.
+            The dropout ratio of BERT layers, required if ``encoder='bert'`` or using  BERT features. Default: .0.
         bert_pooling (str):
             Pooling way to get token embeddings.
-            Either take the first subtoken ('first'), the last subtoken ('last'), or a mean over all ('mean').
-            Default: 'mean'.
+            ``first``: take the first subtoken. ``last``: take the last subtoken. ``mean``: take a mean over all.
+            Default: ``mean``.
         bert_pad_index (int):
-            The index of the padding token in the BERT vocabulary. Default: 0.
+            The index of the padding token in BERT vocabulary, required if ``encoder='bert'`` or using BERT features.
+            Default: 0.
         freeze (bool):
-            If ``True``, freezes bert layers. Default: ``True``.
+            If ``True``, freezes BERT parameters, required if using BERT features. Default: ``True``.
         embed_dropout (float):
             The dropout ratio of input embeddings. Default: .33.
         n_lstm_hidden (int):
@@ -254,7 +257,7 @@ class VIConstituencyModel(CRFConstituencyModel):
         n_lstm_layers (int):
             The number of LSTM layers. Default: 3.
         encoder_dropout (float):
-            The dropout ratio of LSTM. Default: .33.
+            The dropout ratio of encoder layer. Default: .33.
         n_span_mlp (int):
             Span MLP size. Default: 500.
         n_pair_mlp (int):
@@ -264,9 +267,9 @@ class VIConstituencyModel(CRFConstituencyModel):
         mlp_dropout (float):
             The dropout ratio of MLP layers. Default: .33.
         inference (str):
-            Approximate inference methods. Default: 'mfvi'.
+            Approximate inference methods. Default: ``mfvi``.
         max_iter (int):
-            Max iteration times for Variational Inference. Default: 3.
+            Max iteration times for inference. Default: 3.
         interpolation (int):
             Constant to even out the label/edge loss. Default: .1.
         pad_index (int):
@@ -332,14 +335,14 @@ class VIConstituencyModel(CRFConstituencyModel):
                 Word indices.
             feats (list[~torch.LongTensor]):
                 A list of feat indices.
-                The size of indices is ``[batch_size, seq_len, fix_len]`` if feat is ``'char'`` or ``'bert'``,
+                The size is either ``[batch_size, seq_len, fix_len]`` if ``feat`` is ``'char'`` or ``'bert'``,
                 or ``[batch_size, seq_len]`` otherwise.
 
         Returns:
-            ~torch.Tensor, ~torch.Tensor:
-                The first tensor of shape ``[batch_size, seq_len, seq_len]`` holds scores of all possible constituents.
-                The second of shape ``[batch_size, seq_len, seq_len, n_labels]`` holds
-                scores of all possible labels on each constituent.
+            ~torch.Tensor, ~torch.Tensor, ~torch.Tensor:
+                Scores of all possible constituents (``[batch_size, seq_len, seq_len]``),
+                second-order triples (``[batch_size, seq_len, seq_len, n_labels]``) and
+                all possible labels on each constituent (``[batch_size, seq_len, seq_len, n_labels]``).
         """
 
         x = self.encode(words, feats)
@@ -368,17 +371,18 @@ class VIConstituencyModel(CRFConstituencyModel):
         Args:
             s_span (~torch.Tensor): ``[batch_size, seq_len, seq_len]``.
                 Scores of all constituents.
+            s_pair (~torch.Tensor): ``[batch_size, seq_len, seq_len, seq_len]``.
+                Scores of second-order triples.
             s_label (~torch.Tensor): ``[batch_size, seq_len, seq_len, n_labels]``.
                 Scores of all labels on each constituent.
             charts (~torch.LongTensor): ``[batch_size, seq_len, seq_len]``.
-                The tensor of gold-standard labels, in which positions without labels are filled with -1.
+                The tensor of gold-standard labels. Positions without labels are filled with -1.
             mask (~torch.BoolTensor): ``[batch_size, seq_len, seq_len]``.
                 The mask for covering the unpadded tokens in each chart.
 
         Returns:
             ~torch.Tensor, ~torch.Tensor:
-                The training loss and
-                marginals of shape ``[batch_size, seq_len, seq_len]``.
+                The training loss and marginals of shape ``[batch_size, seq_len, seq_len]``.
         """
 
         span_mask = charts.ge(0) & mask
