@@ -9,21 +9,19 @@ from supar.utils.alg import kmeans
 
 class Dataset(torch.utils.data.Dataset):
     r"""
-    Dataset that is compatible with :class:`torch.utils.data.Dataset`.
-    This serves as a wrapper for manipulating all data fields
+    Dataset that is compatible with :class:`torch.utils.data.Dataset`, serving as a wrapper for manipulating all data fields
     with the operating behaviours defined in :class:`Transform`.
     The data fields of all the instantiated sentences can be accessed as an attribute of the dataset.
 
     Args:
         transform (Transform):
-            An instance of :class:`Transform` and its derivations.
+            An instance of :class:`Transform` or its derivations.
             The instance holds a series of loading and processing behaviours with regard to the specfic data format.
         data (list[list] or str):
             A list of instances or a filename.
             This will be passed into :meth:`transform.load`.
         kwargs (dict):
-            Keyword arguments that will be passed into :meth:`transform.load` together with `data`
-            to control the loading behaviour.
+            Together with `data`, kwargs will be passed into :meth:`transform.load` to control the loading behaviour.
 
     Attributes:
         transform (Transform):

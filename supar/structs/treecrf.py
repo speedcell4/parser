@@ -11,7 +11,7 @@ class MatrixTree(nn.Module):
     MatrixTree for calculating partitions and marginals of directed spanning trees (a.k.a. non-projective trees)
     in :math:`O(n^3)` by an adaptation of Kirchhoff's MatrixTree Theorem :cite:`koo-etal-2007-structured`.
 
-    It differs from the original paper in that marginals are computed via back-propagation rather than matrix inversion.
+    Different from the original paper, marginals are computed via back-propagation rather than matrix inversion.
     """
 
     @torch.enable_grad()
@@ -127,7 +127,6 @@ class CRFDependency(nn.Module):
         """
 
         training = scores.requires_grad
-        batch_size, seq_len, _ = scores.shape
         # always enable the gradient computation of scores in order for the computation of marginals
         logZ = self.inside(scores.requires_grad_(), mask)
         # marginals are used for decoding, and can be computed by combining the inside pass and autograd mechanism
