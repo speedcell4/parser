@@ -43,14 +43,14 @@ class BiaffineSemanticDependencyModel(Model):
             The index of the padding token in the character vocabulary, required if using CharLSTM. Default: 0.
         bert (str):
             Specifies which kind of language model to use, e.g., ``'bert-base-cased'`` and ``'xlnet-base-cased'``.
-            This is required if ``encoder='bert'`` or using  BERT features. The full list can be found in `transformers`_.
+            This is required if ``encoder='bert'`` or using BERT features. The full list can be found in `transformers`_.
             Default: ``None``.
         n_bert_layers (int):
-            Specifies how many last layers to use, required if ``encoder='bert'`` or using  BERT features.
+            Specifies how many last layers to use, required if ``encoder='bert'`` or using BERT features.
             The final outputs would be weighted sum of the hidden states of these layers.
             Default: 4.
         mix_dropout (float):
-            The dropout ratio of BERT layers, required if ``encoder='bert'`` or using  BERT features. Default: .0.
+            The dropout ratio of BERT layers, required if ``encoder='bert'`` or using BERT features. Default: .0.
         bert_pooling (str):
             Pooling way to get token embeddings.
             ``first``: take the first subtoken. ``last``: take the last subtoken. ``mean``: take a mean over all.
@@ -243,14 +243,14 @@ class VISemanticDependencyModel(BiaffineSemanticDependencyModel):
             The index of the padding token in the character vocabulary, required if using CharLSTM. Default: 0.
         bert (str):
             Specifies which kind of language model to use, e.g., ``'bert-base-cased'`` and ``'xlnet-base-cased'``.
-            This is required if ``encoder='bert'`` or using  BERT features. The full list can be found in `transformers`_.
+            This is required if ``encoder='bert'`` or using BERT features. The full list can be found in `transformers`_.
             Default: ``None``.
         n_bert_layers (int):
-            Specifies how many last layers to use, required if ``encoder='bert'`` or using  BERT features.
+            Specifies how many last layers to use, required if ``encoder='bert'`` or using BERT features.
             The final outputs would be weighted sum of the hidden states of these layers.
             Default: 4.
         mix_dropout (float):
-            The dropout ratio of BERT layers, required if ``encoder='bert'`` or using  BERT features. Default: .0.
+            The dropout ratio of BERT layers, required if ``encoder='bert'`` or using BERT features. Default: .0.
         bert_pooling (str):
             Pooling way to get token embeddings.
             ``first``: take the first subtoken. ``last``: take the last subtoken. ``mean``: take a mean over all.
