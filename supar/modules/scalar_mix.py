@@ -14,7 +14,7 @@ class ScalarMix(nn.Module):
             The number of layers to be mixed, i.e., :math:`N`.
         dropout (float):
             The dropout ratio of the layer weights.
-            If dropout > 0, then for each scalar weight, adjust its softmax weight mass to 0
+            If dropout > 0, then for each scalar weight, adjusts its softmax weight mass to 0
             with the dropout probability (i.e., setting the unnormalized weight to -inf).
             This effectively redistributes the dropped probability mass to all other weights.
             Default: 0.

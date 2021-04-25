@@ -16,11 +16,9 @@ class TransformerEmbedding(nn.Module):
         model (str):
             Path or name of the pretrained models registered in `transformers`_, e.g., ``'bert-base-cased'``.
         n_layers (int):
-            The number of layers from the model to use.
-            If 0, uses all layers.
+            The number of BERT layers to use. If 0, uses all layers.
         n_out (int):
-            The requested size of the embeddings. Default: 0.
-            If 0, uses the size of the pretrained embedding model.
+            The requested size of the embeddings. If 0, uses the size of the pretrained embedding model. Default: 0.
         stride (int):
             A sequence longer than max length will be splitted into several small pieces
             with a window size of ``stride``. Default: 10.
@@ -31,11 +29,9 @@ class TransformerEmbedding(nn.Module):
         pad_index (int):
             The index of the padding token in BERT vocabulary. Default: 0.
         dropout (float):
-            The dropout ratio of BERT layers. Default: 0.
-            This value will be passed into the :class:`ScalarMix` layer.
+            The dropout ratio of BERT layers. Default: 0. This value will be passed into the :class:`ScalarMix` layer.
         requires_grad (bool):
-            If ``True``, the model parameters will be updated together with the downstream task.
-            Default: ``False``.
+            If ``True``, the model parameters will be updated together with the downstream task. Default: ``False``.
 
     .. _transformers:
         https://github.com/huggingface/transformers

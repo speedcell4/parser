@@ -14,7 +14,6 @@ from supar.utils.logging import get_logger, progress_bar
 from supar.utils.metric import ChartMetric
 from supar.utils.transform import CoNLL
 
-
 logger = get_logger(__name__)
 
 

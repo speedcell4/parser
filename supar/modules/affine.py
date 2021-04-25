@@ -10,8 +10,8 @@ class Biaffine(nn.Module):
 
     This function has a tensor of weights :math:`W` and bias terms if needed.
     The score :math:`s(x, y)` of the vector pair :math:`(x, y)` is computed as :math:`x^T W y / d^s`,
-    where `d` and `s` are vector dimension and scaling factor respectively,
-    and :math:`x` and :math:`y` can be concatenated with bias terms.
+    where `d` and `s` are vector dimension and scaling factor respectively.
+    :math:`x` and :math:`y` can be concatenated with bias terms.
 
     Args:
         n_in (int):
@@ -84,8 +84,8 @@ class Triaffine(nn.Module):
 
     This function has a tensor of weights :math:`W` and bias terms if needed.
     The score :math:`s(x, y, z)` of the vector triple :math:`(x, y, z)` is computed as :math:`x^T z^T W y / d^s`,
-    where `d` and `s` are vector dimension and scaling factor respectively,
-    and :math:`x` and :math:`y` can be concatenated with bias terms.
+    where `d` and `s` are vector dimension and scaling factor respectively.
+    :math:`x` and :math:`y` can be concatenated with bias terms.
 
     Args:
         n_in (int):
