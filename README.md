@@ -226,7 +226,7 @@ Below is an example of training Biaffine Dependency Parser:
 $ python -m supar.cmds.biaffine_dep train -b -d 0 -c biaffine-dep-en -p model -f char
 ```
 
-Alternatively, `SuPar` provides some equivalent command entry points registered in `setup.py`:
+Alternatively, `SuPar` provides some equivalent command entry points registered in [`setup.py`](setup.py):
 `biaffine-dep`, `crf2o-dep`, `crf-con` and `biaffine-sdp`, etc.
 ```sh
 $ biaffine-dep train -b -d 0 -c biaffine-dep-en -p model -f char
@@ -243,7 +243,7 @@ You can consult the PyTorch [documentation](https://pytorch.org/docs/stable/note
 
 The evaluation process resembles prediction:
 ```py
->>> loss, metric = Parser.load('biaffine-dep-en').evaluate('data/ptb/test.conllx', verbose=False)
+>>> loss, metric = Parser.load('biaffine-dep-en').evaluate('ptb/test.conllx', verbose=False)
 >>> print(loss, metric)
 0.24214034126355097 UCM: 60.51% LCM: 50.37% UAS: 96.01% LAS: 94.41%
 ```
