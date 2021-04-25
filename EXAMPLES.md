@@ -1,4 +1,4 @@
-# EXAMPLES
+# Examples
 
 This file provides intructions on how to train parsing models from scratch and evaluate them.
 Some information has been given in [`README`](README.md).
@@ -30,9 +30,9 @@ The option `-c` controls where to load predefined configs, you can either specif
 For CRF models, you need to specify `--proj` to remove non-projective trees. 
 Specifying `--mbr` to perform MBR decoding often leads to consistent improvement.
 
-The English model finetuned on [`robert-large`](https://huggingface.co/roberta-large) achieves nearly state-of-the-art performance.
+The model finetuned on [`robert-large`](https://huggingface.co/roberta-large) achieves nearly state-of-the-art performance in English dependency parsing.
 Here we provide some recommended hyper-parameters (not the best, but good enough).
-You are allowed to set values of registered/unregistered parameters in bash to suppress default configs.
+You are allowed to set values of registered/unregistered parameters in bash to suppress default configs in the file.
 ```sh
 $ python -u -m supar.cmds.biaffine_dep train -b -d 0 -c biaffine-dep-roberta-en -p model  \
     --train ptb/train.conllx  \
@@ -92,11 +92,20 @@ $ python -u -m supar.cmds.crf_con train -b -d 0 -c crf-con-roberta-en -p model  
 Different from conventional evaluation manner of executing `EVALB`, we internally integrate python code for constituency tree evaluation.
 As different treebanks do not share the same evalution parameters, it is recommended to evaluate the results from command-line.
 ```py
->>> Parser.load('crf-con-en').evaluate('ptb/test.pid', delete={'TOP', 'S1', '-NONE-', ',', ':', '``', "''", '.', '?', '!', ''}, equal={'ADVP': 'PRT'}, verbose=False)
+>>> Parser.load('crf-con-en').evaluate('ptb/test.pid', 
+                                       delete={'TOP', 'S1', '-NONE-', ',', ':', '``', "''", '.', '?', '!', ''}, 
+                                       equal={'ADVP': 'PRT'}, 
+                                       verbose=False)
 (0.21318972731630007, UCM: 50.08% LCM: 47.56% UP: 94.89% UR: 94.71% UF: 94.80% LP: 94.16% LR: 93.98% LF: 94.07%)
->>> Parser.load('crf-con-zh').evaluate('ctb7/test.pid', delete={'TOP', 'S1', '-NONE-', ',', ':', '``', "''", '.', '?', '!', ''}, equal={'ADVP': 'PRT'}, verbose=False)
+>>> Parser.load('crf-con-zh').evaluate('ctb7/test.pid',
+                                       delete={'TOP', 'S1', '-NONE-', ',', ':', '``', "''", '.', '?', '!', ''}, 
+                                       equal={'ADVP': 'PRT'}, 
+                                       verbose=False)
 (0.3994724107416053, UCM: 24.96% LCM: 23.39% UP: 90.88% UR: 90.47% UF: 90.68% LP: 88.82% LR: 88.42% LF: 88.62%)
->>> Parser.load('crf-con-xlmr').evaluate('spmrl/eu/test.pid', delete={'TOP', 'ROOT', 'S1', '-NONE-', 'VROOT'}, equal={}, verbose=False)
+>>> Parser.load('crf-con-xlmr').evaluate('spmrl/eu/test.pid', 
+                                         delete={'TOP', 'ROOT', 'S1', '-NONE-', 'VROOT'}, 
+                                         equal={}, 
+                                         verbose=False)
 0.45620645582675934, UCM: 53.07% LCM: 48.10% UP: 94.74% UR: 95.53% UF: 95.14% LP: 93.29% LR: 94.07% LF: 93.68%)
 ```
 
