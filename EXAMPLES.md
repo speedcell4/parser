@@ -1,6 +1,6 @@
 # Examples
 
-This file provides intructions on how to train parsing models from scratch and evaluate them.
+This file provides instructions on how to train parsing models from scratch and evaluate them.
 Some information has been given in [`README`](README.md).
 Here we describe in detail the commands and other settings.
 
@@ -46,7 +46,7 @@ $ python -u -m supar.cmds.biaffine_dep train -b -d 0 -c biaffine-dep-roberta-en 
     --epochs=10  \
     --update-steps=4
 ```
-The pretrained multilingual model `biaffine-dep-xlmr` takes [`xlm-roberta-large`](https://huggingface.co/xlm-roberta-large) as backbone arctechiture and finetunes on it.
+The pretrained multilingual model `biaffine-dep-xlmr` takes [`xlm-roberta-large`](https://huggingface.co/xlm-roberta-large) as backbone architecture and finetunes on it.
 The training command is as following:
 ```sh
 $ python -u -m supar.cmds.biaffine_dep train -b -d 0 -c biaffine-dep-xlmr -p model  \
@@ -98,7 +98,7 @@ $ python -u -m supar.cmds.crf_con train -b -d 0 -c crf-con-roberta-en -p model  
     --encoder=bert  \
     --bert=roberta-large  \
     --lr=5e-5  \
-    --lr-rate=10  \
+    --lr-rate=20  \
     --batch-size=5000  \
     --epochs=10  \
     --update-steps=4
@@ -121,7 +121,9 @@ $ python -u -m supar.cmds.crf_con train -b -d 0 -c crf-con-roberta-en -p model  
 ```
 
 Different from conventional evaluation manner of executing `EVALB`, we internally integrate python code for constituency tree evaluation.
-As different treebanks do not share the same evalution parameters, it is recommended to evaluate the results from command-line.
+As different treebanks do not share the same evaluation parameters, it is recommended to evaluate the results in interactive mode.
+
+To evaluate English and Chinese models:
 ```py
 >>> Parser.load('crf-con-en').evaluate('ptb/test.pid',
                                        delete={'TOP', 'S1', '-NONE-', ',', ':', '``', "''", '.', '?', '!', ''},
@@ -133,11 +135,15 @@ As different treebanks do not share the same evalution parameters, it is recomme
                                        equal={'ADVP': 'PRT'},
                                        verbose=False)
 (0.3994724107416053, UCM: 24.96% LCM: 23.39% UP: 90.88% UR: 90.47% UF: 90.68% LP: 88.82% LR: 88.42% LF: 88.62%)
+```
+
+To evaluate the multilingual model:
+```py
 >>> Parser.load('crf-con-xlmr').evaluate('spmrl/eu/test.pid',
                                          delete={'TOP', 'ROOT', 'S1', '-NONE-', 'VROOT'},
                                          equal={},
                                          verbose=False)
-0.45620645582675934, UCM: 53.07% LCM: 48.10% UP: 94.74% UR: 95.53% UF: 95.14% LP: 93.29% LR: 94.07% LF: 93.68%)
+(0.45620645582675934, UCM: 53.07% LCM: 48.10% UP: 94.74% UR: 95.53% UF: 95.14% LP: 93.29% LR: 94.07% LF: 93.68%)
 ```
 
 ## Semantic Dependency Parsing
