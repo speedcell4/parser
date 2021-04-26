@@ -23,12 +23,17 @@ class VISemanticRoleLabelingModel(Model):
             The number of characters, required if character-level representations are used. Default: ``None``.
         n_lemmas (int):
             The number of lemmas, required if lemma embeddings are used. Default: ``None``.
+        encoder (str):
+            Encoder to use.
+            ``'lstm'``: BiLSTM encoder.
+            ``'bert'``: BERT-like pretrained language model (for finetuning), e.g., ``'bert-base-cased'``.
+            Default: ``'lstm'``.
         feat (list[str]):
-            Additional features to use.
+            Additional features to use, required if ``encoder='lstm'``.
             ``'tag'``: POS tag embeddings.
             ``'char'``: Character-level representations extracted by CharLSTM.
             ``'lemma'``: Lemma embeddings.
-            ``'bert'``: BERT representations, other pretrained langugae models like XLNet are also feasible.
+            ``'bert'``: BERT representations, other pretrained language models like RoBERTa are also feasible.
             Default: [ ``'tag'``, ``'char'``, ``'lemma'``].
         n_embed (int):
             The size of word embeddings. Default: 100.
@@ -43,7 +48,7 @@ class VISemanticRoleLabelingModel(Model):
         char_pad_index (int):
             The index of the padding token in the character vocabulary, required if using CharLSTM. Default: 0.
         bert (str):
-            Specifies which kind of language model to use, e.g., ``'bert-base-cased'`` and ``'xlnet-base-cased'``.
+            Specifies which kind of language model to use, e.g., ``'bert-base-cased'``.
             This is required if ``encoder='bert'`` or using BERT features. The full list can be found in `transformers`_.
             Default: ``None``.
         n_bert_layers (int):
@@ -102,6 +107,7 @@ class VISemanticRoleLabelingModel(Model):
                  n_tags=None,
                  n_chars=None,
                  n_lemmas=None,
+                 encoder='lstm',
                  feat=['tag', 'char', 'lemma'],
                  n_embed=100,
                  n_pretrained=125,
@@ -187,7 +193,7 @@ class VISemanticRoleLabelingModel(Model):
         label_h = self.label_mlp_h(x)
 
         # [batch_size, seq_len, seq_len]
-        s_egde = self.edge_attn(edge_d, edge_h)
+        s_edge = self.edge_attn(edge_d, edge_h)
         # [batch_size, seq_len, seq_len, seq_len], (d->h->s)
         s_sib = self.sib_attn(pair_d, pair_d, pair_h)
         s_sib = (s_sib.triu() + s_sib.triu(1).transpose(-1, -2)).permute(0, 3, 1, 2)
@@ -199,12 +205,12 @@ class VISemanticRoleLabelingModel(Model):
         # [batch_size, seq_len, seq_len, n_labels]
         s_label = self.label_attn(label_d, label_h).permute(0, 2, 3, 1)
 
-        return s_egde, s_sib, s_cop, s_grd, s_label
+        return s_edge, s_sib, s_cop, s_grd, s_label
 
-    def loss(self, s_egde, s_sib, s_cop, s_grd, s_label, labels, mask):
+    def loss(self, s_edge, s_sib, s_cop, s_grd, s_label, labels, mask):
         r"""
         Args:
-            s_egde (~torch.Tensor): ``[batch_size, seq_len, seq_len]``.
+            s_edge (~torch.Tensor): ``[batch_size, seq_len, seq_len]``.
                 Scores of all possible edges.
             s_sib (~torch.Tensor): ``[batch_size, seq_len, seq_len, seq_len]``.
                 Scores of all possible dependent-head-sibling triples.
@@ -225,15 +231,15 @@ class VISemanticRoleLabelingModel(Model):
         """
 
         edge_mask = labels.ge(0) & mask
-        edge_loss, marginals = self.inference((s_egde, s_sib, s_cop, s_grd), mask, edge_mask.long())
+        edge_loss, marginals = self.inference((s_edge, s_sib, s_cop, s_grd), mask, edge_mask.long())
         label_loss = self.criterion(s_label[edge_mask], labels[edge_mask])
         loss = self.args.interpolation * label_loss + (1 - self.args.interpolation) * edge_loss
         return loss, marginals
 
-    def decode(self, s_egde, s_label):
+    def decode(self, s_edge, s_label):
         r"""
         Args:
-            s_egde (~torch.Tensor): ``[batch_size, seq_len, seq_len]``.
+            s_edge (~torch.Tensor): ``[batch_size, seq_len, seq_len]``.
                 Scores of all possible edges.
             s_label (~torch.Tensor): ``[batch_size, seq_len, seq_len, n_labels]``.
                 Scores of all possible labels on each edge.
@@ -243,4 +249,4 @@ class VISemanticRoleLabelingModel(Model):
                 Predicted labels of shape ``[batch_size, seq_len, seq_len]``.
         """
 
-        return s_label.argmax(-1).masked_fill_(s_egde.lt(0.5), -1)
+        return s_label.argmax(-1).masked_fill_(s_edge.lt(0.5), -1)

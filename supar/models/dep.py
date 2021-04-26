@@ -24,14 +24,21 @@ class BiaffineDependencyModel(Model):
             The number of POS tags, required if POS tag embeddings are used. Default: ``None``.
         n_chars (int):
             The number of characters, required if character-level representations are used. Default: ``None``.
+        encoder (str):
+            Encoder to use.
+            ``'lstm'``: BiLSTM encoder.
+            ``'bert'``: BERT-like pretrained language model (for finetuning), e.g., ``'bert-base-cased'``.
+            Default: ``'lstm'``.
         feat (list[str]):
-            Additional features to use.
+            Additional features to use, required if ``encoder='lstm'``.
             ``'tag'``: POS tag embeddings.
             ``'char'``: Character-level representations extracted by CharLSTM.
-            ``'bert'``: BERT representations, other pretrained langugae models like XLNet are also feasible.
+            ``'bert'``: BERT representations, other pretrained language models like RoBERTa are also feasible.
             Default: [``'char'``].
         n_embed (int):
             The size of word embeddings. Default: 100.
+        n_pretrained (int):
+            The size of pretrained word embeddings. Default: 100.
         n_feat_embed (int):
             The size of feature representations. Default: 100.
         n_char_embed (int):
@@ -41,7 +48,7 @@ class BiaffineDependencyModel(Model):
         char_pad_index (int):
             The index of the padding token in the character vocabulary, required if using CharLSTM. Default: 0.
         bert (str):
-            Specifies which kind of language model to use, e.g., ``'bert-base-cased'`` and ``'xlnet-base-cased'``.
+            Specifies which kind of language model to use, e.g., ``'bert-base-cased'``.
             This is required if ``encoder='bert'`` or using BERT features. The full list can be found in `transformers`_.
             Default: ``None``.
         n_bert_layers (int):
@@ -55,7 +62,8 @@ class BiaffineDependencyModel(Model):
             ``first``: take the first subtoken. ``last``: take the last subtoken. ``mean``: take a mean over all.
             Default: ``mean``.
         bert_pad_index (int):
-            The index of the padding token in BERT vocabulary, required if ``encoder='bert'`` or using BERT features. Default: 0.
+            The index of the padding token in BERT vocabulary, required if ``encoder='bert'`` or using BERT features.
+            Default: 0.
         freeze (bool):
             If ``True``, freezes BERT parameters, required if using BERT features. Default: ``True``.
         embed_dropout (float):
@@ -88,8 +96,10 @@ class BiaffineDependencyModel(Model):
                  n_rels,
                  n_tags=None,
                  n_chars=None,
+                 encoder='lstm',
                  feat=['char'],
                  n_embed=100,
+                 n_pretrained=100,
                  n_feat_embed=100,
                  n_char_embed=50,
                  n_char_hidden=100,
@@ -230,14 +240,21 @@ class CRFDependencyModel(BiaffineDependencyModel):
             The number of POS tags, required if POS tag embeddings are used. Default: ``None``.
         n_chars (int):
             The number of characters, required if character-level representations are used. Default: ``None``.
+        encoder (str):
+            Encoder to use.
+            ``'lstm'``: BiLSTM encoder.
+            ``'bert'``: BERT-like pretrained language model (for finetuning), e.g., ``'bert-base-cased'``.
+            Default: ``'lstm'``.
         feat (list[str]):
-            Additional features to use.
+            Additional features to use, required if ``encoder='lstm'``.
             ``'tag'``: POS tag embeddings.
             ``'char'``: Character-level representations extracted by CharLSTM.
-            ``'bert'``: BERT representations, other pretrained langugae models like XLNet are also feasible.
+            ``'bert'``: BERT representations, other pretrained language models like RoBERTa are also feasible.
             Default: [``'char'``].
         n_embed (int):
             The size of word embeddings. Default: 100.
+        n_pretrained (int):
+            The size of pretrained word embeddings. Default: 100.
         n_feat_embed (int):
             The size of feature representations. Default: 100.
         n_char_embed (int):
@@ -247,7 +264,7 @@ class CRFDependencyModel(BiaffineDependencyModel):
         char_pad_index (int):
             The index of the padding token in the character vocabulary, required if using CharLSTM. Default: 0.
         bert (str):
-            Specifies which kind of language model to use, e.g., ``'bert-base-cased'`` and ``'xlnet-base-cased'``.
+            Specifies which kind of language model to use, e.g., ``'bert-base-cased'``.
             This is required if ``encoder='bert'`` or using BERT features. The full list can be found in `transformers`_.
             Default: ``None``.
         n_bert_layers (int):
@@ -261,7 +278,8 @@ class CRFDependencyModel(BiaffineDependencyModel):
             ``first``: take the first subtoken. ``last``: take the last subtoken. ``mean``: take a mean over all.
             Default: ``mean``.
         bert_pad_index (int):
-            The index of the padding token in BERT vocabulary, required if ``encoder='bert'`` or using BERT features. Default: 0.
+            The index of the padding token in BERT vocabulary, required if ``encoder='bert'`` or using BERT features.
+            Default: 0.
         freeze (bool):
             If ``True``, freezes BERT parameters, required if using BERT features. Default: ``True``.
         embed_dropout (float):
@@ -342,14 +360,21 @@ class CRF2oDependencyModel(BiaffineDependencyModel):
             The number of POS tags, required if POS tag embeddings are used. Default: ``None``.
         n_chars (int):
             The number of characters, required if character-level representations are used. Default: ``None``.
+        encoder (str):
+            Encoder to use.
+            ``'lstm'``: BiLSTM encoder.
+            ``'bert'``: BERT-like pretrained language model (for finetuning), e.g., ``'bert-base-cased'``.
+            Default: ``'lstm'``.
         feat (list[str]):
-            Additional features to use.
+            Additional features to use, required if ``encoder='lstm'``.
             ``'tag'``: POS tag embeddings.
             ``'char'``: Character-level representations extracted by CharLSTM.
-            ``'bert'``: BERT representations, other pretrained langugae models like XLNet are also feasible.
+            ``'bert'``: BERT representations, other pretrained language models like RoBERTa are also feasible.
             Default: [``'char'``].
         n_embed (int):
             The size of word embeddings. Default: 100.
+        n_pretrained (int):
+            The size of pretrained word embeddings. Default: 100.
         n_feat_embed (int):
             The size of feature representations. Default: 100.
         n_char_embed (int):
@@ -359,7 +384,7 @@ class CRF2oDependencyModel(BiaffineDependencyModel):
         char_pad_index (int):
             The index of the padding token in the character vocabulary, required if using CharLSTM. Default: 0.
         bert (str):
-            Specifies which kind of language model to use, e.g., ``'bert-base-cased'`` and ``'xlnet-base-cased'``.
+            Specifies which kind of language model to use, e.g., ``'bert-base-cased'``.
             This is required if ``encoder='bert'`` or using BERT features. The full list can be found in `transformers`_.
             Default: ``None``.
         n_bert_layers (int):
@@ -373,7 +398,8 @@ class CRF2oDependencyModel(BiaffineDependencyModel):
             ``first``: take the first subtoken. ``last``: take the last subtoken. ``mean``: take a mean over all.
             Default: ``mean``.
         bert_pad_index (int):
-            The index of the padding token in BERT vocabulary, required if ``encoder='bert'`` or using BERT features. Default: 0.
+            The index of the padding token in BERT vocabulary, required if ``encoder='bert'`` or using BERT features.
+            Default: 0.
         freeze (bool):
             If ``True``, freezes BERT parameters, required if using BERT features. Default: ``True``.
         embed_dropout (float):
@@ -405,8 +431,10 @@ class CRF2oDependencyModel(BiaffineDependencyModel):
                  n_rels,
                  n_tags=None,
                  n_chars=None,
+                 encoder='lstm',
                  feat=['char'],
                  n_embed=100,
+                 n_pretrained=100,
                  n_feat_embed=100,
                  n_char_embed=50,
                  n_char_hidden=100,
@@ -571,14 +599,21 @@ class VIDependencyModel(BiaffineDependencyModel):
             The number of POS tags, required if POS tag embeddings are used. Default: ``None``.
         n_chars (int):
             The number of characters, required if character-level representations are used. Default: ``None``.
+        encoder (str):
+            Encoder to use.
+            ``'lstm'``: BiLSTM encoder.
+            ``'bert'``: BERT-like pretrained language model (for finetuning), e.g., ``'bert-base-cased'``.
+            Default: ``'lstm'``.
         feat (list[str]):
-            Additional features to use.
+            Additional features to use, required if ``encoder='lstm'``.
             ``'tag'``: POS tag embeddings.
             ``'char'``: Character-level representations extracted by CharLSTM.
-            ``'bert'``: BERT representations, other pretrained langugae models like XLNet are also feasible.
+            ``'bert'``: BERT representations, other pretrained language models like RoBERTa are also feasible.
             Default: [``'char'``].
         n_embed (int):
             The size of word embeddings. Default: 100.
+        n_pretrained (int):
+            The size of pretrained word embeddings. Default: 100.
         n_feat_embed (int):
             The size of feature representations. Default: 100.
         n_char_embed (int):
@@ -588,7 +623,7 @@ class VIDependencyModel(BiaffineDependencyModel):
         char_pad_index (int):
             The index of the padding token in the character vocabulary, required if using CharLSTM. Default: 0.
         bert (str):
-            Specifies which kind of language model to use, e.g., ``'bert-base-cased'`` and ``'xlnet-base-cased'``.
+            Specifies which kind of language model to use, e.g., ``'bert-base-cased'``.
             This is required if ``encoder='bert'`` or using BERT features. The full list can be found in `transformers`_.
             Default: ``None``.
         n_bert_layers (int):
@@ -602,7 +637,8 @@ class VIDependencyModel(BiaffineDependencyModel):
             ``first``: take the first subtoken. ``last``: take the last subtoken. ``mean``: take a mean over all.
             Default: ``mean``.
         bert_pad_index (int):
-            The index of the padding token in BERT vocabulary, required if ``encoder='bert'`` or using BERT features. Default: 0.
+            The index of the padding token in BERT vocabulary, required if ``encoder='bert'`` or using BERT features.
+            Default: 0.
         freeze (bool):
             If ``True``, freezes BERT parameters, required if using BERT features. Default: ``True``.
         embed_dropout (float):
@@ -643,8 +679,10 @@ class VIDependencyModel(BiaffineDependencyModel):
                  n_rels,
                  n_tags=None,
                  n_chars=None,
+                 encoder='lstm',
                  feat=['char'],
                  n_embed=100,
+                 n_pretrained=100,
                  n_feat_embed=100,
                  n_char_embed=50,
                  n_char_hidden=100,

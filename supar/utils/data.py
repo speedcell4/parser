@@ -16,7 +16,7 @@ class Dataset(torch.utils.data.Dataset):
     Args:
         transform (Transform):
             An instance of :class:`Transform` or its derivations.
-            The instance holds a series of loading and processing behaviours with regard to the specfic data format.
+            The instance holds a series of loading and processing behaviours with regard to the specific data format.
         data (list[list] or str):
             A list of instances or a filename.
             This will be passed into :meth:`transform.load`.
@@ -139,7 +139,7 @@ class Sampler(torch.utils.data.Sampler):
         g.manual_seed(self.epoch)
         range_fn = torch.arange
         # if `shuffle=True`, shuffle both the buckets and samples in each bucket
-        # for distributed training, make sure each process genertes the same random sequence at each epoch
+        # for distributed training, make sure each process generates the same random sequence at each epoch
         if self.shuffle:
             def range_fn(x):
                 return torch.randperm(x, generator=g)

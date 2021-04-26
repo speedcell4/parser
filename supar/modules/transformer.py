@@ -10,7 +10,7 @@ class TransformerEmbedding(nn.Module):
     r"""
     A module that directly utilizes the pretrained models in `transformers`_ to produce BERT representations.
     While mainly tailored to provide input preparation and post-processing for the BERT model,
-    it is also compatiable with other pretrained language models like XLNet, RoBERTa and ELECTRA, etc.
+    it is also compatible with other pretrained language models like XLNet, RoBERTa and ELECTRA, etc.
 
     Args:
         model (str):

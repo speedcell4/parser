@@ -17,20 +17,27 @@ class CRFConstituencyModel(Model):
     Args:
         n_words (int):
             The size of the word vocabulary.
-        n_rels (int):
+        n_labels (int):
             The number of labels in the treebank.
         n_tags (int):
             The number of POS tags, required if POS tag embeddings are used. Default: ``None``.
         n_chars (int):
             The number of characters, required if character-level representations are used. Default: ``None``.
+        encoder (str):
+            Encoder to use.
+            ``'lstm'``: BiLSTM encoder.
+            ``'bert'``: BERT-like pretrained language model (for finetuning), e.g., ``'bert-base-cased'``.
+            Default: ``'lstm'``.
         feat (list[str]):
-            Additional features to use.
+            Additional features to use, required if ``encoder='lstm'``.
             ``'tag'``: POS tag embeddings.
             ``'char'``: Character-level representations extracted by CharLSTM.
-            ``'bert'``: BERT representations, other pretrained langugae models like XLNet are also feasible.
+            ``'bert'``: BERT representations, other pretrained language models like RoBERTa are also feasible.
             Default: [``'char'``].
         n_embed (int):
             The size of word embeddings. Default: 100.
+        n_pretrained (int):
+            The size of pretrained word embeddings. Default: 100.
         n_feat_embed (int):
             The size of feature representations. Default: 100.
         n_char_embed (int):
@@ -40,7 +47,7 @@ class CRFConstituencyModel(Model):
         char_pad_index (int):
             The index of the padding token in the character vocabulary, required if using CharLSTM. Default: 0.
         bert (str):
-            Specifies which kind of language model to use, e.g., ``'bert-base-cased'`` and ``'xlnet-base-cased'``.
+            Specifies which kind of language model to use, e.g., ``'bert-base-cased'``.
             This is required if ``encoder='bert'`` or using BERT features. The full list can be found in `transformers`_.
             Default: ``None``.
         n_bert_layers (int):
@@ -86,8 +93,10 @@ class CRFConstituencyModel(Model):
                  n_labels,
                  n_tags=None,
                  n_chars=None,
+                 encoder='lstm',
                  feat=['char'],
                  n_embed=100,
+                 n_pretrained=100,
                  n_feat_embed=100,
                  n_char_embed=50,
                  n_char_hidden=100,
@@ -209,20 +218,27 @@ class VIConstituencyModel(CRFConstituencyModel):
     Args:
         n_words (int):
             The size of the word vocabulary.
-        n_rels (int):
+        n_labels (int):
             The number of labels in the treebank.
         n_tags (int):
             The number of POS tags, required if POS tag embeddings are used. Default: ``None``.
         n_chars (int):
             The number of characters, required if character-level representations are used. Default: ``None``.
+        encoder (str):
+            Encoder to use.
+            ``'lstm'``: BiLSTM encoder.
+            ``'bert'``: BERT-like pretrained language model (for finetuning), e.g., ``'bert-base-cased'``.
+            Default: ``'lstm'``.
         feat (list[str]):
-            Additional features to use.
+            Additional features to use, required if ``encoder='lstm'``.
             ``'tag'``: POS tag embeddings.
             ``'char'``: Character-level representations extracted by CharLSTM.
-            ``'bert'``: BERT representations, other pretrained langugae models like XLNet are also feasible.
+            ``'bert'``: BERT representations, other pretrained language models like RoBERTa are also feasible.
             Default: [``'char'``].
         n_embed (int):
             The size of word embeddings. Default: 100.
+        n_pretrained (int):
+            The size of pretrained word embeddings. Default: 100.
         n_feat_embed (int):
             The size of feature representations. Default: 100.
         n_char_embed (int):
@@ -232,7 +248,7 @@ class VIConstituencyModel(CRFConstituencyModel):
         char_pad_index (int):
             The index of the padding token in the character vocabulary, required if using CharLSTM. Default: 0.
         bert (str):
-            Specifies which kind of language model to use, e.g., ``'bert-base-cased'`` and ``'xlnet-base-cased'``.
+            Specifies which kind of language model to use, e.g., ``'bert-base-cased'``.
             This is required if ``encoder='bert'`` or using BERT features. The full list can be found in `transformers`_.
             Default: ``None``.
         n_bert_layers (int):
@@ -286,8 +302,10 @@ class VIConstituencyModel(CRFConstituencyModel):
                  n_labels,
                  n_tags=None,
                  n_chars=None,
+                 encoder='lstm',
                  feat=['char'],
                  n_embed=100,
+                 n_pretrained=100,
                  n_feat_embed=100,
                  n_char_embed=50,
                  n_char_hidden=100,

@@ -227,7 +227,7 @@ def chuliu_edmonds(s):
 
 def mst(scores, mask, multiroot=False):
     r"""
-    MST algorithm for decoding non-pojective trees.
+    MST algorithm for decoding non-projective trees.
     This is a wrapper for ChuLiu/Edmonds algorithm.
 
     The algorithm first runs ChuLiu/Edmonds to parse a tree and then have a check of multi-roots,
@@ -241,7 +241,7 @@ def mst(scores, mask, multiroot=False):
         mask (~torch.BoolTensor): ``[batch_size, seq_len]``.
             The mask to avoid parsing over padding tokens.
             The first column serving as pseudo words for roots should be ``False``.
-        muliroot (bool):
+        multiroot (bool):
             Ensures to parse a single-root tree If ``False``.
 
     Returns:
@@ -294,7 +294,7 @@ def eisner(scores, mask, multiroot=False):
         mask (~torch.BoolTensor): ``[batch_size, seq_len]``.
             The mask to avoid parsing over padding tokens.
             The first column serving as pseudo words for roots should be ``False``.
-        muliroot (bool):
+        multiroot (bool):
             Ensures to parse a single-root tree If ``False``.
 
     Returns:
@@ -380,13 +380,13 @@ def eisner2o(scores, mask, multiroot=False):
 
     Args:
         scores (~torch.Tensor, ~torch.Tensor):
-            A tuple of two tensors representing the first-order and second-order scores repectively.
+            A tuple of two tensors representing the first-order and second-order scores respectively.
             The first (``[batch_size, seq_len, seq_len]``) holds scores of all dependent-head pairs.
             The second (``[batch_size, seq_len, seq_len, seq_len]``) holds scores of all dependent-head-sibling triples.
         mask (~torch.BoolTensor): ``[batch_size, seq_len]``.
             The mask to avoid parsing over padding tokens.
             The first column serving as pseudo words for roots should be ``False``.
-        muliroot (bool):
+        multiroot (bool):
             Ensures to parse a single-root tree If ``False``.
 
     Returns:

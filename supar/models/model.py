@@ -15,6 +15,7 @@ class Model(nn.Module):
                  n_tags=None,
                  n_chars=None,
                  n_lemmas=None,
+                 encoder='lstm',
                  feat=['char'],
                  n_embed=100,
                  n_pretrained=100,
@@ -28,6 +29,7 @@ class Model(nn.Module):
                  mix_dropout=.0,
                  bert_pooling='mean',
                  bert_pad_index=0,
+                 freeze=False,
                  embed_dropout=.33,
                  n_lstm_hidden=400,
                  n_lstm_layers=3,
@@ -37,55 +39,55 @@ class Model(nn.Module):
 
         self.args = Config().update(locals())
 
-        if self.args.encoder != 'bert':
-            self.word_embed = nn.Embedding(num_embeddings=self.args.n_words,
-                                           embedding_dim=self.args.n_embed)
+        if encoder != 'bert':
+            self.word_embed = nn.Embedding(num_embeddings=n_words,
+                                           embedding_dim=n_embed)
 
-            self.args.n_input = self.args.n_embed
-            if self.args.n_pretrained != self.args.n_embed:
-                self.args.n_input += self.args.n_pretrained
-            if 'tag' in self.args.feat:
-                self.tag_embed = nn.Embedding(num_embeddings=self.args.n_tags,
-                                              embedding_dim=self.args.n_feat_embed)
-                self.args.n_input += self.args.n_feat_embed
-            if 'char' in self.args.feat:
-                self.char_embed = CharLSTM(n_chars=self.args.n_chars,
-                                           n_embed=self.args.n_char_embed,
-                                           n_hidden=self.args.n_char_hidden,
-                                           n_out=self.args.n_feat_embed,
-                                           pad_index=self.args.char_pad_index,
-                                           dropout=self.args.char_dropout)
-                self.args.n_input += self.args.n_feat_embed
-            if 'lemma' in self.args.feat:
-                self.lemma_embed = nn.Embedding(num_embeddings=self.args.n_lemmas,
-                                                embedding_dim=self.args.n_feat_embed)
-                self.args.n_input += self.args.n_feat_embed
-            if 'bert' in self.args.feat:
-                self.bert_embed = TransformerEmbedding(model=self.args.bert,
-                                                       n_layers=self.args.n_bert_layers,
-                                                       n_out=self.args.n_feat_embed,
+            n_input = n_embed
+            if n_pretrained != n_embed:
+                n_input += n_pretrained
+            if 'tag' in feat:
+                self.tag_embed = nn.Embedding(num_embeddings=n_tags,
+                                              embedding_dim=n_feat_embed)
+                n_input += n_feat_embed
+            if 'char' in feat:
+                self.char_embed = CharLSTM(n_chars=n_chars,
+                                           n_embed=n_char_embed,
+                                           n_hidden=n_char_hidden,
+                                           n_out=n_feat_embed,
+                                           pad_index=char_pad_index,
+                                           dropout=char_dropout)
+                n_input += n_feat_embed
+            if 'lemma' in feat:
+                self.lemma_embed = nn.Embedding(num_embeddings=n_lemmas,
+                                                embedding_dim=n_feat_embed)
+                n_input += n_feat_embed
+            if 'bert' in feat:
+                self.bert_embed = TransformerEmbedding(model=bert,
+                                                       n_layers=n_bert_layers,
+                                                       n_out=n_feat_embed,
                                                        pooling=bert_pooling,
-                                                       pad_index=self.args.bert_pad_index,
-                                                       dropout=self.args.mix_dropout,
-                                                       requires_grad=(not self.args.freeze))
-                self.args.n_input += self.bert_embed.n_out
-            self.embed_dropout = IndependentDropout(p=self.args.embed_dropout)
-        if self.args.encoder == 'lstm':
-            self.encoder = VariationalLSTM(input_size=self.args.n_input,
-                                           hidden_size=self.args.n_lstm_hidden,
-                                           num_layers=self.args.n_lstm_layers,
+                                                       pad_index=bert_pad_index,
+                                                       dropout=mix_dropout,
+                                                       requires_grad=(not freeze))
+                n_input += self.bert_embed.n_out
+            self.embed_dropout = IndependentDropout(p=embed_dropout)
+        if encoder == 'lstm':
+            self.encoder = VariationalLSTM(input_size=n_input,
+                                           hidden_size=n_lstm_hidden,
+                                           num_layers=n_lstm_layers,
                                            bidirectional=True,
-                                           dropout=self.args.encoder_dropout)
-            self.encoder_dropout = SharedDropout(p=self.args.encoder_dropout)
-            self.args.n_hidden = self.args.n_lstm_hidden * 2
+                                           dropout=encoder_dropout)
+            self.encoder_dropout = SharedDropout(p=encoder_dropout)
+            self.args.n_hidden = n_lstm_hidden * 2
         else:
-            self.encoder = TransformerEmbedding(model=self.args.bert,
-                                                n_layers=self.args.n_bert_layers,
+            self.encoder = TransformerEmbedding(model=bert,
+                                                n_layers=n_bert_layers,
                                                 pooling=bert_pooling,
-                                                pad_index=self.args.pad_index,
-                                                dropout=self.args.mix_dropout,
+                                                pad_index=bert_pad_index,
+                                                dropout=mix_dropout,
                                                 requires_grad=True)
-            self.encoder_dropout = nn.Dropout(p=self.args.encoder_dropout)
+            self.encoder_dropout = nn.Dropout(p=encoder_dropout)
             self.args.n_hidden = self.encoder.n_out
 
     def load_pretrained(self, embed=None):
