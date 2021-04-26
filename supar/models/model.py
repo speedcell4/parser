@@ -34,6 +34,7 @@ class Model(nn.Module):
                  n_lstm_hidden=400,
                  n_lstm_layers=3,
                  encoder_dropout=.33,
+                 pad_index=0,
                  **kwargs):
         super().__init__()
 
@@ -84,7 +85,7 @@ class Model(nn.Module):
             self.encoder = TransformerEmbedding(model=bert,
                                                 n_layers=n_bert_layers,
                                                 pooling=bert_pooling,
-                                                pad_index=bert_pad_index,
+                                                pad_index=pad_index,
                                                 dropout=mix_dropout,
                                                 requires_grad=True)
             self.encoder_dropout = nn.Dropout(p=encoder_dropout)
