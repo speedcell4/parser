@@ -86,7 +86,7 @@ def tarjan(sequence):
             List of head indices.
 
     Yields:
-        A list of indices that make up a SCC. All self-loops are ignored.
+        A list of indices making up a SCC. All self-loops are ignored.
 
     Examples:
         >>> next(tarjan([2, 5, 0, 3, 1]))  # (1 -> 5 -> 2 -> 1) is a cycle
