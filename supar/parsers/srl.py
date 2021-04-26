@@ -210,7 +210,7 @@ class VISemanticRoleLabelingParser(Parser):
 
         args = Config(**locals())
         args.device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        os.makedirs(os.path.dirname(path), exist_ok=True)
+        os.makedirs(os.path.dirname(path) or './', exist_ok=True)
         if os.path.exists(path) and not args.build:
             parser = cls.load(**args)
             parser.model = cls.MODEL(**parser.args)
