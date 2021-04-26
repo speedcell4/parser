@@ -87,7 +87,7 @@ Below are the results.
 | `crf-con-en`         | 94.16 | 93.98 |  94.07  |  841.88 |
 | `crf-con-roberta-en` | 96.42 | 96.13 |  96.28  |  233.34 |
 | `crf-con-zh`         | 88.82 | 88.42 |  88.62  |  590.05 |
-| `crf-con-electra-zh` | 92.15 | 91.56 |  91.85  |  140.45 |
+| `crf-con-electra-zh` | 92.18 | 91.66 |  91.92  |  140.45 |
 
 The multilingual model `crf-con-xlmr` is trained on SPMRL dataset by finetuning [`xlm-roberta-large`](https://huggingface.co/xlm-roberta-large).
 We follow instructions of [Benepar](https://github.com/nikitakit/self-attentive-parser) to preprocess the data.

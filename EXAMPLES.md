@@ -41,7 +41,7 @@ $ python -u -m supar.cmds.biaffine_dep train -b -d 0 -c biaffine-dep-roberta-en 
     --encoder=bert  \
     --bert=roberta-large  \
     --lr=5e-5  \
-    --lr-rate=10  \
+    --lr-rate=20  \
     --batch-size=5000  \
     --epochs=10  \
     --update-steps=4
@@ -56,7 +56,7 @@ $ python -u -m supar.cmds.biaffine_dep train -b -d 0 -c biaffine-dep-xlmr -p mod
     --encoder=bert  \
     --bert=xlm-roberta-large  \
     --lr=5e-5  \
-    --lr-rate=10  \
+    --lr-rate=20  \
     --batch-size=5000  \
     --epochs=10  \
     --update-steps=4
@@ -104,8 +104,7 @@ $ python -u -m supar.cmds.crf_con train -b -d 0 -c crf-con-roberta-en -p model  
     --update-steps=4
 ```
 
-We provide a pretrained multilingual model finetuned on [`xlm-roberta-large`](https://huggingface.co/xlm-roberta-large).
-The model is trained on merge treebanks of 9 languages in SPMRL dataset:
+The command for finetuning [`xlm-roberta-large`](https://huggingface.co/xlm-roberta-large) on merged treebanks of 9 languages in SPMRL dataset is:
 ```sh
 $ python -u -m supar.cmds.crf_con train -b -d 0 -c crf-con-roberta-en -p model  \
     --train spmrl/train.pid  \
