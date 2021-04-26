@@ -138,8 +138,9 @@ class Sentence(object):
 class CoNLL(Transform):
     r"""
     The CoNLL object holds ten fields required for CoNLL-X data format :cite:`buchholz-marsi-2006-conll`.
-    Each field can be binded with one or more :class:`Field` objects. For example,
-    ``FORM`` can contain both :class:`Field` and :class:`SubwordField` to produce tensors for words and subwords.
+    Each field can be binded with one or more :class:`~supar.utils.field.Field` objects. For example,
+    ``FORM`` can contain both :class:`~supar.utils.field.Field` and :class:`~supar.utils.field.SubwordField`
+    to produce tensors for words and subwords.
 
     Attributes:
         ID:
@@ -408,7 +409,7 @@ class CoNLLSentence(Sentence):
 
     Args:
         transform (CoNLL):
-            A :class:`CoNLL` object.
+            A :class:`~supar.utils.transform.CoNLL` object.
         lines (list[str]):
             A list of strings composing a sentence in CoNLL-X format.
             Comments and non-integer IDs are permitted.
@@ -475,7 +476,8 @@ class CoNLLSentence(Sentence):
 
 class Tree(Transform):
     r"""
-    The Tree object factorize a constituency tree into four fields, each associated with one or more :class:`Field` objects.
+    The Tree object factorize a constituency tree into four fields,
+    each associated with one or more :class:`~supar.utils.field.Field` objects.
 
     Attributes:
         WORD:
