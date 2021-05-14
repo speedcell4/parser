@@ -153,10 +153,38 @@ class Parser(object):
         raise NotImplementedError
 
     @classmethod
-    def load(cls, path, reload=False, **kwargs):
+    def load(cls, path, reload=False, src=None, **kwargs):
+        r"""
+        Loads a parser with data fields and pretrained model parameters.
+
+        Args:
+            path (str):
+                - a string with the shortcut name of a pretrained model defined in ``supar.MODEL``
+                  to load from cache or download, e.g., ``'biaffine-dep-en'``.
+                - a local path to a pretrained model, e.g., ``./<path>/model``.
+            reload (bool):
+                Whether to discard the existing cache and force a fresh download. Default: ``False``.
+            src (str):
+                Specifies where to download the model.
+                ``'github'``: github release page.
+                ``'hlt'``: hlt homepage, only accessible from 9:00 to 18:00 (UTC+8).
+                Default: None.
+            kwargs (dict):
+                A dict holding unconsumed arguments for updating training configs and initializing the model.
+
+        Examples:
+            >>> from supar import Parser
+            >>> parser = Parser.load('biaffine-dep-en')
+            >>> parser = Parser.load('./ptb.biaffine.dep.lstm.char')
+        """
+
         args = Config(**locals())
         args.device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        state = torch.load(path if os.path.exists(path) else download(supar.MODEL.get(path, path), reload=reload))
+        if src is not None:
+            links = {n: f"{supar.SRC[src]}/v{supar.__version__}/{m}.zip" for n, m in supar.NAME.items()}
+        else:
+            links = supar.MODEL
+        state = torch.load(path if os.path.exists(path) else download(links.get(path, path), reload=reload))
         cls = supar.PARSER[state['name']] if cls.NAME is None else cls
         args = state['args'].update(args)
         model = cls.MODEL(**args)

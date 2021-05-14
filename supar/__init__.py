@@ -4,7 +4,7 @@ from .parsers import (BiaffineDependencyParser,
                       BiaffineSemanticDependencyParser, CRF2oDependencyParser,
                       CRFConstituencyParser, CRFDependencyParser, Parser,
                       VIConstituencyParser, VIDependencyParser,
-                      VISemanticDependencyParser, VISemanticRoleLabelingParser)
+                      VISemanticDependencyParser)
 
 __all__ = ['BiaffineDependencyParser',
            'CRFDependencyParser',
@@ -14,10 +14,9 @@ __all__ = ['BiaffineDependencyParser',
            'VIConstituencyParser',
            'BiaffineSemanticDependencyParser',
            'VISemanticDependencyParser',
-           'VISemanticRoleLabelingParser',
            'Parser']
 
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 
 PARSER = {parser.NAME: parser for parser in [BiaffineDependencyParser,
                                              CRFDependencyParser,
@@ -26,11 +25,10 @@ PARSER = {parser.NAME: parser for parser in [BiaffineDependencyParser,
                                              CRFConstituencyParser,
                                              VIConstituencyParser,
                                              BiaffineSemanticDependencyParser,
-                                             VISemanticDependencyParser,
-                                             VISemanticRoleLabelingParser]}
+                                             VISemanticDependencyParser]}
 
-SRC = 'http://hlt.suda.edu.cn/LA/yzhang/supar'
-
+SRC = {'github': 'https://github.com/yzhangcs/parser/releases/download',
+       'hlt': 'http://hlt.suda.edu.cn/LA/yzhang/supar'}
 NAME = {
     'biaffine-dep-en': 'ptb.biaffine.dep.lstm.char',
     'biaffine-dep-zh': 'ctb7.biaffine.dep.lstm.char',
@@ -48,9 +46,8 @@ NAME = {
     'biaffine-sdp-zh': 'semeval16.biaffine.sdp.lstm.tag-char-lemma',
     'vi-sdp-en': 'dm.vi.sdp.lstm.tag-char-lemma',
     'vi-sdp-zh': 'semeval16.vi.sdp.lstm.tag-char-lemma',
-    'biaffine-sdp-roberta-en': 'dm.biaffine.sdp.roberta',
-    'biaffine-sdp-electra-zh': 'semeval16.biaffine.sdp.electra'
+    'vi-sdp-roberta-en': 'dm.vi.sdp.roberta',
+    'vi-sdp-electra-zh': 'semeval16.vi.sdp.electra'
 }
-
-MODEL = {n: f'{SRC}/v{__version__}/{m}.zip' for n, m in NAME.items()}
-CONFIG = {n: f'{SRC}/v{__version__}/{m}.ini' for n, m in NAME.items()}
+MODEL = {n: f"{SRC['github']}/v1.1.0/{m}.zip" for n, m in NAME.items()}
+CONFIG = {n: f"{SRC['github']}/v1.1.0/{m}.ini" for n, m in NAME.items()}

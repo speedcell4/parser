@@ -8,7 +8,7 @@ from supar.models import (BiaffineDependencyModel, CRF2oDependencyModel,
                           CRFDependencyModel, VIDependencyModel)
 from supar.parsers.parser import Parser
 from supar.utils import Config, Dataset, Embedding
-from supar.utils.common import bos, pad, unk
+from supar.utils.common import BOS, PAD, UNK
 from supar.utils.field import ChartField, Field, RawField, SubwordField
 from supar.utils.fn import ispunct
 from supar.utils.logging import get_logger, progress_bar
@@ -124,7 +124,7 @@ class BiaffineDependencyParser(Parser):
         return super().predict(**Config().update(locals()))
 
     @classmethod
-    def load(cls, path, reload=False, **kwargs):
+    def load(cls, path, reload=False, src=None, **kwargs):
         r"""
         Loads a parser with data fields and pretrained model parameters.
 
@@ -135,6 +135,11 @@ class BiaffineDependencyParser(Parser):
                 - a local path to a pretrained model, e.g., ``./<path>/model``.
             reload (bool):
                 Whether to discard the existing cache and force a fresh download. Default: ``False``.
+            src (str):
+                Specifies where to download the model.
+                ``'github'``: github release page.
+                ``'hlt'``: hlt homepage, only accessible from 9:00 to 18:00 (UTC+8).
+                Default: None.
             kwargs (dict):
                 A dict holding unconsumed arguments for updating training configs and initializing the model.
 
@@ -144,7 +149,7 @@ class BiaffineDependencyParser(Parser):
             >>> parser = Parser.load('./ptb.biaffine.dep.lstm.char')
         """
 
-        return super().load(path, reload, **kwargs)
+        return super().load(path, reload, src, **kwargs)
 
     def _train(self, loader):
         self.model.train()
@@ -267,11 +272,11 @@ class BiaffineDependencyParser(Parser):
                                 fn=None if not isinstance(t, (GPT2Tokenizer, GPT2TokenizerFast)) else lambda x: ' '+x)
             WORD.vocab = t.get_vocab()
         else:
-            WORD = Field('words', pad=pad, unk=unk, bos=bos, lower=True)
+            WORD = Field('words', pad=PAD, unk=UNK, bos=BOS, lower=True)
             if 'tag' in args.feat:
-                TAG = Field('tags', bos=bos)
+                TAG = Field('tags', bos=BOS)
             if 'char' in args.feat:
-                CHAR = SubwordField('chars', pad=pad, unk=unk, bos=bos, fix_len=args.fix_len)
+                CHAR = SubwordField('chars', pad=PAD, unk=UNK, bos=BOS, fix_len=args.fix_len)
             if 'bert' in args.feat:
                 from transformers import (AutoTokenizer, GPT2Tokenizer,
                                           GPT2TokenizerFast)
@@ -285,8 +290,8 @@ class BiaffineDependencyParser(Parser):
                                     fn=None if not isinstance(t, (GPT2Tokenizer, GPT2TokenizerFast)) else lambda x: ' '+x)
                 BERT.vocab = t.get_vocab()
         TEXT = RawField('texts')
-        ARC = Field('arcs', bos=bos, use_vocab=False, fn=CoNLL.get_arcs)
-        REL = Field('rels', bos=bos)
+        ARC = Field('arcs', bos=BOS, use_vocab=False, fn=CoNLL.get_arcs)
+        REL = Field('rels', bos=BOS)
         transform = CoNLL(FORM=(WORD, TEXT, CHAR, BERT), CPOS=TAG, HEAD=ARC, DEPREL=REL)
 
         train = Dataset(transform, args.train)
@@ -425,7 +430,7 @@ class CRFDependencyParser(BiaffineDependencyParser):
         return super().predict(**Config().update(locals()))
 
     @classmethod
-    def load(cls, path, reload=False, **kwargs):
+    def load(cls, path, reload=False, src=None, **kwargs):
         r"""
         Loads a parser with data fields and pretrained model parameters.
 
@@ -436,6 +441,11 @@ class CRFDependencyParser(BiaffineDependencyParser):
                 - a local path to a pretrained model, e.g., ``./<path>/model``.
             reload (bool):
                 Whether to discard the existing cache and force a fresh download. Default: ``False``.
+            src (str):
+                Specifies where to download the model.
+                ``'github'``: github release page.
+                ``'hlt'``: hlt homepage, only accessible from 9:00 to 18:00 (UTC+8).
+                Default: None.
             kwargs (dict):
                 A dict holding unconsumed arguments for updating training configs and initializing the model.
 
@@ -445,7 +455,7 @@ class CRFDependencyParser(BiaffineDependencyParser):
             >>> parser = Parser.load('./ptb.crf.dep.lstm.char')
         """
 
-        return super().load(path, reload, **kwargs)
+        return super().load(path, reload, src, **kwargs)
 
     def _train(self, loader):
         self.model.train()
@@ -636,7 +646,7 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
         return super().predict(**Config().update(locals()))
 
     @classmethod
-    def load(cls, path, reload=False, **kwargs):
+    def load(cls, path, reload=False, src=None, **kwargs):
         r"""
         Loads a parser with data fields and pretrained model parameters.
 
@@ -647,6 +657,11 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
                 - a local path to a pretrained model, e.g., ``./<path>/model``.
             reload (bool):
                 Whether to discard the existing cache and force a fresh download. Default: ``False``.
+            src (str):
+                Specifies where to download the model.
+                ``'github'``: github release page.
+                ``'hlt'``: hlt homepage, only accessible from 9:00 to 18:00 (UTC+8).
+                Default: None.
             kwargs (dict):
                 A dict holding unconsumed arguments for updating training configs and initializing the model.
 
@@ -656,7 +671,7 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
             >>> parser = Parser.load('./ptb.crf2o.dep.lstm.char')
         """
 
-        return super().load(path, reload, **kwargs)
+        return super().load(path, reload, src, **kwargs)
 
     def _train(self, loader):
         self.model.train()
@@ -780,11 +795,11 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
                                 fn=None if not isinstance(t, (GPT2Tokenizer, GPT2TokenizerFast)) else lambda x: ' '+x)
             WORD.vocab = t.get_vocab()
         else:
-            WORD = Field('words', pad=pad, unk=unk, bos=bos, lower=True)
+            WORD = Field('words', pad=PAD, unk=UNK, bos=BOS, lower=True)
             if 'tag' in args.feat:
-                TAG = Field('tags', bos=bos)
+                TAG = Field('tags', bos=BOS)
             if 'char' in args.feat:
-                CHAR = SubwordField('chars', pad=pad, unk=unk, bos=bos, fix_len=args.fix_len)
+                CHAR = SubwordField('chars', pad=PAD, unk=UNK, bos=BOS, fix_len=args.fix_len)
             if 'bert' in args.feat:
                 from transformers import (AutoTokenizer, GPT2Tokenizer,
                                           GPT2TokenizerFast)
@@ -798,9 +813,9 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
                                     fn=None if not isinstance(t, (GPT2Tokenizer, GPT2TokenizerFast)) else lambda x: ' '+x)
                 BERT.vocab = t.get_vocab()
         TEXT = RawField('texts')
-        ARC = Field('arcs', bos=bos, use_vocab=False, fn=CoNLL.get_arcs)
-        SIB = ChartField('sibs', bos=bos, use_vocab=False, fn=CoNLL.get_sibs)
-        REL = Field('rels', bos=bos)
+        ARC = Field('arcs', bos=BOS, use_vocab=False, fn=CoNLL.get_arcs)
+        SIB = ChartField('sibs', bos=BOS, use_vocab=False, fn=CoNLL.get_sibs)
+        REL = Field('rels', bos=BOS)
         transform = CoNLL(FORM=(WORD, TEXT, CHAR, BERT), CPOS=TAG, HEAD=(ARC, SIB), DEPREL=REL)
 
         train = Dataset(transform, args.train)
@@ -933,7 +948,7 @@ class VIDependencyParser(BiaffineDependencyParser):
         return super().predict(**Config().update(locals()))
 
     @classmethod
-    def load(cls, path, reload=False, **kwargs):
+    def load(cls, path, reload=False, src=None, **kwargs):
         r"""
         Loads a parser with data fields and pretrained model parameters.
 
@@ -944,6 +959,11 @@ class VIDependencyParser(BiaffineDependencyParser):
                 - a local path to a pretrained model, e.g., ``./<path>/model``.
             reload (bool):
                 Whether to discard the existing cache and force a fresh download. Default: ``False``.
+            src (str):
+                Specifies where to download the model.
+                ``'github'``: github release page.
+                ``'hlt'``: hlt homepage, only accessible from 9:00 to 18:00 (UTC+8).
+                Default: None.
             kwargs (dict):
                 A dict holding unconsumed arguments for updating training configs and initializing the model.
 
@@ -953,7 +973,7 @@ class VIDependencyParser(BiaffineDependencyParser):
             >>> parser = Parser.load('./ptb.vi.dep.lstm.char')
         """
 
-        return super().load(path, reload, **kwargs)
+        return super().load(path, reload, src, **kwargs)
 
     def _train(self, loader):
         self.model.train()

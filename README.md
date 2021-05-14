@@ -45,7 +45,7 @@ All results are tested on the machine with Intel(R) Xeon(R) CPU E5-2650 v4 @ 2.2
 
 English and Chinese dependency parsing models are trained on PTB and CTB7 respectively.
 For each parser, we provide pretrained models that take BiLSTM as encoder.
-We also provide models finetuned on pretrained language models from [Huggingface Transformers](https://github.com/huggingface/transformers).
+We also provide models trained by finetuning pretrained language models from [Huggingface Transformers](https://github.com/huggingface/transformers).
 We use [`robert-large`](https://huggingface.co/roberta-large) for English and [`hfl/chinese-electra-180g-large-discriminator`](https://huggingface.co/hfl/chinese-electra-180g-large-discriminator) for Chinese.
 During evaluation, punctuation is ignored in all metrics for PTB.
 
@@ -110,14 +110,14 @@ The results of each treebank are as follows.
 English semantic dependency parsing models are trained on [DM data introduced in SemEval-2014 task 8](https://catalog.ldc.upenn.edu/LDC2016T10), while Chinese models are trained on [NEWS domain data of corpora from SemEval-2016 Task 9](https://github.com/HIT-SCIR/SemEval-2016).
 Our data preprocessing steps follow [Second_Order_SDP](https://github.com/wangxinyu0922/Second_Order_SDP).
 
-| Name                      |   P   |   R   | F<sub>1 | Sents/s |
-| ------------------------- | :---: | :---: | :-----: | ------: |
-| `biaffine-sdp-en`         | 94.35 | 93.12 |  93.73  | 1067.06 |
-| `vi-sdp-en`               | 94.36 | 93.52 |  93.94  |  821.73 |
-| `biaffine-sdp-roberta-en` | 95.07 | 95.22 |  95.15  |  269.05 |
-| `biaffine-sdp-zh`         | 72.93 | 66.29 |  69.45  |  523.36 |
-| `vi-sdp-zh`               | 72.05 | 67.97 |  69.95  |  411.94 |
-| `biaffine-sdp-electra-zh` | 71.49 | 70.08 |  70.78  |  143.04 |
+| Name                |   P   |   R   | F<sub>1 | Sents/s |
+| ------------------- | :---: | :---: | :-----: | ------: |
+| `biaffine-sdp-en`   | 94.35 | 93.12 |  93.73  | 1067.06 |
+| `vi-sdp-en`         | 94.36 | 93.52 |  93.94  |  821.73 |
+| `vi-sdp-roberta-en` | 95.18 | 95.20 |  95.19  |  264.13 |
+| `biaffine-sdp-zh`   | 72.93 | 66.29 |  69.45  |  523.36 |
+| `vi-sdp-zh`         | 72.05 | 67.97 |  69.95  |  411.94 |
+| `vi-sdp-electra-zh` | 73.29 | 70.53 |  71.89  |  139.52 |
 
 ## Usage
 
@@ -152,12 +152,13 @@ probs: tensor([1.0000, 0.9999, 0.9966, 0.8944, 1.0000, 1.0000, 0.9999])
 ```
 
 `SuPar` also supports parsing from tokenized sentences or from file.
-For semantic dependency parsing, lemmas and POS tags are needed.
+For BiLSTM-based semantic dependency parsing models, lemmas and POS tags are needed.
 
 ```py
 >>> import os
 >>> import tempfile
->>> Parser.load('biaffine-dep-en').predict(['I','saw','Sarah','with','a','telescope','.'], verbose=False)[0]
+>>> dep = Parser.load('biaffine-dep-en')
+>>> dep.predict(['I', 'saw', 'Sarah', 'with', 'a', 'telescope', '.'], verbose=False)[0]
 1       I       _       _       _       _       2       nsubj   _       _
 2       saw     _       _       _       _       0       root    _       _
 3       Sarah   _       _       _       _       2       dobj    _       _
@@ -185,7 +186,7 @@ For semantic dependency parsing, lemmas and POS tags are needed.
 
 ''')
 ...
->>> Parser.load('biaffine-dep-en').predict(path, pred='pred.conllx', verbose=False)[0]
+>>> dep.predict(path, pred='pred.conllx', verbose=False)[0]
 # text = But I found the location wonderful and the neighbors very kind.
 1       But     _       _       _       _       3       cc      _       _
 2       I       _       _       _       _       3       nsubj   _       _
@@ -201,13 +202,26 @@ For semantic dependency parsing, lemmas and POS tags are needed.
 11      kind    _       _       _       _       6       conj    _       _
 12      .       _       _       _       _       3       punct   _       _
 
->>> Parser.load('crf-con-en').predict(['I','saw','Sarah','with','a','telescope','.'], verbose=False)[0]
-(TOP (S (NP (_ I)) (VP (_ saw) (NP (_ Sarah)) (PP (_ with) (NP (_ a) (_ telescope)))) (_ .)))
->>> Parser.load('biaffine-sdp-en').predict([[('I','I','PRP'), ('saw','see','VBD'),
-                                             ('Sarah','Sarah','NNP'), ('with','with','IN'),
-                                             ('a','a','DT'), ('telescope','telescope','NN'),
-                                             ('.','_','.')]],
-                                           verbose=False)[0]
+>>> con = Parser.load('crf-con-en')
+>>> con.predict(['I', 'saw', 'Sarah', 'with', 'a', 'telescope', '.'], verbose=False)[0].pretty_print()
+              TOP                       
+               |                         
+               S                        
+  _____________|______________________   
+ |             VP                     | 
+ |    _________|____                  |  
+ |   |    |         PP                | 
+ |   |    |     ____|___              |  
+ NP  |    NP   |        NP            | 
+ |   |    |    |     ___|______       |  
+ _   _    _    _    _          _      _ 
+ |   |    |    |    |          |      |  
+ I  saw Sarah with  a      telescope  . 
+
+>>> sdp = Parser.load('biaffine-sdp-en')
+>>> sdp.predict([[('I','I','PRP'), ('saw','see','VBD'), ('Sarah','Sarah','NNP'), ('with','with','IN'),
+                  ('a','a','DT'), ('telescope','telescope','NN'), ('.','_','.')]],
+                verbose=False)[0]
 1       I       I       PRP     _       _       _       _       2:ARG1  _
 2       saw     see     VBD     _       _       _       _       0:root|4:ARG1   _
 3       Sarah   Sarah   NNP     _       _       _       _       2:ARG2  _

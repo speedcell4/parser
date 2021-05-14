@@ -7,7 +7,7 @@ import torch.nn as nn
 from supar.models import CRFConstituencyModel, VIConstituencyModel
 from supar.parsers.parser import Parser
 from supar.utils import Config, Dataset, Embedding
-from supar.utils.common import bos, eos, pad, unk
+from supar.utils.common import BOS, EOS, PAD, UNK
 from supar.utils.field import ChartField, Field, RawField, SubwordField
 from supar.utils.logging import get_logger, progress_bar
 from supar.utils.metric import SpanMetric
@@ -129,7 +129,7 @@ class CRFConstituencyParser(Parser):
         return super().predict(**Config().update(locals()))
 
     @classmethod
-    def load(cls, path, reload=False, **kwargs):
+    def load(cls, path, reload=False, src=None, **kwargs):
         r"""
         Loads a parser with data fields and pretrained model parameters.
 
@@ -140,6 +140,11 @@ class CRFConstituencyParser(Parser):
                 - a local path to a pretrained model, e.g., ``./<path>/model``.
             reload (bool):
                 Whether to discard the existing cache and force a fresh download. Default: ``False``.
+            src (str):
+                Specifies where to download the model.
+                ``'github'``: github release page.
+                ``'hlt'``: hlt homepage, only accessible from 9:00 to 18:00 (UTC+8).
+                Default: None.
             kwargs (dict):
                 A dict holding unconsumed arguments for updating training configs and initializing the model.
 
@@ -149,7 +154,7 @@ class CRFConstituencyParser(Parser):
             >>> parser = Parser.load('./ptb.crf.con.lstm.char')
         """
 
-        return super().load(path, reload, **kwargs)
+        return super().load(path, reload, src, **kwargs)
 
     def _train(self, loader):
         self.model.train()
@@ -246,7 +251,7 @@ class CRFConstituencyParser(Parser):
             return parser
 
         logger.info("Building the fields")
-        WORD = Field('words', pad=pad, unk=unk, bos=bos, eos=eos, lower=True)
+        WORD = Field('words', pad=PAD, unk=UNK, bos=BOS, eos=EOS, lower=True)
         TAG, CHAR, BERT = None, None, None
         if args.encoder != 'lstm':
             from transformers import (AutoTokenizer, GPT2Tokenizer,
@@ -262,11 +267,11 @@ class CRFConstituencyParser(Parser):
                                 fn=None if not isinstance(t, (GPT2Tokenizer, GPT2TokenizerFast)) else lambda x: ' '+x)
             WORD.vocab = t.get_vocab()
         else:
-            WORD = Field('words', pad=pad, unk=unk, bos=bos, eos=eos, lower=True)
+            WORD = Field('words', pad=PAD, unk=UNK, bos=BOS, eos=EOS, lower=True)
             if 'tag' in args.feat:
-                TAG = Field('tags', bos=bos, eos=eos)
+                TAG = Field('tags', bos=BOS, eos=EOS)
             if 'char' in args.feat:
-                CHAR = SubwordField('chars', pad=pad, unk=unk, bos=bos, eos=eos, fix_len=args.fix_len)
+                CHAR = SubwordField('chars', pad=PAD, unk=UNK, bos=BOS, eos=EOS, fix_len=args.fix_len)
             if 'bert' in args.feat:
                 from transformers import (AutoTokenizer, GPT2Tokenizer,
                                           GPT2TokenizerFast)
@@ -411,7 +416,7 @@ class VIConstituencyParser(CRFConstituencyParser):
         return super().predict(**Config().update(locals()))
 
     @classmethod
-    def load(cls, path, reload=False, **kwargs):
+    def load(cls, path, reload=False, src=None, **kwargs):
         r"""
         Loads a parser with data fields and pretrained model parameters.
 
@@ -422,6 +427,11 @@ class VIConstituencyParser(CRFConstituencyParser):
                 - a local path to a pretrained model, e.g., ``./<path>/model``.
             reload (bool):
                 Whether to discard the existing cache and force a fresh download. Default: ``False``.
+            src (str):
+                Specifies where to download the model.
+                ``'github'``: github release page.
+                ``'hlt'``: hlt homepage, only accessible from 9:00 to 18:00 (UTC+8).
+                Default: None.
             kwargs (dict):
                 A dict holding unconsumed arguments for updating training configs and initializing the model.
 
@@ -431,7 +441,7 @@ class VIConstituencyParser(CRFConstituencyParser):
             >>> parser = Parser.load('./ptb.vi.con.lstm.char')
         """
 
-        return super().load(path, reload, **kwargs)
+        return super().load(path, reload, src, **kwargs)
 
     def _train(self, loader):
         self.model.train()

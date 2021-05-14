@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='supar',
-    version='1.1.0',
+    version='1.1.1',
     author='Yu Zhang',
     author_email='yzhang.cs@outlook.com',
     description='Syntactic/Semantic Parsing Models',
@@ -27,6 +27,7 @@ setup(
         'transformers>=4.0.0',
         'nltk',
         'stanza',
+        'opt_einsum',
         'dill'],
     entry_points={
         'console_scripts': [
