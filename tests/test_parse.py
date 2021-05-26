@@ -22,7 +22,7 @@ def test_parse():
     for name, model in supar.NAME.items():
         if 'xlmr' in name or 'roberta' in name or 'electra' in name:
             continue
-        parser = Parser.load(name, reload=True)
+        parser = Parser.load(name)
         if name.endswith(('en', 'zh')):
             lang = name[-2:]
             parser.predict(sents[lang], prob=True, lang=lang)

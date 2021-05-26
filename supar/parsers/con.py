@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 from supar.models import CRFConstituencyModel, VIConstituencyModel
 from supar.parsers.parser import Parser
+from supar.structs.crf import CRFConstituency
 from supar.utils import Config, Dataset, Embedding
 from supar.utils.common import BOS, EOS, PAD, UNK
 from supar.utils.field import ChartField, Field, RawField, SubwordField
@@ -213,8 +214,7 @@ class CRFConstituencyParser(Parser):
             mask = (mask.unsqueeze(1) & mask.unsqueeze(2)).triu_(1)
             lens = mask[:, 0].sum(-1)
             s_span, s_label = self.model(words, feats)
-            if self.args.mbr:
-                s_span = self.model.crf(s_span, mask, mbr=True)
+            s_span = CRFConstituency(s_span, mask).marginals if self.args.mbr else s_span
             chart_preds = self.model.decode(s_span, s_label, mask)
             preds['trees'].extend([Tree.build(tree, [(i, j, self.CHART.vocab[label]) for i, j, label in chart])
                                    for tree, chart in zip(trees, chart_preds)])

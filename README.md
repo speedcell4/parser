@@ -288,3 +288,7 @@ If you are interested in them, please cite:
   pages     = {4046--4053}
 }
 ```
+
+## Acknowledgements
+
+The implementations and API design of many structured prediction algorithms are heavily inspired by [`torchstruct`](https://github.com/harvardnlp/pytorch-struct).

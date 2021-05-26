@@ -5,6 +5,10 @@ from .parsers import (BiaffineDependencyParser,
                       CRFConstituencyParser, CRFDependencyParser, Parser,
                       VIConstituencyParser, VIDependencyParser,
                       VISemanticDependencyParser)
+from .structs import (CRF2oDependency, CRFConstituency, CRFDependency,
+                      LBPConstituency, LBPDependency, LBPSemanticDependency,
+                      MatrixTree, MFVIConstituency, MFVIDependency,
+                      MFVISemanticDependency)
 
 __all__ = ['BiaffineDependencyParser',
            'CRFDependencyParser',
@@ -14,7 +18,17 @@ __all__ = ['BiaffineDependencyParser',
            'VIConstituencyParser',
            'BiaffineSemanticDependencyParser',
            'VISemanticDependencyParser',
-           'Parser']
+           'Parser',
+           'MatrixTree',
+           'CRFDependency',
+           'CRF2oDependency',
+           'CRFConstituency',
+           'LBPConstituency',
+           'MFVIConstituency',
+           'LBPDependency',
+           'MFVIDependency',
+           'LBPSemanticDependency',
+           'MFVISemanticDependency']
 
 __version__ = '1.1.1'
 

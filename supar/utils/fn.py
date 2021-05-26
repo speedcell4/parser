@@ -29,7 +29,7 @@ def tohalfwidth(token):
     return unicodedata.normalize('NFKC', token)
 
 
-def stripe(x, n, w, offset=(0, 0), dim=1):
+def stripe(x, n, w, offset=(0, 0), horizontal=True, dim1=-2, dim2=-1):
     r"""
     Returns a diagonal stripe of the tensor.
 
@@ -37,8 +37,10 @@ def stripe(x, n, w, offset=(0, 0), dim=1):
         x (~torch.Tensor): the input tensor with 2 or more dims.
         n (int): the length of the stripe.
         w (int): the width of the stripe.
-        offset (tuple): the offset of the first two dims.
-        dim (int): 1 if returns a horizontal stripe; 0 otherwise.
+        offset (tuple): the offset of the two dims.
+        horizontal (bool): ``True`` if returns a horizontal stripe; ``False`` otherwise. Default: ``True``.
+        dim1 (int) – first dim with respect to which to take stripe. Default: -2.
+        dim2 (int) – second dim with respect to which to take stripe. Default: -1.
 
     Returns:
         a diagonal stripe of the tensor.
@@ -62,13 +64,19 @@ def stripe(x, n, w, offset=(0, 0), dim=1):
                 [12, 17, 22]])
     """
 
-    x, seq_len = x.contiguous(), x.size(1)
-    stride, numel = list(x.stride()), x[0, 0].numel()
-    stride[0] = (seq_len + 1) * numel
-    stride[1] = (1 if dim == 1 else seq_len) * numel
-    return x.as_strided(size=(n, w, *x.shape[2:]),
-                        stride=stride,
-                        storage_offset=(offset[0]*seq_len+offset[1])*numel)
+    if dim1 > dim2:
+        x = x.transpose(dim1, dim2)
+    x = x.contiguous()
+    dim1, dim2 = sorted(i if i >= 0 else x.dim() + i for i in (dim1, dim2))
+    size = list(x.shape)
+    size[dim1], size[dim2] = n, w
+    slices = [slice(None)] * x.dim()
+    slices[dim1], slices[dim2] = offset[0], offset[1]
+    first = x[tuple(slices)]
+    length = x.size(dim2)
+    stride, numel = list(x.stride()), x[tuple([*[0]*dim2, offset[1]])].numel()
+    stride[dim1], stride[dim2] = (length + 1) * numel, (1 if horizontal else length) * numel
+    return x.as_strided(size=size, stride=stride, storage_offset=first.storage_offset())
 
 
 def pad(tensors, padding_value=0, total_length=None, padding_side='right'):

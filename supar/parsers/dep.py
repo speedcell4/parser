@@ -7,6 +7,7 @@ import torch.nn as nn
 from supar.models import (BiaffineDependencyModel, CRF2oDependencyModel,
                           CRFDependencyModel, VIDependencyModel)
 from supar.parsers.parser import Parser
+from supar.structs import CRF2oDependency, CRFDependency, MatrixTree
 from supar.utils import Config, Dataset, Embedding
 from supar.utils.common import BOS, PAD, UNK
 from supar.utils.field import ChartField, Field, RawField, SubwordField
@@ -524,8 +525,7 @@ class CRFDependencyParser(BiaffineDependencyParser):
             mask[:, 0] = 0
             lens = mask.sum(1).tolist()
             s_arc, s_rel = self.model(words, feats)
-            if self.args.mbr:
-                s_arc = self.model.crf(s_arc, mask, mbr=True)
+            s_arc = (CRFDependency if self.args.proj else MatrixTree)(s_arc, mask).marginals if self.args.mbr else s_arc
             arc_preds, rel_preds = self.model.decode(s_arc, s_rel, mask, self.args.tree, self.args.proj)
             preds['arcs'].extend(arc_preds[mask].split(lens))
             preds['rels'].extend(rel_preds[mask].split(lens))
@@ -740,8 +740,7 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
             mask[:, 0] = 0
             lens = mask.sum(1).tolist()
             s_arc, s_sib, s_rel = self.model(words, feats)
-            if self.args.mbr:
-                s_arc = self.model.crf((s_arc, s_sib), mask, mbr=True)
+            s_arc = CRF2oDependency((s_arc, s_sib), mask).marginals if self.args.mbr else s_arc
             arc_preds, rel_preds = self.model.decode(s_arc, s_sib, s_rel, mask, self.args.tree, self.args.mbr, self.args.proj)
             preds['arcs'].extend(arc_preds[mask].split(lens))
             preds['rels'].extend(rel_preds[mask].split(lens))
