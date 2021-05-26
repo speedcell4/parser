@@ -48,16 +48,16 @@ class MatrixTree(StructuredDistribution):
         raise NotImplementedError
 
     def score(self, value):
+        arcs = value
         if self.partial:
             mask, lens = self.mask, self.lens
-            mask = self.mask.index_fill(1, self.lens.new_tensor(0), 1)
+            mask = mask.index_fill(1, self.lens.new_tensor(0), 1)
             mask = mask.unsqueeze(1) & mask.unsqueeze(2)
-            value = value.index_fill(1, lens.new_tensor(0), -1).unsqueeze(-1)
-            value = value.eq(lens.new_tensor(range(mask.shape[1]))) | value.lt(0)
-            value = value & mask
-            scores = LogSemiring.zero_mask(self.scores, ~value)
+            arcs = arcs.index_fill(1, lens.new_tensor(0), -1).unsqueeze(-1)
+            arcs = arcs.eq(lens.new_tensor(range(mask.shape[1]))) | arcs.lt(0)
+            scores = LogSemiring.zero_mask(self.scores, ~(arcs & mask))
             return self.__class__(scores, self.mask, **self.kwargs).log_partition
-        return LogSemiring.prod(LogSemiring.one_mask(self.scores.gather(-1, value.unsqueeze(-1)).squeeze(-1), ~self.mask), -1)
+        return LogSemiring.prod(LogSemiring.one_mask(self.scores.gather(-1, arcs.unsqueeze(-1)).squeeze(-1), ~self.mask), -1)
 
     @torch.enable_grad()
     def forward(self, semiring):
@@ -76,10 +76,9 @@ class MatrixTree(StructuredDistribution):
 
         s_arc = self.scores
         mask, lens = self.mask, self.lens
-        lens = mask.sum(-1)
         batch_size, seq_len, _ = s_arc.shape
         mask = mask.index_fill(1, lens.new_tensor(0), 1)
-        s_arc = semiring.zero_mask(s_arc, mask.unsqueeze(-1) & mask.unsqueeze(-2))
+        s_arc = semiring.zero_mask(s_arc, ~(mask.unsqueeze(-1) & mask.unsqueeze(-2)))
 
         # A(i, j) = exp(s(i, j))
         # double precision to prevent overflows
@@ -93,7 +92,7 @@ class MatrixTree(StructuredDistribution):
         # L(i, j) = D(i, j) - A(i, j)
         L = nn.init.eye_(torch.empty_like(A[0])).repeat(batch_size, 1, 1).masked_scatter_(mask.unsqueeze(-1), (D - A)[mask])
         # Z = L^(0, 0), the minor of L w.r.t row 0 and column 0
-        return L[:, 1:, 1:].logdet().float()
+        return L[:, 1:, 1:].slogdet()[1].float()
 
 
 class CRFDependency(StructuredDistribution):
