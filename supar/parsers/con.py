@@ -167,7 +167,7 @@ class CRFConstituencyParser(Parser):
             mask = word_mask if len(words.shape) < 3 else word_mask.any(-1)
             mask = (mask.unsqueeze(1) & mask.unsqueeze(2)).triu_(1)
             s_span, s_label = self.model(words, feats)
-            loss, _ = self.model.loss(s_span, s_label, charts, mask, self.args.mbr)
+            loss, _ = self.model.loss(s_span, s_label, charts, mask, False)
             loss = loss / self.args.update_steps
             loss.backward()
             nn.utils.clip_grad_norm_(self.model.parameters(), self.args.clip)

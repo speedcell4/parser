@@ -4,7 +4,7 @@ import itertools
 from functools import partial
 
 import torch
-from supar.structs import CRF2oDependency, CRFDependency
+from supar.structs import CRF2oDependency, CRFConstituency, CRFDependency
 from supar.structs.semiring import LogSemiring, MaxSemiring, Semiring
 from supar.utils.transform import CoNLL
 from torch.distributions.distribution import Distribution
@@ -34,8 +34,8 @@ class BruteForceStructuredDistribution(Distribution):
 
     @lazy_property
     def count(self):
-        seqs = self.enumerate(Semiring)
-        return torch.tensor([len(i) for i in seqs]).to(seqs[0].device).long()
+        structs = self.enumerate(Semiring)
+        return torch.tensor([len(i) for i in structs]).to(structs[0].device).long()
 
     def cross_entropy(self, other):
         ps = [seq - self.log_partition[i] for i, seq in enumerate(self.enumerate(LogSemiring))]
@@ -62,14 +62,14 @@ class BruteForceCRFDependency(BruteForceStructuredDistribution):
         self.lens = self.mask.sum(-1)
 
     def enumerate(self, semiring):
-        seqs = []
+        trees = []
         for i, length in enumerate(self.mask.sum(-1).tolist()):
-            seqs.append([])
+            trees.append([])
             for seq in itertools.product(range(length + 1), repeat=length):
                 if not CoNLL.istree(list(seq), True, self.multiroot):
                     continue
-                seqs[-1].append(semiring.prod(self.scores[i, range(1, length + 1), seq], -1))
-        return [torch.stack(seq) for seq in seqs]
+                trees[-1].append(semiring.prod(self.scores[i, range(1, length + 1), seq], -1))
+        return [torch.stack(seq) for seq in trees]
 
 
 class BruteForceCRF2oDependency(BruteForceStructuredDistribution):
@@ -85,9 +85,9 @@ class BruteForceCRF2oDependency(BruteForceStructuredDistribution):
         self.lens = self.mask.sum(-1)
 
     def enumerate(self, semiring):
-        seqs = []
+        trees = []
         for i, length in enumerate(self.mask.sum(-1).tolist()):
-            seqs.append([])
+            trees.append([])
             for seq in itertools.product(range(length + 1), repeat=length):
                 if not CoNLL.istree(list(seq), True, self.multiroot):
                     continue
@@ -95,29 +95,67 @@ class BruteForceCRF2oDependency(BruteForceStructuredDistribution):
                 sib_mask = sibs.gt(0)
                 s_arc = semiring.prod(self.scores[0][i, range(1, length + 1), seq], -1)
                 s_sib = semiring.prod(self.scores[1][i, 1:][sib_mask].gather(-1, sibs[sib_mask].unsqueeze(-1)).squeeze(-1))
-                seqs[-1].append(semiring.mul(s_arc, s_sib))
-        return [torch.stack(seq) for seq in seqs]
+                trees[-1].append(semiring.mul(s_arc, s_sib))
+        return [torch.stack(seq) for seq in trees]
+
+
+class BruteForceCRFConstituency(BruteForceStructuredDistribution):
+
+    def __init__(self, scores, mask=None, labeled=False):
+        super().__init__(scores, mask)
+
+        self.labeled = labeled
+
+        self.mask = mask if mask is not None else scores.new_ones(scores.shape[:(-1 if labeled else None)]).bool().triu_(1)
+        self.lens = self.mask[:, 0].sum(-1)
+
+    def enumerate(self, semiring):
+        scores = self.scores if self.labeled else self.scores.unsqueeze(-1)
+
+        def enumerate(s, i, j):
+            if i + 1 == j:
+                yield from s[i, j].unbind(-1)
+            for k in range(i + 1, j):
+                for t1 in enumerate(s, i, k):
+                    for t2 in enumerate(s, k, j):
+                        for t in s[i, j].unbind(-1):
+                            yield semiring.times(t, t1, t2)
+        return [torch.stack([i for i in enumerate(s, 0, length)]) for s, length in zip(scores, self.lens)]
 
 
 def test_struct():
     torch.manual_seed(1)
     batch_size, seq_len = 2, 5
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
-    structs = [(CRFDependency, BruteForceCRFDependency, False),
-               (partial(CRFDependency, multiroot=True), partial(BruteForceCRFDependency, multiroot=True), False),
-               (CRF2oDependency, BruteForceCRF2oDependency, True),
-               (partial(CRF2oDependency, multiroot=True), partial(BruteForceCRF2oDependency, multiroot=True), True)]
-    for struct, brute_force, second_order in structs:
-        for i in range(5):
-            s1, s2 = torch.randn(batch_size, seq_len, seq_len).to(device), torch.randn(batch_size, seq_len, seq_len).to(device)
-            if second_order:
-                s1 = [s1, torch.randn(batch_size, seq_len, seq_len, seq_len).to(device)]
-                s2 = [s2, torch.randn(batch_size, seq_len, seq_len, seq_len).to(device)]
-            struct1, struct2 = struct(s1), struct(s2)
-            brute_force1, brute_force2 = brute_force(s1), brute_force(s2)
-            assert struct1.max.allclose(brute_force1.max)
-            assert struct1.log_partition.allclose(brute_force1.log_partition)
-            assert struct1.entropy.allclose(brute_force1.entropy)
-            assert struct1.count.allclose(brute_force1.count)
-            assert struct1.cross_entropy(struct2).allclose(brute_force1.cross_entropy(brute_force2))
-            assert struct1.kl(struct2).allclose(brute_force1.kl(brute_force2))
+
+    def enumerate():
+        structs = [
+            (CRFDependency, BruteForceCRFDependency),
+            (partial(CRFDependency, multiroot=True), partial(BruteForceCRFDependency, multiroot=True)),
+            (CRF2oDependency, BruteForceCRF2oDependency),
+            (partial(CRF2oDependency, multiroot=True), partial(BruteForceCRF2oDependency, multiroot=True)),
+            (CRFConstituency, BruteForceCRFConstituency),
+            (partial(CRFConstituency, labeled=True), partial(BruteForceCRFConstituency, labeled=True)),
+        ]
+        for struct, brute_force in structs:
+            for _ in range(5):
+                if struct == CRF2oDependency or (isinstance(struct, partial) and struct.func == CRF2oDependency):
+                    s1 = [torch.randn(batch_size, seq_len, seq_len).to(device),
+                          torch.randn(batch_size, seq_len, seq_len, seq_len).to(device)]
+                    s2 = [torch.randn(batch_size, seq_len, seq_len).to(device),
+                          torch.randn(batch_size, seq_len, seq_len, seq_len).to(device)]
+                elif isinstance(struct, partial) and struct.func == CRFConstituency and struct.keywords['labeled']:
+                    s1 = torch.randn(batch_size, seq_len, seq_len, 2).to(device).fill_(0)
+                    s2 = torch.randn(batch_size, seq_len, seq_len, 2).to(device).fill_(0)
+                else:
+                    s1 = torch.randn(batch_size, seq_len, seq_len).to(device)
+                    s2 = torch.randn(batch_size, seq_len, seq_len).to(device)
+                yield struct(s1), struct(s2), brute_force(s1), brute_force(s2)
+
+    for s1, s2, b1, b2 in enumerate():
+        assert s1.max.allclose(b1.max)
+        assert s1.log_partition.allclose(b1.log_partition)
+        assert s1.entropy.allclose(b1.entropy)
+        assert s1.count.allclose(b1.count)
+        assert s1.cross_entropy(s2).allclose(b1.cross_entropy(b2))
+        assert s1.kl(s2).allclose(b1.kl(b2))

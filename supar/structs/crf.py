@@ -3,7 +3,7 @@
 import torch
 import torch.nn as nn
 from supar.structs.distribution import StructuredDistribution
-from supar.structs.semiring import LogSemiring
+from supar.structs.semiring import EntropySemiring, LogSemiring
 from supar.utils.alg import mst
 from supar.utils.fn import stripe
 from torch.distributions.utils import lazy_property
@@ -277,7 +277,7 @@ class CRFConstituency(StructuredDistribution):
     """
 
     def __init__(self, scores, mask=None, labeled=False):
-        super().__init__(scores, mask)
+        super().__init__(scores, mask, labeled=labeled)
 
         self.labeled = labeled
 
@@ -300,20 +300,16 @@ class CRFConstituency(StructuredDistribution):
 
     @torch.enable_grad()
     def forward(self, semiring):
-        scores = semiring.sum(self.scores, -1) if self.labeled else self.scores
-        batch_size, seq_len, _ = scores.shape[-3:]
+        scores = semiring.convert(self.scores)
         # [..., batch_size, seq_len, seq_len], (l->r)
-        scores = semiring.convert(scores)
+        scores = semiring.sum(scores, -1) if self.labeled else scores
+        batch_size, seq_len, _ = scores.shape[-3:]
         s = semiring.zero_(torch.empty_like(scores))
 
         for w in range(1, seq_len):
             n = seq_len - w
-
-            if w == 1:
-                s.diagonal(w, -2, -1).copy_(scores.diagonal(w, -2, -1))
-                continue
             # [..., batch_size, n]
-            s_s = semiring.dot(stripe(s, n, w-1, (0, 1)), stripe(s, n, w-1, (1, w), 0), -1)
+            s_s = semiring.dot(stripe(s, n, w-1, (0, 1)), stripe(s, n, w-1, (1, w), 0), -1) if w > 1 else semiring.one
             s.diagonal(w, -2, -1).copy_(semiring.mul(s_s, scores.diagonal(w, -2, -1)))
         # [..., batch_size, seq_len, seq_len]
         s = semiring.unconvert(s)
