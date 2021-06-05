@@ -42,7 +42,7 @@ PARSER = {parser.NAME: parser for parser in [BiaffineDependencyParser,
                                              VISemanticDependencyParser]}
 
 SRC = {'github': 'https://github.com/yzhangcs/parser/releases/download',
-       'hlt': 'http://hlt.suda.edu.cn/LA/yzhang/supar'}
+       'hlt': 'http://hlt.suda.edu.cn/~yzhang/supar'}
 NAME = {
     'biaffine-dep-en': 'ptb.biaffine.dep.lstm.char',
     'biaffine-dep-zh': 'ctb7.biaffine.dep.lstm.char',
