@@ -9,7 +9,7 @@ import torch
 import torch.distributed as dist
 from supar.utils import Config, Dataset
 from supar.utils.field import Field
-from supar.utils.fn import download
+from supar.utils.fn import download, get_rng_state, set_rng_state
 from supar.utils.logging import init_logger, logger
 from supar.utils.metric import Metric
 from supar.utils.parallel import DistributedDataParallel as DDP
@@ -60,10 +60,16 @@ class Parser(object):
         if dist.is_initialized():
             self.model = DDP(self.model, device_ids=[args.local_rank], find_unused_parameters=True)
 
-        elapsed = timedelta()
-        best_e, best_metric = 1, Metric()
+        self.epoch, self.best_e, self.patience, self.best_metric, self.elapsed = 1, 1, patience, Metric(), timedelta()
+        if self.args.checkpoint:
+            self.optimizer.load_state_dict(self.args.pop('optimizer_state_dict'))
+            self.scheduler.load_state_dict(self.args.pop('scheduler_state_dict'))
+            for k, v in args.pop('state_args').items():
+                setattr(self, k, v)
+            set_rng_state(args.pop('rng_state'))
+            train.loader.batch_sampler.epoch = self.epoch
 
-        for epoch in range(1, args.epochs + 1):
+        for epoch in range(self.epoch, args.epochs + 1):
             start = datetime.now()
 
             logger.info(f"Epoch {epoch} / {args.epochs}:")
@@ -74,22 +80,26 @@ class Parser(object):
             logger.info(f"{'test:':5} loss: {loss:.4f} - {test_metric}")
 
             t = datetime.now() - start
-            if dev_metric > best_metric:
-                best_e, best_metric = epoch, dev_metric
+            self.epoch += 1
+            self.patience -= 1
+            self.elapsed += t
+
+            if dev_metric > self.best_metric:
+                self.best_e, self.patience, self.best_metric = epoch, patience, dev_metric
                 if is_master():
-                    self.save(args.path)
+                    self.save_checkpoint(args.path)
                 logger.info(f"{t}s elapsed (saved)\n")
             else:
                 logger.info(f"{t}s elapsed\n")
-            elapsed += t
-            if epoch - best_e >= args.patience:
+            if self.patience < 1:
                 break
         loss, metric = self.load(**args)._evaluate(test.loader)
+        self.save(args.path)
 
-        logger.info(f"Epoch {best_e} saved")
-        logger.info(f"{'dev:':5} {best_metric}")
+        logger.info(f"Epoch {self.best_e} saved")
+        logger.info(f"{'dev:':5} {self.best_metric}")
         logger.info(f"{'test:':5} {metric}")
-        logger.info(f"{elapsed}s elapsed, {elapsed / epoch}s/epoch")
+        logger.info(f"{self.elapsed}s elapsed, {self.elapsed / epoch}s/epoch")
 
     def evaluate(self, data, buckets=8, batch_size=5000, **kwargs):
         args = self.args.update(locals())
@@ -199,6 +209,24 @@ class Parser(object):
         if hasattr(model, 'module'):
             model = self.model.module
         args = model.args
+        state_dict = {k: v.cpu() for k, v in model.state_dict().items()}
+        pretrained = state_dict.pop('pretrained.weight', None)
+        state = {'name': self.NAME,
+                 'args': args,
+                 'state_dict': state_dict,
+                 'pretrained': pretrained,
+                 'transform': self.transform}
+        torch.save(state, path, pickle_module=dill)
+
+    def save_checkpoint(self, path):
+        model = self.model
+        if hasattr(model, 'module'):
+            model = self.model.module
+        args = model.args
+        args.state_args = {k: getattr(self, k) for k in ['epoch', 'best_e', 'patience', 'best_metric', 'elapsed']}
+        args.optimizer_state_dict = self.optimizer.state_dict()
+        args.scheduler_state_dict = self.scheduler.state_dict()
+        args.rng_state = get_rng_state()
         state_dict = {k: v.cpu() for k, v in model.state_dict().items()}
         pretrained = state_dict.pop('pretrained.weight', None)
         state = {'name': self.NAME,

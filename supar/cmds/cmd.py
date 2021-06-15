@@ -25,7 +25,7 @@ def parse(parser):
     logger.info('\n' + str(args))
 
     if args.mode == 'train':
-        parser = Parser.build(**args)
+        parser = Parser.load(args.path) if args.checkpoint else Parser.build(**args)
         parser.train(**args)
     elif args.mode == 'evaluate':
         parser = Parser.load(args.path)

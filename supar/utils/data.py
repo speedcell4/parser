@@ -113,7 +113,7 @@ class Sampler(torch.utils.data.Sampler):
         self.rank = dist.get_rank() if distributed else 0
         self.replicas = dist.get_world_size() if distributed else 1
         self.samples = sum(self.chunks) // self.replicas
-        self.epoch = 0
+        self.epoch = 1
 
     def __iter__(self):
         g = torch.Generator()
