@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import torch.nn as nn
+import torch.nn.functional as F
 from supar.models.model import Model
 from supar.modules import MLP, Biaffine, Triaffine
 from supar.structs import LBPSemanticDependency, MFVISemanticDependency
@@ -132,7 +133,7 @@ class BiaffineSemanticDependencyModel(Model):
         self.label_mlp_d = MLP(n_in=self.args.n_hidden, n_out=n_label_mlp, dropout=label_mlp_dropout, activation=False)
         self.label_mlp_h = MLP(n_in=self.args.n_hidden, n_out=n_label_mlp, dropout=label_mlp_dropout, activation=False)
 
-        self.edge_attn = Biaffine(n_in=n_edge_mlp, n_out=2, bias_x=True, bias_y=True)
+        self.edge_attn = Biaffine(n_in=n_edge_mlp, bias_x=True, bias_y=True)
         self.label_attn = Biaffine(n_in=n_label_mlp, n_out=n_labels, bias_x=True, bias_y=True)
         self.criterion = nn.CrossEntropyLoss()
 
@@ -156,7 +157,7 @@ class BiaffineSemanticDependencyModel(Model):
 
         Returns:
             ~torch.Tensor, ~torch.Tensor:
-                The first tensor of shape ``[batch_size, seq_len, seq_len, 2]`` holds scores of all possible edges.
+                The first tensor of shape ``[batch_size, seq_len, seq_len]`` holds scores of all possible edges.
                 The second of shape ``[batch_size, seq_len, seq_len, n_labels]`` holds
                 scores of all possible labels on each edge.
         """
@@ -168,8 +169,8 @@ class BiaffineSemanticDependencyModel(Model):
         label_d = self.label_mlp_d(x)
         label_h = self.label_mlp_h(x)
 
-        # [batch_size, seq_len, seq_len, 2]
-        s_edge = self.edge_attn(edge_d, edge_h).permute(0, 2, 3, 1)
+        # [batch_size, seq_len, seq_len]
+        s_edge = self.edge_attn(edge_d, edge_h)
         # [batch_size, seq_len, seq_len, n_labels]
         s_label = self.label_attn(label_d, label_h).permute(0, 2, 3, 1)
 
@@ -178,7 +179,7 @@ class BiaffineSemanticDependencyModel(Model):
     def loss(self, s_edge, s_label, labels, mask):
         r"""
         Args:
-            s_edge (~torch.Tensor): ``[batch_size, seq_len, seq_len, 2]``.
+            s_edge (~torch.Tensor): ``[batch_size, seq_len, seq_len]``.
                 Scores of all possible edges.
             s_label (~torch.Tensor): ``[batch_size, seq_len, seq_len, n_labels]``.
                 Scores of all possible labels on each edge.
@@ -193,24 +194,24 @@ class BiaffineSemanticDependencyModel(Model):
         """
 
         edge_mask = labels.ge(0) & mask
-        edge_loss = self.criterion(s_edge[mask], edge_mask[mask].long())
+        edge_loss = F.binary_cross_entropy_with_logits(s_edge[mask], edge_mask[mask].float())
         label_loss = self.criterion(s_label[edge_mask], labels[edge_mask])
         return self.args.interpolation * label_loss + (1 - self.args.interpolation) * edge_loss
 
     def decode(self, s_edge, s_label):
         r"""
         Args:
-            s_edge (~torch.Tensor): ``[batch_size, seq_len, seq_len, 2]``.
+            s_edge (~torch.Tensor): ``[batch_size, seq_len, seq_len]``.
                 Scores of all possible edges.
             s_label (~torch.Tensor): ``[batch_size, seq_len, seq_len, n_labels]``.
                 Scores of all possible labels on each edge.
 
         Returns:
-            ~torch.BoolTensor:
+            ~torch.LongTensor:
                 Predicted labels of shape ``[batch_size, seq_len, seq_len]``.
         """
 
-        return s_label.argmax(-1).masked_fill_(s_edge.argmax(-1).lt(1), -1)
+        return s_label.argmax(-1).masked_fill_(s_edge.lt(0), -1)
 
 
 class VISemanticDependencyModel(BiaffineSemanticDependencyModel):
