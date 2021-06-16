@@ -62,11 +62,11 @@ class Parser(object):
 
         self.epoch, self.best_e, self.patience, self.best_metric, self.elapsed = 1, 1, patience, Metric(), timedelta()
         if self.args.checkpoint:
-            self.optimizer.load_state_dict(self.args.pop('optimizer_state_dict'))
-            self.scheduler.load_state_dict(self.args.pop('scheduler_state_dict'))
-            for k, v in args.pop('state_args').items():
+            self.optimizer.load_state_dict(self.checkpoint_state_dict.pop('optimizer_state_dict'))
+            self.scheduler.load_state_dict(self.checkpoint_state_dict.pop('scheduler_state_dict'))
+            set_rng_state(self.checkpoint_state_dict.pop('rng_state'))
+            for k, v in self.checkpoint_state_dict.items():
                 setattr(self, k, v)
-            set_rng_state(args.pop('rng_state'))
             train.loader.batch_sampler.epoch = self.epoch
 
         for epoch in range(self.epoch, args.epochs + 1):
@@ -202,7 +202,9 @@ class Parser(object):
         model.load_state_dict(state['state_dict'], False)
         model.to(args.device)
         transform = state['transform']
-        return cls(args, model, transform)
+        parser = cls(args, model, transform)
+        parser.checkpoint_state_dict = state['checkpoint_state_dict'] if args.checkpoint else None
+        return parser
 
     def save(self, path):
         model = self.model
@@ -223,15 +225,16 @@ class Parser(object):
         if hasattr(model, 'module'):
             model = self.model.module
         args = model.args
-        args.state_args = {k: getattr(self, k) for k in ['epoch', 'best_e', 'patience', 'best_metric', 'elapsed']}
-        args.optimizer_state_dict = self.optimizer.state_dict()
-        args.scheduler_state_dict = self.scheduler.state_dict()
-        args.rng_state = get_rng_state()
+        checkpoint_state_dict = {k: getattr(self, k) for k in ['epoch', 'best_e', 'patience', 'best_metric', 'elapsed']}
+        checkpoint_state_dict.update({'optimizer_state_dict': self.optimizer.state_dict(),
+                                      'scheduler_state_dict': self.scheduler.state_dict(),
+                                      'rng_state': get_rng_state()})
         state_dict = {k: v.cpu() for k, v in model.state_dict().items()}
         pretrained = state_dict.pop('pretrained.weight', None)
         state = {'name': self.NAME,
                  'args': args,
                  'state_dict': state_dict,
                  'pretrained': pretrained,
+                 'checkpoint_state_dict': checkpoint_state_dict,
                  'transform': self.transform}
         torch.save(state, path, pickle_module=dill)

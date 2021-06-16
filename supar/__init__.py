@@ -65,3 +65,6 @@ NAME = {
 }
 MODEL = {n: f"{SRC['github']}/v1.1.0/{m}.zip" for n, m in NAME.items()}
 CONFIG = {n: f"{SRC['github']}/v1.1.0/{m}.ini" for n, m in NAME.items()}
+
+MODEL['biaffine-sdp-en'] = f"{SRC['hlt']}/v1.1.1/{NAME['biaffine-sdp-en']}.zip"
+MODEL['biaffine-sdp-zh'] = f"{SRC['hlt']}/v1.1.1/{NAME['biaffine-sdp-zh']}.zip"
