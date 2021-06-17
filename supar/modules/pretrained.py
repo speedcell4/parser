@@ -8,9 +8,7 @@ from supar.utils.fn import pad
 
 class TransformerEmbedding(nn.Module):
     r"""
-    A module that directly utilizes the pretrained models in `transformers`_ to produce BERT representations.
-    While mainly tailored to provide input preparation and post-processing for the BERT model,
-    it is also compatible with other pretrained language models like XLNet, RoBERTa and ELECTRA, etc.
+    Bidirectional transformer embeddings of words from various transformer architectures :cite:`devlin-etal-2019-bert`.
 
     Args:
         model (str):
@@ -115,18 +113,16 @@ class TransformerEmbedding(nn.Module):
 
 class ELMoEmbedding(nn.Module):
     r"""
-    A module that directly utilizes the pretrained models in `transformers`_ to produce BERT representations.
-    While mainly tailored to provide input preparation and post-processing for the BERT model,
-    it is also compatible with other pretrained language models like XLNet, RoBERTa and ELECTRA, etc.
+    Contextual word embeddings using word-level bidirectional LM :cite:`peters-etal-2018-deep`.
 
     Args:
         model (str):
-            Name of the pretrained ELMo registered in `OPTION` and `WEIGHT`. Default: ``'original_5b'``.
+            The name of the pretrained ELMo registered in `OPTION` and `WEIGHT`. Default: ``'original_5b'``.
         bos_eos (tuple[bool]):
             A tuple of two boolean values indicating whether to keep start/end boundaries of sentence outputs.
             Default: ``(True, True)``.
         n_out (int):
-            The requested size of the embeddings. If ``None``, uses the default size of ELMo outputs. Default: ``None``.
+            The requested size of the embeddings. If 0, uses the default size of ELMo outputs. Default: 0.
         dropout (float):
             The dropout ratio for the ELMo layer. Default: 0.
         requires_grad (bool):
@@ -146,7 +142,7 @@ class ELMoEmbedding(nn.Module):
         'original_5b': 'https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway_5.5B/elmo_2x4096_512_2048cnn_2xhighway_5.5B_weights.hdf5',  # noqa
     }
 
-    def __init__(self, model='original_5b', bos_eos=(True, True), n_out=None, dropout=0.5, requires_grad=False):
+    def __init__(self, model='original_5b', bos_eos=(True, True), n_out=0, dropout=0.5, requires_grad=False):
         super().__init__()
 
         from allennlp.modules import Elmo
