@@ -125,7 +125,8 @@ class BiaffineSemanticDependencyParser(Parser):
 
         bar, metric = progress_bar(loader), ChartMetric()
 
-        for i, (words, *feats, labels) in enumerate(bar, 1):
+        for i, batch in enumerate(bar, 1):
+            words, *feats, labels = batch
             word_mask = words.ne(self.args.pad_index)
             mask = word_mask if len(words.shape) < 3 else word_mask.any(-1)
             mask = mask.unsqueeze(1) & mask.unsqueeze(2)
@@ -151,7 +152,8 @@ class BiaffineSemanticDependencyParser(Parser):
 
         total_loss, metric = 0, ChartMetric()
 
-        for words, *feats, labels in loader:
+        for batch in loader:
+            words, *feats, labels = batch
             word_mask = words.ne(self.args.pad_index)
             mask = word_mask if len(words.shape) < 3 else word_mask.any(-1)
             mask = mask.unsqueeze(1) & mask.unsqueeze(2)
@@ -171,7 +173,8 @@ class BiaffineSemanticDependencyParser(Parser):
         self.model.eval()
 
         preds = {'labels': [], 'probs': [] if self.args.prob else None}
-        for words, *feats in progress_bar(loader):
+        for batch in progress_bar(loader):
+            words, *feats = batch
             word_mask = words.ne(self.args.pad_index)
             mask = word_mask if len(words.shape) < 3 else word_mask.any(-1)
             mask = mask.unsqueeze(1) & mask.unsqueeze(2)
@@ -403,7 +406,8 @@ class VISemanticDependencyParser(BiaffineSemanticDependencyParser):
 
         bar, metric = progress_bar(loader), ChartMetric()
 
-        for i, (words, *feats, labels) in enumerate(bar, 1):
+        for i, batch in enumerate(bar, 1):
+            words, *feats, labels = batch
             word_mask = words.ne(self.args.pad_index)
             mask = word_mask if len(words.shape) < 3 else word_mask.any(-1)
             mask = mask.unsqueeze(1) & mask.unsqueeze(2)
@@ -429,7 +433,8 @@ class VISemanticDependencyParser(BiaffineSemanticDependencyParser):
 
         total_loss, metric = 0, ChartMetric()
 
-        for words, *feats, labels in loader:
+        for batch in loader:
+            words, *feats, labels = batch
             word_mask = words.ne(self.args.pad_index)
             mask = word_mask if len(words.shape) < 3 else word_mask.any(-1)
             mask = mask.unsqueeze(1) & mask.unsqueeze(2)
@@ -449,7 +454,8 @@ class VISemanticDependencyParser(BiaffineSemanticDependencyParser):
         self.model.eval()
 
         preds = {'labels': [], 'probs': [] if self.args.prob else None}
-        for words, *feats in progress_bar(loader):
+        for batch in progress_bar(loader):
+            words, *feats = batch
             word_mask = words.ne(self.args.pad_index)
             mask = word_mask if len(words.shape) < 3 else word_mask.any(-1)
             mask = mask.unsqueeze(1) & mask.unsqueeze(2)
