@@ -82,6 +82,7 @@ class Dataset(torch.utils.data.Dataset):
         self.loader = DataLoader(dataset=self,
                                  batch_sampler=Sampler(self.buckets, batch_size, shuffle, distributed),
                                  collate_fn=lambda x: Batch(x))
+        return self
 
 
 class Sampler(torch.utils.data.Sampler):
@@ -118,13 +119,10 @@ class Sampler(torch.utils.data.Sampler):
     def __iter__(self):
         g = torch.Generator()
         g.manual_seed(self.epoch)
-        range_fn = torch.arange
+        total, count = 0, 0
         # if `shuffle=True`, shuffle both the buckets and samples in each bucket
         # for distributed training, make sure each process generates the same random sequence at each epoch
-        if self.shuffle:
-            def range_fn(x):
-                return torch.randperm(x, generator=g)
-        total, count = 0, 0
+        range_fn = torch.arange if not self.shuffle else lambda x: torch.randperm(x, generator=g)
         # TODO: more elegant way to deal with uneven data, which we directly discard right now
         for i in range_fn(len(self.buckets)).tolist():
             split_sizes = [(len(self.buckets[i]) - j - 1) // self.chunks[i] + 1 for j in range(self.chunks[i])]

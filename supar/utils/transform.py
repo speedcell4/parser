@@ -35,11 +35,10 @@ class Transform(object):
         return f"{self.__class__.__name__}({s})"
 
     def __call__(self, sentences):
-        # numericalize the specified field of each sentence and set the value as sentence attribute
-        for f in self.flattened_fields:
-            values = f.transform([getattr(i, f.name) for i in sentences])
-            for s, v in zip(sentences, values):
-                s.transformed[f.name] = v
+        # numericalize the fields of each sentence
+        for sentence in progress_bar(sentences):
+            for f in self.flattened_fields:
+                sentence.transformed[f.name] = f.transform([getattr(sentence, f.name)])[0]
         return self.flattened_fields
 
     def __getitem__(self, index):
