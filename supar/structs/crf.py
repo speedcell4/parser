@@ -308,8 +308,11 @@ class CRFConstituency(StructuredDistribution):
 
         for w in range(1, seq_len):
             n = seq_len - w
+            if w == 1:
+                s.diagonal(w, -2, -1).copy_(scores.diagonal(w, -2, -1))
+                continue
             # [..., batch_size, n]
-            s_s = semiring.dot(stripe(s, n, w-1, (0, 1)), stripe(s, n, w-1, (1, w), 0), -1) if w > 1 else semiring.one
+            s_s = semiring.dot(stripe(s, n, w-1, (0, 1)), stripe(s, n, w-1, (1, w), 0), -1)
             s.diagonal(w, -2, -1).copy_(semiring.mul(s_s, scores.diagonal(w, -2, -1)))
         # [..., batch_size, seq_len, seq_len]
         s = semiring.unconvert(s)
