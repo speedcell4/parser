@@ -34,15 +34,13 @@ class Parser(object):
         init_logger(logger, verbose=args.verbose)
 
         self.transform.train()
+        batch_size = batch_size // update_steps
         if dist.is_initialized():
-            args.batch_size = args.batch_size // dist.get_world_size()
+            batch_size = batch_size // dist.get_world_size()
         logger.info("Loading the data")
-        train = Dataset(self.transform, args.train, **args)
-        dev = Dataset(self.transform, args.dev)
-        test = Dataset(self.transform, args.test)
-        train.build(args.batch_size//args.update_steps, args.buckets, True, dist.is_initialized())
-        dev.build(args.batch_size, args.buckets)
-        test.build(args.batch_size, args.buckets)
+        train = Dataset(self.transform, args.train, **args).build(batch_size, buckets, True, dist.is_initialized())
+        dev = Dataset(self.transform, args.dev).build(batch_size, buckets)
+        test = Dataset(self.transform, args.test).build(batch_size, buckets)
         logger.info(f"\n{'train:':6} {train}\n{'dev:':6} {dev}\n{'test:':6} {test}\n")
 
         if args.encoder == 'lstm':
@@ -108,7 +106,7 @@ class Parser(object):
         self.transform.train()
         logger.info("Loading the data")
         dataset = Dataset(self.transform, data)
-        dataset.build(args.batch_size, args.buckets)
+        dataset.build(batch_size, buckets)
         logger.info(f"\n{dataset}")
 
         logger.info("Evaluating the dataset")
@@ -130,7 +128,7 @@ class Parser(object):
 
         logger.info("Loading the data")
         dataset = Dataset(self.transform, data, lang=lang)
-        dataset.build(args.batch_size, args.buckets)
+        dataset.build(batch_size, buckets)
         logger.info(f"\n{dataset}")
 
         logger.info("Making predictions on the dataset")
@@ -163,7 +161,7 @@ class Parser(object):
         raise NotImplementedError
 
     @classmethod
-    def load(cls, path, reload=False, src=None, **kwargs):
+    def load(cls, path, reload=False, src=None, checkpoint=False, **kwargs):
         r"""
         Loads a parser with data fields and pretrained model parameters.
 
@@ -179,6 +177,8 @@ class Parser(object):
                 ``'github'``: github release page.
                 ``'hlt'``: hlt homepage, only accessible from 9:00 to 18:00 (UTC+8).
                 Default: None.
+            checkpoint (bool):
+                If ``True``, loads all checkpoint states to restore the training process. Default: ``False``.
             kwargs (dict):
                 A dict holding unconsumed arguments for updating training configs and initializing the model.
 
