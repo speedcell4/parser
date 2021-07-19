@@ -175,7 +175,7 @@ class CRFConstituencyModel(Model):
             s_span (~torch.Tensor): ``[batch_size, seq_len, seq_len]``.
                 Scores of all constituents.
             s_label (~torch.Tensor): ``[batch_size, seq_len, seq_len, n_labels]``.
-                Scores of all labels on each constituent.
+                Scores of all constituent labels.
             charts (~torch.LongTensor): ``[batch_size, seq_len, seq_len]``.
                 The tensor of gold-standard labels. Positions without labels are filled with -1.
             mask (~torch.BoolTensor): ``[batch_size, seq_len, seq_len]``.
@@ -190,8 +190,13 @@ class CRFConstituencyModel(Model):
         """
 
         span_mask = charts.ge(0) & mask
-        span_dist = CRFConstituency(s_span, mask)
-        span_loss = -span_dist.log_prob(span_mask).sum() / mask[:, 0].sum()
+        if self.args.loss == 'crf':
+            span_dist = CRFConstituency(s_span, mask)
+            span_loss = -span_dist.log_prob(span_mask).sum()
+        elif self.args.loss == 'max-margin':
+            span_dist = CRFConstituency(s_span + torch.full_like(s_span, 1) - span_mask.float(), mask)
+            span_loss = span_dist.max.sum() - s_span[span_mask].sum()
+        span_loss = span_loss / mask[:, 0].sum()
         span_probs = span_dist.marginals if mbr else s_span
         label_loss = self.criterion(s_label[span_mask], charts[span_mask])
         loss = span_loss + label_loss
@@ -204,7 +209,7 @@ class CRFConstituencyModel(Model):
             s_span (~torch.Tensor): ``[batch_size, seq_len, seq_len]``.
                 Scores of all constituents.
             s_label (~torch.Tensor): ``[batch_size, seq_len, seq_len, n_labels]``.
-                Scores of all labels on each constituent.
+                Scores of all constituent labels.
             mask (~torch.BoolTensor): ``[batch_size, seq_len, seq_len]``.
                 The mask for covering the unpadded tokens in each chart.
 
@@ -406,7 +411,7 @@ class VIConstituencyModel(CRFConstituencyModel):
             s_pair (~torch.Tensor): ``[batch_size, seq_len, seq_len, seq_len]``.
                 Scores of second-order triples.
             s_label (~torch.Tensor): ``[batch_size, seq_len, seq_len, n_labels]``.
-                Scores of all labels on each constituent.
+                Scores of all constituent labels.
             charts (~torch.LongTensor): ``[batch_size, seq_len, seq_len]``.
                 The tensor of gold-standard labels. Positions without labels are filled with -1.
             mask (~torch.BoolTensor): ``[batch_size, seq_len, seq_len]``.
@@ -430,7 +435,7 @@ class VIConstituencyModel(CRFConstituencyModel):
             s_span (~torch.Tensor): ``[batch_size, seq_len, seq_len]``.
                 Scores of all constituents.
             s_label (~torch.Tensor): ``[batch_size, seq_len, seq_len, n_labels]``.
-                Scores of all labels on each constituent.
+                Scores of all constituent labels.
             mask (~torch.BoolTensor): ``[batch_size, seq_len, seq_len]``.
                 The mask for covering the unpadded tokens in each chart.
 

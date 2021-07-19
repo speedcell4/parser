@@ -289,10 +289,10 @@ class CRFConstituency(StructuredDistribution):
 
     @lazy_property
     def argmax(self):
-        return [sorted(i.nonzero().tolist(), key=lambda x:(x[0], -x[1])) for i in self.backward(self.max.sum())]
+        return [sorted(torch.nonzero(i).tolist(), key=lambda x:(x[0], -x[1])) for i in self.backward(self.max.sum())]
 
     def topk(self, k):
-        return list(zip(*[[sorted(i.nonzero().tolist(), key=lambda x:(x[0], -x[1])) for i in self.backward(i)]
+        return list(zip(*[[sorted(torch.nonzero(i).tolist(), key=lambda x:(x[0], -x[1])) for i in self.backward(i)]
                           for i in self.kmax(k).sum(0)]))
 
     def score(self, value):
