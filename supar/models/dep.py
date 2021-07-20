@@ -342,8 +342,13 @@ class CRFDependencyModel(BiaffineDependencyModel):
                 original arc scores of shape ``[batch_size, seq_len, seq_len]`` if ``mbr=False``, or marginals otherwise.
         """
 
-        arc_dist = (CRFDependency if self.args.proj else MatrixTree)(s_arc, mask, partial=partial)
-        arc_loss = -arc_dist.log_prob(arcs).sum() / mask.sum()
+        CRF = CRFDependency if self.args.proj else MatrixTree
+        if self.args.loss == 'crf':
+            arc_dist = CRF(s_arc, mask, partial=partial)
+            arc_loss = -arc_dist.log_prob(arcs).sum() / mask.sum()
+        elif self.args.loss == 'max-margin':
+            arc_dist = CRF(s_arc + torch.full_like(s_arc, 1).scatter_(-1, arcs.unsqueeze(-1), 0), mask, partial=partial)
+            arc_loss = (arc_dist.max - arc_dist.score(arcs)).sum() / mask.sum()
         arc_probs = arc_dist.marginals if mbr else s_arc
         # -1 denotes un-annotated arcs
         if partial:
@@ -553,8 +558,13 @@ class CRF2oDependencyModel(BiaffineDependencyModel):
                 original arc scores of shape ``[batch_size, seq_len, seq_len]`` if ``mbr=False``, or marginals otherwise.
         """
 
-        arc_dist = CRF2oDependency((s_arc, s_sib), mask, partial=partial)
-        arc_loss = -arc_dist.log_prob((arcs, sibs)).sum() / mask.sum()
+        if self.args.loss == 'crf':
+            arc_dist = CRF2oDependency((s_arc, s_sib), mask, partial=partial)
+            arc_loss = -arc_dist.log_prob((arcs, sibs)).sum() / mask.sum()
+        elif self.args.loss == 'max-margin':
+            s_arc = s_arc + torch.full_like(s_arc, 1).scatter_(-1, arcs.unsqueeze(-1), 0)
+            arc_dist = CRF2oDependency((s_arc, s_sib), mask, partial=partial)
+            arc_loss = (arc_dist.max - arc_dist.score(arcs)).sum() / mask.sum()
         arc_probs = arc_dist.marginals if mbr else s_arc
         # -1 denotes un-annotated arcs
         if partial:

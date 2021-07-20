@@ -116,10 +116,10 @@ class CRFDependency(StructuredDistribution):
 
     @lazy_property
     def argmax(self):
-        return self.lens.new_zeros(self.mask.shape).masked_scatter_(self.mask, self.backward(self.max.sum()).nonzero()[:, 2])
+        return self.lens.new_zeros(self.mask.shape).masked_scatter_(self.mask, torch.where(self.backward(self.max.sum()))[2])
 
     def topk(self, k):
-        preds = torch.stack([self.backward(i).nonzero()[:, 2] for i in self.kmax(k).sum(0)], -1)
+        preds = torch.stack([torch.where(self.backward(i))[2] for i in self.kmax(k).sum(0)], -1)
         return self.lens.new_zeros(*self.mask.shape, k).masked_scatter_(self.mask.unsqueeze(-1), preds)
 
     def score(self, value):
@@ -190,10 +190,10 @@ class CRF2oDependency(StructuredDistribution):
 
     @lazy_property
     def argmax(self):
-        return self.lens.new_zeros(self.mask.shape).masked_scatter_(self.mask, self.backward(self.max.sum()).nonzero()[:, 2])
+        return self.lens.new_zeros(self.mask.shape).masked_scatter_(self.mask, torch.where(self.backward(self.max.sum()))[2])
 
     def topk(self, k):
-        preds = torch.stack([self.backward(i).nonzero()[:, 2] for i in self.kmax(k).sum(0)], -1)
+        preds = torch.stack([torch.where(self.backward(i))[2] for i in self.kmax(k).sum(0)], -1)
         return self.lens.new_zeros(*self.mask.shape, k).masked_scatter_(self.mask.unsqueeze(-1), preds)
 
     def score(self, value):
