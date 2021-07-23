@@ -28,7 +28,6 @@ class BiaffineSemanticDependencyParser(Parser):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.WORD, self.CHAR, self.ELMO, self.BERT = self.transform.FORM
         self.LEMMA = self.transform.LEMMA
         self.TAG = self.transform.POS
         self.LABEL = self.transform.PHEAD
@@ -301,7 +300,6 @@ class VISemanticDependencyParser(BiaffineSemanticDependencyParser):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.WORD, self.CHAR, self.ELMO, self.BERT = self.transform.FORM
         self.LEMMA = self.transform.LEMMA
         self.TAG = self.transform.POS
         self.LABEL = self.transform.PHEAD

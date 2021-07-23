@@ -158,7 +158,7 @@ class BiaffineDependencyParser(Parser):
         bar, metric = progress_bar(loader), AttachmentMetric()
 
         for i, batch in enumerate(bar, 1):
-            words, *feats, arcs, rels = batch
+            words, texts, *feats, arcs, rels = batch
             word_mask = words.ne(self.args.pad_index)
             mask = word_mask if len(words.shape) < 3 else word_mask.any(-1)
             # ignore the first token of each sentence
@@ -178,7 +178,7 @@ class BiaffineDependencyParser(Parser):
                 mask &= arcs.ge(0)
             # ignore all punctuation if not specified
             if not self.args.punct:
-                mask.masked_scatter_(mask, ~mask.new_tensor([ispunct(w) for s in batch.sentences for w in s.words]))
+                mask.masked_scatter_(mask, ~mask.new_tensor([ispunct(w) for s in texts for w in s]))
             metric(arc_preds, rel_preds, arcs, rels, mask)
             bar.set_postfix_str(f"lr: {self.scheduler.get_last_lr()[0]:.4e} - loss: {loss:.4f} - {metric}")
         logger.info(f"{bar.postfix}")
@@ -190,7 +190,7 @@ class BiaffineDependencyParser(Parser):
         total_loss, metric = 0, AttachmentMetric()
 
         for batch in loader:
-            words, *feats, arcs, rels = batch
+            words, texts, *feats, arcs, rels = batch
             word_mask = words.ne(self.args.pad_index)
             mask = word_mask if len(words.shape) < 3 else word_mask.any(-1)
             # ignore the first token of each sentence
@@ -202,7 +202,7 @@ class BiaffineDependencyParser(Parser):
                 mask &= arcs.ge(0)
             # ignore all punctuation if not specified
             if not self.args.punct:
-                mask.masked_scatter_(mask, ~mask.new_tensor([ispunct(w) for s in batch.sentences for w in s.words]))
+                mask.masked_scatter_(mask, ~mask.new_tensor([ispunct(w) for s in texts for w in s]))
             total_loss += loss.item()
             metric(arc_preds, rel_preds, arcs, rels, mask)
         total_loss /= len(loader)
@@ -215,7 +215,7 @@ class BiaffineDependencyParser(Parser):
 
         preds = {'arcs': [], 'rels': [], 'probs': [] if self.args.prob else None}
         for batch in progress_bar(loader):
-            words, *feats = batch
+            words, texts, *feats = batch
             word_mask = words.ne(self.args.pad_index)
             mask = word_mask if len(words.shape) < 3 else word_mask.any(-1)
             # ignore the first token of each sentence
@@ -470,7 +470,7 @@ class CRFDependencyParser(BiaffineDependencyParser):
         bar, metric = progress_bar(loader), AttachmentMetric()
 
         for i, batch in enumerate(bar, 1):
-            words, *feats, arcs, rels = batch
+            words, texts, *feats, arcs, rels = batch
             word_mask = words.ne(self.args.pad_index)
             mask = word_mask if len(words.shape) < 3 else word_mask.any(-1)
             # ignore the first token of each sentence
@@ -490,7 +490,7 @@ class CRFDependencyParser(BiaffineDependencyParser):
                 mask &= arcs.ge(0)
             # ignore all punctuation if not specified
             if not self.args.punct:
-                mask.masked_scatter_(mask, ~mask.new_tensor([ispunct(w) for s in batch.sentences for w in s.words]))
+                mask.masked_scatter_(mask, ~mask.new_tensor([ispunct(w) for s in texts for w in s]))
             metric(arc_preds, rel_preds, arcs, rels, mask)
             bar.set_postfix_str(f"lr: {self.scheduler.get_last_lr()[0]:.4e} - loss: {loss:.4f} - {metric}")
         logger.info(f"{bar.postfix}")
@@ -502,7 +502,7 @@ class CRFDependencyParser(BiaffineDependencyParser):
         total_loss, metric = 0, AttachmentMetric()
 
         for batch in loader:
-            words, *feats, arcs, rels = batch
+            words, texts, *feats, arcs, rels = batch
             word_mask = words.ne(self.args.pad_index)
             mask = word_mask if len(words.shape) < 3 else word_mask.any(-1)
             # ignore the first token of each sentence
@@ -514,7 +514,7 @@ class CRFDependencyParser(BiaffineDependencyParser):
                 mask &= arcs.ge(0)
             # ignore all punctuation if not specified
             if not self.args.punct:
-                mask.masked_scatter_(mask, ~mask.new_tensor([ispunct(w) for s in batch.sentences for w in s.words]))
+                mask.masked_scatter_(mask, ~mask.new_tensor([ispunct(w) for s in texts for w in s]))
             total_loss += loss.item()
             metric(arc_preds, rel_preds, arcs, rels, mask)
         total_loss /= len(loader)
@@ -527,7 +527,7 @@ class CRFDependencyParser(BiaffineDependencyParser):
 
         preds = {'arcs': [], 'rels': [], 'probs': [] if self.args.prob else None}
         for batch in progress_bar(loader):
-            words, *feats = batch
+            words, texts, *feats = batch
             word_mask = words.ne(self.args.pad_index)
             mask = word_mask if len(words.shape) < 3 else word_mask.any(-1)
             # ignore the first token of each sentence
@@ -688,7 +688,7 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
         bar, metric = progress_bar(loader), AttachmentMetric()
 
         for i, batch in enumerate(bar, 1):
-            words, *feats, arcs, sibs, rels = batch
+            words, texts, *feats, arcs, sibs, rels = batch
             word_mask = words.ne(self.args.pad_index)
             mask = word_mask if len(words.shape) < 3 else word_mask.any(-1)
             # ignore the first token of each sentence
@@ -708,7 +708,7 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
                 mask &= arcs.ge(0)
             # ignore all punctuation if not specified
             if not self.args.punct:
-                mask.masked_scatter_(mask, ~mask.new_tensor([ispunct(w) for s in batch.sentences for w in s.words]))
+                mask.masked_scatter_(mask, ~mask.new_tensor([ispunct(w) for s in texts for w in s]))
             metric(arc_preds, rel_preds, arcs, rels, mask)
             bar.set_postfix_str(f"lr: {self.scheduler.get_last_lr()[0]:.4e} - loss: {loss:.4f} - {metric}")
         logger.info(f"{bar.postfix}")
@@ -720,7 +720,7 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
         total_loss, metric = 0, AttachmentMetric()
 
         for batch in loader:
-            words, *feats, arcs, sibs, rels = batch
+            words, texts, *feats, arcs, sibs, rels = batch
             word_mask = words.ne(self.args.pad_index)
             mask = word_mask if len(words.shape) < 3 else word_mask.any(-1)
             # ignore the first token of each sentence
@@ -732,7 +732,7 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
                 mask &= arcs.ge(0)
             # ignore all punctuation if not specified
             if not self.args.punct:
-                mask.masked_scatter_(mask, ~mask.new_tensor([ispunct(w) for s in batch.sentences for w in s.words]))
+                mask.masked_scatter_(mask, ~mask.new_tensor([ispunct(w) for s in texts for w in s]))
             total_loss += loss.item()
             metric(arc_preds, rel_preds, arcs, rels, mask)
         total_loss /= len(loader)
@@ -745,7 +745,7 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
 
         preds = {'arcs': [], 'rels': [], 'probs': [] if self.args.prob else None}
         for batch in progress_bar(loader):
-            words, *feats = batch
+            words, texts, *feats = batch
             word_mask = words.ne(self.args.pad_index)
             mask = word_mask if len(words.shape) < 3 else word_mask.any(-1)
             # ignore the first token of each sentence
@@ -995,7 +995,7 @@ class VIDependencyParser(BiaffineDependencyParser):
         bar, metric = progress_bar(loader), AttachmentMetric()
 
         for i, batch in enumerate(bar, 1):
-            words, *feats, arcs, rels = batch
+            words, texts, *feats, arcs, rels = batch
             word_mask = words.ne(self.args.pad_index)
             mask = word_mask if len(words.shape) < 3 else word_mask.any(-1)
             # ignore the first token of each sentence
@@ -1015,7 +1015,7 @@ class VIDependencyParser(BiaffineDependencyParser):
                 mask &= arcs.ge(0)
             # ignore all punctuation if not specified
             if not self.args.punct:
-                mask.masked_scatter_(mask, ~mask.new_tensor([ispunct(w) for s in batch.sentences for w in s.words]))
+                mask.masked_scatter_(mask, ~mask.new_tensor([ispunct(w) for s in texts for w in s]))
             metric(arc_preds, rel_preds, arcs, rels, mask)
             bar.set_postfix_str(f"lr: {self.scheduler.get_last_lr()[0]:.4e} - loss: {loss:.4f} - {metric}")
         logger.info(f"{bar.postfix}")
@@ -1027,7 +1027,7 @@ class VIDependencyParser(BiaffineDependencyParser):
         total_loss, metric = 0, AttachmentMetric()
 
         for batch in loader:
-            words, *feats, arcs, rels = batch
+            words, texts, *feats, arcs, rels = batch
             word_mask = words.ne(self.args.pad_index)
             mask = word_mask if len(words.shape) < 3 else word_mask.any(-1)
             # ignore the first token of each sentence
@@ -1039,7 +1039,7 @@ class VIDependencyParser(BiaffineDependencyParser):
                 mask &= arcs.ge(0)
             # ignore all punctuation if not specified
             if not self.args.punct:
-                mask.masked_scatter_(mask, ~mask.new_tensor([ispunct(w) for s in batch.sentences for w in s.words]))
+                mask.masked_scatter_(mask, ~mask.new_tensor([ispunct(w) for s in texts for w in s]))
             total_loss += loss.item()
             metric(arc_preds, rel_preds, arcs, rels, mask)
         total_loss /= len(loader)
@@ -1052,7 +1052,7 @@ class VIDependencyParser(BiaffineDependencyParser):
 
         preds = {'arcs': [], 'rels': [], 'probs': [] if self.args.prob else None}
         for batch in progress_bar(loader):
-            words, *feats = batch
+            words, texts, *feats = batch
             word_mask = words.ne(self.args.pad_index)
             mask = word_mask if len(words.shape) < 3 else word_mask.any(-1)
             # ignore the first token of each sentence

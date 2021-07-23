@@ -30,7 +30,7 @@ __all__ = ['BiaffineDependencyParser',
            'LBPSemanticDependency',
            'MFVISemanticDependency']
 
-__version__ = '1.1.1'
+__version__ = '1.1.2'
 
 PARSER = {parser.NAME: parser for parser in [BiaffineDependencyParser,
                                              CRFDependencyParser,
@@ -51,6 +51,8 @@ NAME = {
     'biaffine-dep-roberta-en': 'ptb.biaffine.dep.roberta',
     'biaffine-dep-electra-zh': 'ctb7.biaffine.dep.electra',
     'biaffine-dep-xlmr': 'ud.biaffine.dep.xlmr',
+    'mm-con-en': 'ptb.mm.con.lstm.char',
+    # 'mm-con-zh': 'ctb7.mm.con.lstm.char',
     'crf-con-en': 'ptb.crf.con.lstm.char',
     'crf-con-zh': 'ctb7.crf.con.lstm.char',
     'crf-con-roberta-en': 'ptb.crf.con.roberta',
@@ -63,8 +65,7 @@ NAME = {
     'vi-sdp-roberta-en': 'dm.vi.sdp.roberta',
     'vi-sdp-electra-zh': 'semeval16.vi.sdp.electra'
 }
-MODEL = {n: f"{SRC['github']}/v1.1.0/{m}.zip" for n, m in NAME.items()}
-CONFIG = {n: f"{SRC['github']}/v1.1.0/{m}.ini" for n, m in NAME.items()}
-
-MODEL['biaffine-sdp-en'] = f"{SRC['hlt']}/v1.1.1/{NAME['biaffine-sdp-en']}.zip"
-MODEL['biaffine-sdp-zh'] = f"{SRC['hlt']}/v1.1.1/{NAME['biaffine-sdp-zh']}.zip"
+MODEL = {n: f"{SRC['hlt']}/v1.1.0/{m}.zip" for n, m in NAME.items()}
+CONFIG = {n: f"{SRC['hlt']}/v1.1.0/{m}.ini" for n, m in NAME.items()}
+MODEL['biaffine-sdp-en'] = f"{SRC['hlt']}/v1.1.2/{NAME['biaffine-sdp-en']}.zip"
+MODEL['biaffine-sdp-zh'] = f"{SRC['hlt']}/v1.1.2/{NAME['biaffine-sdp-zh']}.zip"

@@ -28,10 +28,6 @@ class CRFConstituencyParser(Parser):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if self.args.feat in ('char', 'bert'):
-            self.WORD, self.FEAT = self.transform.WORD
-        else:
-            self.WORD, self.FEAT = self.transform.WORD, self.transform.POS
         self.TREE = self.transform.TREE
         self.CHART = self.transform.CHART
 
