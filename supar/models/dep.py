@@ -346,9 +346,12 @@ class CRFDependencyModel(BiaffineDependencyModel):
         if self.args.loss == 'crf':
             arc_dist = CRF(s_arc, mask, partial=partial)
             arc_loss = -arc_dist.log_prob(arcs).sum() / mask.sum()
-        elif self.args.loss == 'max-margin':
+        elif self.args.loss == 'max-marg':
             arc_dist = CRF(s_arc + torch.full_like(s_arc, 1).scatter_(-1, arcs.unsqueeze(-1), 0), mask, partial=partial)
             arc_loss = (arc_dist.max - arc_dist.score(arcs)).sum() / mask.sum()
+        elif self.args.loss == 'softmax-marg':
+            arc_dist = CRF(s_arc + torch.full_like(s_arc, 1).scatter_(-1, arcs.unsqueeze(-1), 0), mask, partial=partial)
+            arc_loss = -arc_dist.log_prob(arcs).sum() / mask.sum()
         arc_probs = arc_dist.marginals if mbr else s_arc
         # -1 denotes un-annotated arcs
         if partial:
@@ -562,11 +565,16 @@ class CRF2oDependencyModel(BiaffineDependencyModel):
         if self.args.loss == 'crf':
             arc_dist = CRF2oDependency((s_arc, s_sib), mask, partial=partial)
             arc_loss = -arc_dist.log_prob((arcs, sibs)).sum() / mask.sum()
-        elif self.args.loss == 'max-margin':
+        elif self.args.loss == 'max-marg':
             s_arc = s_arc + torch.full_like(s_arc, 1).scatter_(-1, arcs.unsqueeze(-1), 0)
             s_sib = s_sib + torch.full_like(s_sib, 1).masked_fill_(sibs.unsqueeze(-1).eq(sibs.new_tensor(range(seq_len))), 0)
             arc_dist = CRF2oDependency((s_arc, s_sib), mask, partial=partial)
             arc_loss = (arc_dist.max - arc_dist.score((arcs, sibs))).sum() / mask.sum()
+        elif self.args.loss == 'softmax-marg':
+            s_arc = s_arc + torch.full_like(s_arc, 1).scatter_(-1, arcs.unsqueeze(-1), 0)
+            s_sib = s_sib + torch.full_like(s_sib, 1).masked_fill_(sibs.unsqueeze(-1).eq(sibs.new_tensor(range(seq_len))), 0)
+            arc_dist = CRF2oDependency((s_arc, s_sib), mask, partial=partial)
+            arc_loss = -arc_dist.log_prob((arcs, sibs)).sum() / mask.sum()
         arc_probs = arc_dist.marginals if mbr else s_arc
         # -1 denotes un-annotated arcs
         if partial:

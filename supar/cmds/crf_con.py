@@ -26,7 +26,7 @@ def main():
     subparser.add_argument('--unk', default='unk', help='unk token in pretrained embeddings')
     subparser.add_argument('--n-embed', default=100, type=int, help='dimension of embeddings')
     subparser.add_argument('--bert', default='bert-base-cased', help='which BERT model to use')
-    subparser.add_argument('--loss', choices=['crf', 'max-margin'], default='crf', help='loss for global training')
+    subparser.add_argument('--loss', choices=['crf', 'max-marg', 'softmax-marg'], default='crf', help='training criteria')
     # evaluate
     subparser = subparsers.add_parser('evaluate', help='Evaluate the specified parser and dataset.')
     subparser.add_argument('--buckets', default=8, type=int, help='max num of buckets to use')
