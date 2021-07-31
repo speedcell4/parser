@@ -73,9 +73,9 @@ class BiaffineDependencyModel(Model):
             If ``True``, freezes BERT parameters, required if using BERT features. Default: ``True``.
         embed_dropout (float):
             The dropout ratio of input embeddings. Default: .33.
-        n_lstm_hidden (int):
+        n_encoder_hidden (int):
             The size of LSTM hidden states. Default: 400.
-        n_lstm_layers (int):
+        n_encoder_layers (int):
             The number of LSTM layers. Default: 3.
         encoder_dropout (float):
             The dropout ratio of encoder layer. Default: .33.
@@ -118,8 +118,8 @@ class BiaffineDependencyModel(Model):
                  bert_pad_index=0,
                  freeze=True,
                  embed_dropout=.33,
-                 n_lstm_hidden=400,
-                 n_lstm_layers=3,
+                 n_encoder_hidden=400,
+                 n_encoder_layers=3,
                  encoder_dropout=.33,
                  n_arc_mlp=500,
                  n_rel_mlp=100,
@@ -295,9 +295,9 @@ class CRFDependencyModel(BiaffineDependencyModel):
             If ``True``, freezes BERT parameters, required if using BERT features. Default: ``True``.
         embed_dropout (float):
             The dropout ratio of input embeddings. Default: .33.
-        n_lstm_hidden (int):
+        n_encoder_hidden (int):
             The size of LSTM hidden states. Default: 400.
-        n_lstm_layers (int):
+        n_encoder_layers (int):
             The number of LSTM layers. Default: 3.
         encoder_dropout (float):
             The dropout ratio of encoder layer. Default: .33.
@@ -425,9 +425,9 @@ class CRF2oDependencyModel(BiaffineDependencyModel):
             If ``True``, freezes BERT parameters, required if using BERT features. Default: ``True``.
         embed_dropout (float):
             The dropout ratio of input embeddings. Default: .33.
-        n_lstm_hidden (int):
+        n_encoder_hidden (int):
             The size of LSTM hidden states. Default: 400.
-        n_lstm_layers (int):
+        n_encoder_layers (int):
             The number of LSTM layers. Default: 3.
         encoder_dropout (float):
             The dropout ratio of encoder layer. Default: .33.
@@ -469,8 +469,8 @@ class CRF2oDependencyModel(BiaffineDependencyModel):
                  bert_pad_index=0,
                  freeze=True,
                  embed_dropout=.33,
-                 n_lstm_hidden=400,
-                 n_lstm_layers=3,
+                 n_encoder_hidden=400,
+                 n_encoder_layers=3,
                  encoder_dropout=.33,
                  n_arc_mlp=500,
                  n_sib_mlp=100,
@@ -683,9 +683,9 @@ class VIDependencyModel(BiaffineDependencyModel):
             If ``True``, freezes BERT parameters, required if using BERT features. Default: ``True``.
         embed_dropout (float):
             The dropout ratio of input embeddings. Default: .33.
-        n_lstm_hidden (int):
+        n_encoder_hidden (int):
             The size of LSTM hidden states. Default: 400.
-        n_lstm_layers (int):
+        n_encoder_layers (int):
             The number of LSTM layers. Default: 3.
         encoder_dropout (float):
             The dropout ratio of encoder layer. Default: .33.
@@ -736,8 +736,8 @@ class VIDependencyModel(BiaffineDependencyModel):
                  bert_pad_index=0,
                  freeze=True,
                  embed_dropout=.33,
-                 n_lstm_hidden=400,
-                 n_lstm_layers=3,
+                 n_encoder_hidden=400,
+                 n_encoder_layers=3,
                  encoder_dropout=.33,
                  n_arc_mlp=500,
                  n_sib_mlp=100,

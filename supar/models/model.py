@@ -3,8 +3,8 @@
 import torch
 import torch.nn as nn
 from supar.modules import (CharLSTM, ELMoEmbedding, IndependentDropout,
-                           SharedDropout, TransformerEmbedding,
-                           VariationalLSTM)
+                           RelativePositionTransformerEncoder, SharedDropout,
+                           TransformerEmbedding, VariationalLSTM)
 from supar.utils import Config
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
@@ -34,8 +34,9 @@ class Model(nn.Module):
                  bert_pad_index=0,
                  freeze=False,
                  embed_dropout=.33,
-                 n_lstm_hidden=400,
-                 n_lstm_layers=3,
+                 n_heads=8,
+                 n_encoder_hidden=400,
+                 n_encoder_layers=3,
                  encoder_dropout=.33,
                  pad_index=0,
                  **kwargs):
@@ -85,12 +86,19 @@ class Model(nn.Module):
             self.embed_dropout = IndependentDropout(p=embed_dropout)
         if encoder == 'lstm':
             self.encoder = VariationalLSTM(input_size=n_input,
-                                           hidden_size=n_lstm_hidden,
-                                           num_layers=n_lstm_layers,
+                                           hidden_size=n_encoder_hidden,
+                                           num_layers=n_encoder_layers,
                                            bidirectional=True,
                                            dropout=encoder_dropout)
             self.encoder_dropout = SharedDropout(p=encoder_dropout)
-            self.args.n_hidden = n_lstm_hidden * 2
+            self.args.n_hidden = n_encoder_hidden * 2
+        elif encoder == 'transformer':
+            self.encoder = RelativePositionTransformerEncoder(n_layers=n_encoder_layers,
+                                                              n_heads=n_heads,
+                                                              n_model=n_encoder_hidden,
+                                                              dropout=encoder_dropout)
+            self.encoder_dropout = SharedDropout(p=encoder_dropout)
+            self.args.n_hidden = n_encoder_hidden
         else:
             self.encoder = TransformerEmbedding(model=bert,
                                                 n_layers=n_bert_layers,
@@ -153,6 +161,8 @@ class Model(nn.Module):
             x = pack_padded_sequence(self.embed(words, feats), words.ne(self.args.pad_index).sum(1).tolist(), True, False)
             x, _ = self.encoder(x)
             x, _ = pad_packed_sequence(x, True, total_length=words.shape[1])
+        elif self.args.encoder == 'transformer':
+            x = self.encoder(self.embed(words, feats), words.ne(self.args.pad_index))
         else:
             x = self.encoder(words)
         return self.encoder_dropout(x)

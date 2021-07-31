@@ -73,9 +73,9 @@ class VISemanticRoleLabelingModel(Model):
             If ``True``, freezes BERT parameters, required if using BERT features. Default: ``True``.
         embed_dropout (float):
             The dropout ratio of input embeddings. Default: .2.
-        n_lstm_hidden (int):
+        n_encoder_hidden (int):
             The size of LSTM hidden states. Default: 600.
-        n_lstm_layers (int):
+        n_encoder_layers (int):
             The number of LSTM layers. Default: 3.
         encoder_dropout (float):
             The dropout ratio of encoder layer. Default: .33.
@@ -130,8 +130,8 @@ class VISemanticRoleLabelingModel(Model):
                  bert_pad_index=0,
                  freeze=True,
                  embed_dropout=.2,
-                 n_lstm_hidden=600,
-                 n_lstm_layers=3,
+                 n_encoder_hidden=600,
+                 n_encoder_layers=3,
                  encoder_dropout=.33,
                  n_edge_mlp=600,
                  n_pair_mlp=150,
