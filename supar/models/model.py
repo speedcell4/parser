@@ -112,6 +112,7 @@ class Model(nn.Module):
     def load_pretrained(self, embed=None):
         if embed is not None:
             self.pretrained = nn.Embedding.from_pretrained(embed.to(self.args.device))
+            self.embed_proj = nn.Identity()
             if embed.shape[1] != self.args.n_pretrained:
                 self.embed_proj = nn.Linear(embed.shape[1], self.args.n_pretrained).to(self.args.device)
             nn.init.zeros_(self.word_embed.weight)
@@ -133,11 +134,11 @@ class Model(nn.Module):
         # get outputs from embedding layers
         word_embed = self.word_embed(ext_words)
         if hasattr(self, 'pretrained'):
-            pretrained = self.pretrained(words)
+            pretrained = self.embed_proj(self.pretrained(words))
             if self.args.n_embed == self.args.n_pretrained:
                 word_embed += pretrained
             else:
-                word_embed = torch.cat((word_embed, self.embed_proj(pretrained)), -1)
+                word_embed = torch.cat((word_embed, pretrained), -1)
 
         feat_embeds = []
         if 'tag' in self.args.feat:

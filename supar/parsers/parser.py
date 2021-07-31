@@ -46,6 +46,11 @@ class Parser(object):
         if args.encoder == 'lstm':
             self.optimizer = Adam(self.model.parameters(), args.lr, (args.mu, args.nu), args.eps, args.weight_decay)
             self.scheduler = ExponentialLR(self.optimizer, args.decay**(1/args.decay_steps))
+        elif args.encoder == 'transformer':
+            from transformers import get_linear_schedule_with_warmup
+            steps = len(train.loader) * epochs // args.update_steps
+            self.optimizer = Adam(self.model.parameters(), args.lr, (args.mu, args.nu), args.eps, args.weight_decay)
+            self.scheduler = get_linear_schedule_with_warmup(self.optimizer, int(steps*args.warmup), steps)
         else:
             from transformers import AdamW, get_linear_schedule_with_warmup
             steps = len(train.loader) * epochs // args.update_steps
