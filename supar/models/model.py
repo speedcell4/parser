@@ -97,7 +97,7 @@ class Model(nn.Module):
                                                               n_heads=n_heads,
                                                               n_model=n_encoder_hidden,
                                                               dropout=encoder_dropout)
-            self.encoder_dropout = SharedDropout(p=encoder_dropout)
+            self.encoder_dropout = nn.Dropout(p=encoder_dropout)
             self.args.n_hidden = n_encoder_hidden
         else:
             self.encoder = TransformerEmbedding(model=bert,

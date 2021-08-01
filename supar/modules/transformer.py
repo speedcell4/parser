@@ -5,6 +5,25 @@ import torch.nn as nn
 from torch.nn import TransformerEncoderLayer
 
 
+class SinusoidPositionalEmbedding(nn.Module):
+
+    def forward(self, x):
+        seq_len, n_model = x[0].shape
+        pos = x.new_tensor(range(seq_len)).unsqueeze(-1) / 10000 ** (x.new_tensor(range(n_model)) // 2 * 2 / n_model)
+        pos[:, 0::2], pos[:, 1::2] = pos[:, 0::2].sin(), pos[:, 1::2].cos()
+        return pos
+
+
+class SinusoidRelativePositionalEmbedding(nn.Module):
+
+    def forward(self, x):
+        seq_len, n_model = x[0].shape
+        pos = x.new_tensor(range(seq_len))
+        pos = (pos - pos.unsqueeze(-1)).unsqueeze(-1) / 10000 ** (x.new_tensor(range(n_model)) // 2 * 2 / n_model)
+        pos[..., 0::2], pos[..., 1::2] = pos[..., 0::2].sin(), pos[..., 1::2].cos()
+        return pos
+
+
 class TransformerEncoder(nn.Module):
 
     def __init__(self, n_layers, n_heads=8, n_model=1024, n_inner=2048, dropout=0.1):
@@ -32,20 +51,13 @@ class TransformerEncoder(nn.Module):
         s += ')'
         return s
 
-    @classmethod
-    def init_pos(cls, x):
-        seq_len, n_model = x[0].shape
-        pos = x.new_tensor(range(seq_len)).unsqueeze(-1) / 10000 ** (x.new_tensor(range(n_model)) // 2 * 2 / n_model)
-        pos[:, 0::2], pos[:, 1::2] = pos[:, 0::2].sin(), pos[:, 1::2].cos()
-        return pos.unsqueeze(0).expand_as(x)
-
     def reset_parameters(self):
         for p in self.parameters():
             if p.dim() > 1:
                 nn.init.xavier_uniform_(p)
 
     def forward(self, x, mask):
-        x += self.init_pos(x)
+        x += self.pos_embed(x)
         x, src_key_padding_mask = self.dropout(x).transpose(0, 1), ~mask
         for layer in self.layers:
             x = layer(x, src_key_padding_mask=src_key_padding_mask)
@@ -108,6 +120,7 @@ class RelativePositionMultiHeadAttention(nn.Module):
         self.n_embed = n_embed
         self.scale = n_embed**0.5
 
+        self.pos_embed = SinusoidRelativePositionalEmbedding()
         self.wq = nn.Parameter(torch.zeros(n_model, n_embed, n_heads))
         self.wk = nn.Parameter(torch.zeros(n_model, n_embed, n_heads))
         self.wv = nn.Parameter(torch.zeros(n_model, n_embed, n_heads))
@@ -115,14 +128,6 @@ class RelativePositionMultiHeadAttention(nn.Module):
         self.bv = nn.Parameter(torch.zeros(n_embed, n_heads))
         self.wo = nn.Parameter(torch.zeros(n_embed, n_heads, n_model))
         self.dropout = nn.Dropout(dropout)
-
-    @classmethod
-    def init_pos(cls, x):
-        seq_len, n_model = x[0].shape
-        pos = x.new_tensor(range(seq_len))
-        pos = (pos - pos.unsqueeze(-1)).unsqueeze(-1) / 10000 ** (x.new_tensor(range(n_model)) // 2 * 2 / n_model)
-        pos[..., 0::2], pos[..., 1::2] = pos[..., 0::2].sin(), pos[..., 1::2].cos()
-        return pos
 
     def forward(self, q, k, v, mask):
         # [batch_size, seq_len, n_embed, n_heads]
@@ -132,7 +137,7 @@ class RelativePositionMultiHeadAttention(nn.Module):
         # [batch_size, seq_len, n_embed, n_heads]
         v = torch.einsum('btm,meh->bteh', v, self.wv)
         # [seq_len, seq_len, n_embed]
-        p = self.init_pos(q[..., 0])
+        p = self.pos_embed(q[..., 0])
 
         attn = torch.einsum('bqeh,bkeh->bqkh', q + self.bu, k) + torch.einsum('bqeh,qke->bqkh', q + self.bv, p)
         attn = attn / self.scale
