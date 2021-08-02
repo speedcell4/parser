@@ -3,6 +3,65 @@
 import torch
 import torch.nn as nn
 from torch.nn import TransformerEncoderLayer
+from torch.optim.lr_scheduler import _LRScheduler
+
+
+class NoamLR(_LRScheduler):
+
+    def __init__(self, optimizer, d_model, warmup_steps, factor=1, last_epoch=-1):
+        self.warmup_steps = warmup_steps
+        self.factor = factor * d_model ** -0.5
+        super(NoamLR, self).__init__(optimizer, last_epoch)
+
+    def get_lr(self):
+        epoch = max(self.last_epoch, 1)
+        scale = min(epoch ** -0.5, epoch * self.warmup_steps ** -1.5) * self.factor
+        return [scale for _ in self.base_lrs]
+
+
+class PositionalEmbedding(nn.Module):
+
+    def __init__(self, n_model, max_len=1024):
+        super().__init__()
+
+        self.embed = nn.Embedding(max_len, n_model)
+
+        self.reset_parameters()
+
+    @torch.no_grad()
+    def reset_parameters(self):
+        w = self.embed.weight
+        max_len, n_model = w.shape
+        w = w.new_tensor(range(max_len)).unsqueeze(-1) / 10000 ** (w.new_tensor(range(n_model)) // 2 * 2 / n_model)
+        w[:, 0::2], w[:, 1::2] = w[:, 0::2].sin(), w[:, 1::2].cos()
+        self.embed.weight.copy_(w)
+
+    def forward(self, x):
+        return self.embed(x.new_tensor(range(x.shape[1])).long())
+
+
+class RelativePositionalEmbedding(nn.Module):
+
+    def __init__(self, n_model, max_len=1024):
+        super().__init__()
+
+        self.embed = nn.Embedding(max_len, n_model)
+
+        self.reset_parameters()
+
+    @torch.no_grad()
+    def reset_parameters(self):
+        w = self.embed.weight
+        max_len, n_model = w.shape
+        pos = torch.cat((w.new_tensor(range(-max_len//2, 0)), w.new_tensor(range(max_len//2))))
+        w = pos.unsqueeze(-1) / 10000 ** (w.new_tensor(range(n_model)) // 2 * 2 / n_model)
+        w[:, 0::2], w[:, 1::2] = w[:, 0::2].sin(), w[:, 1::2].cos()
+        self.embed.weight.copy_(w)
+
+    def forward(self, x):
+        pos = x.new_tensor(range(x.shape[1]))
+        offset = sum(divmod(self.embed.weight.shape[0], 2))
+        return self.embed(pos - pos.unsqueeze(-1) + offset)
 
 
 class SinusoidPositionalEmbedding(nn.Module):
@@ -52,9 +111,9 @@ class TransformerEncoder(nn.Module):
         return s
 
     def reset_parameters(self):
-        for p in self.parameters():
-            if p.dim() > 1:
-                nn.init.xavier_uniform_(p)
+        for param in self.parameters():
+            if param.dim() > 1:
+                nn.init.xavier_uniform_(param)
 
     def forward(self, x, mask):
         x += self.pos_embed(x)
@@ -97,9 +156,9 @@ class RelativePositionTransformerEncoder(nn.Module):
         return s
 
     def reset_parameters(self):
-        for p in self.parameters():
-            if p.dim() > 1:
-                nn.init.xavier_uniform_(p)
+        for param in self.parameters():
+            if param.dim() > 1:
+                nn.init.xavier_uniform_(param)
 
     def forward(self, x, mask):
         x = self.dropout(x)
