@@ -93,6 +93,7 @@ class TransformerEncoder(nn.Module):
         self.n_model = n_model
         self.n_inner = n_inner
 
+        self.pos_embed = SinusoidPositionalEmbedding()
         self.layers = nn.ModuleList([TransformerEncoderLayer(d_model=n_model,
                                                              nhead=n_heads,
                                                              dim_feedforward=n_inner,
