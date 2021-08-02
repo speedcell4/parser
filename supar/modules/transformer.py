@@ -59,7 +59,7 @@ class RelativePositionalEmbedding(nn.Module):
         self.embed.weight.copy_(w)
 
     def forward(self, x):
-        pos = x.new_tensor(range(x.shape[1]))
+        pos = x.new_tensor(range(x.shape[1])).long()
         offset = sum(divmod(self.embed.weight.shape[0], 2))
         return self.embed(pos - pos.unsqueeze(-1) + offset)
 
@@ -179,7 +179,7 @@ class RelativePositionMultiHeadAttention(nn.Module):
         self.n_embed = n_embed
         self.scale = n_embed**0.5
 
-        self.pos_embed = SinusoidRelativePositionalEmbedding()
+        self.pos_embed = RelativePositionalEmbedding(n_model=n_embed)
         self.wq = nn.Parameter(torch.zeros(n_model, n_embed, n_heads))
         self.wk = nn.Parameter(torch.zeros(n_model, n_embed, n_heads))
         self.wv = nn.Parameter(torch.zeros(n_model, n_embed, n_heads))
