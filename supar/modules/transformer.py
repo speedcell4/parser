@@ -126,7 +126,7 @@ class TransformerEncoder(nn.Module):
 
 class RelativePositionTransformerEncoder(nn.Module):
 
-    def __init__(self, n_layers, n_heads=8, n_model=1024, n_inner=2048, pre_norm=True, dropout=0.1):
+    def __init__(self, n_layers, n_heads=8, n_model=1024, n_inner=2048, pre_norm=False, dropout=0.1):
         super(RelativePositionTransformerEncoder, self).__init__()
 
         self.n_layers = n_layers
@@ -212,7 +212,7 @@ class RelativePositionMultiHeadAttention(nn.Module):
 
 class RelativePositionTransformerEncoderLayer(nn.Module):
 
-    def __init__(self, n_heads, n_model, n_inner, activation='relu', pre_norm=True, dropout=0.1):
+    def __init__(self, n_heads, n_model, n_inner, activation='relu', pre_norm=False, dropout=0.1):
         super(RelativePositionTransformerEncoderLayer, self).__init__()
 
         self.pre_norm = pre_norm
