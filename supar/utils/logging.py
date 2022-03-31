@@ -5,8 +5,9 @@ import os
 from logging import FileHandler, Formatter, Handler, Logger, StreamHandler
 from typing import Iterable, Optional
 
-from supar.utils.parallel import is_master
 from tqdm import tqdm
+
+from supar.utils.parallel import is_master
 
 
 def get_logger(name: Optional[str] = None) -> Logger:

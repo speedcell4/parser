@@ -150,7 +150,7 @@ def stripe(x: torch.Tensor, n: int, w: int, offset: Tuple = (0, 0), horizontal: 
     numel = stride[1]
     return x.as_strided(size=(n, w, *x.shape[2:]),
                         stride=[(seq_len + 1) * numel, (1 if horizontal else seq_len) * numel] + stride[2:],
-                        storage_offset=(offset[0]*seq_len+offset[1])*numel)
+                        storage_offset=(offset[0] * seq_len + offset[1]) * numel)
 
 
 def diagonal_stripe(x: torch.Tensor, offset: int = 1) -> torch.Tensor:
@@ -186,7 +186,7 @@ def diagonal_stripe(x: torch.Tensor, offset: int = 1) -> torch.Tensor:
     n, w, numel = seq_len - abs(offset), abs(offset), stride[2]
     return x.as_strided(size=(n, w, *x.shape[3:]),
                         stride=[((seq_len + 1) * x.size(2) + 1) * numel] + stride[2:],
-                        storage_offset=offset*stride[1] if offset > 0 else abs(offset)*stride[0])
+                        storage_offset=offset * stride[1] if offset > 0 else abs(offset) * stride[0])
 
 
 def expanded_stripe(x: torch.Tensor, n: int, w: int, offset: Tuple = (0, 0)) -> torch.Tensor:
@@ -232,7 +232,7 @@ def expanded_stripe(x: torch.Tensor, n: int, w: int, offset: Tuple = (0, 0)) -> 
     stride = list(x.stride())
     return x.as_strided(size=(n, w, *list(x.shape[1:])),
                         stride=stride[:1] + [stride[0]] + stride[1:],
-                        storage_offset=(offset[1])*stride[0])
+                        storage_offset=(offset[1]) * stride[0])
 
 
 def binarize(
