@@ -34,6 +34,7 @@ def wait(fn) -> Any:
             dist.barrier()
             value = gather(value)[0]
         return value
+
     return wrapper
 
 

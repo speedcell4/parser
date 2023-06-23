@@ -6,6 +6,7 @@ from typing import Callable, Optional
 
 import torch
 import torch.nn as nn
+
 from supar.modules.mlp import MLP
 
 
@@ -40,16 +41,16 @@ class Biaffine(nn.Module):
     """
 
     def __init__(
-        self,
-        n_in: int,
-        n_out: int = 1,
-        n_proj: Optional[int] = None,
-        dropout: Optional[float] = 0,
-        scale: int = 0,
-        bias_x: bool = True,
-        bias_y: bool = True,
-        decompose: bool = False,
-        init: Callable = nn.init.zeros_
+            self,
+            n_in: int,
+            n_out: int = 1,
+            n_proj: Optional[int] = None,
+            dropout: Optional[float] = 0,
+            scale: int = 0,
+            bias_x: bool = True,
+            bias_y: bool = True,
+            decompose: bool = False,
+            init: Callable = nn.init.zeros_
     ) -> Biaffine:
         super().__init__()
 
@@ -100,9 +101,9 @@ class Biaffine(nn.Module):
             self.init(self.weight)
 
     def forward(
-        self,
-        x: torch.Tensor,
-        y: torch.Tensor
+            self,
+            x: torch.Tensor,
+            y: torch.Tensor
     ) -> torch.Tensor:
         r"""
         Args:
@@ -162,16 +163,16 @@ class Triaffine(nn.Module):
     """
 
     def __init__(
-        self,
-        n_in: int,
-        n_out: int = 1,
-        n_proj: Optional[int] = None,
-        dropout: Optional[float] = 0,
-        scale: int = 0,
-        bias_x: bool = False,
-        bias_y: bool = False,
-        decompose: bool = False,
-        init: Callable = nn.init.zeros_
+            self,
+            n_in: int,
+            n_out: int = 1,
+            n_proj: Optional[int] = None,
+            dropout: Optional[float] = 0,
+            scale: int = 0,
+            bias_x: bool = False,
+            bias_y: bool = False,
+            decompose: bool = False,
+            init: Callable = nn.init.zeros_
     ) -> Triaffine:
         super().__init__()
 
@@ -225,10 +226,10 @@ class Triaffine(nn.Module):
             self.init(self.weight)
 
     def forward(
-        self,
-        x: torch.Tensor,
-        y: torch.Tensor,
-        z: torch.Tensor
+            self,
+            x: torch.Tensor,
+            y: torch.Tensor,
+            z: torch.Tensor
     ) -> torch.Tensor:
         r"""
         Args:

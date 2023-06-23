@@ -4,6 +4,7 @@ from typing import List, Tuple
 
 import torch
 import torch.nn as nn
+
 from supar.config import Config
 from supar.model import Model
 from supar.models.const.aj.transform import AttachJuxtaposeTree
@@ -129,7 +130,7 @@ class AttachJuxtaposeConstituencyModel(Model):
         super().__init__(**Config().update(locals()))
 
         # the last one represents the dummy node in the initial states
-        self.label_embed = nn.Embedding(n_labels+1, self.args.n_encoder_hidden)
+        self.label_embed = nn.Embedding(n_labels + 1, self.args.n_encoder_hidden)
         self.gnn_layers = GraphConvolutionalNetwork(n_model=self.args.n_encoder_hidden,
                                                     n_layers=self.args.n_gnn_layers,
                                                     dropout=self.args.gnn_dropout)
@@ -149,9 +150,9 @@ class AttachJuxtaposeConstituencyModel(Model):
         self.criterion = nn.CrossEntropyLoss()
 
     def forward(
-        self,
-        words: torch.LongTensor,
-        feats: List[torch.LongTensor] = None
+            self,
+            words: torch.LongTensor,
+            feats: List[torch.LongTensor] = None
     ) -> torch.Tensor:
         r"""
         Args:
@@ -171,12 +172,12 @@ class AttachJuxtaposeConstituencyModel(Model):
         return self.encode(words, feats)
 
     def loss(
-        self,
-        x: torch.Tensor,
-        nodes: torch.LongTensor,
-        parents: torch.LongTensor,
-        news: torch.LongTensor,
-        mask: torch.BoolTensor
+            self,
+            x: torch.Tensor,
+            nodes: torch.LongTensor,
+            parents: torch.LongTensor,
+            news: torch.LongTensor,
+            mask: torch.BoolTensor
     ) -> torch.Tensor:
         r"""
         Args:
@@ -222,10 +223,10 @@ class AttachJuxtaposeConstituencyModel(Model):
         return node_loss + label_loss
 
     def decode(
-        self,
-        x: torch.Tensor,
-        mask: torch.BoolTensor,
-        beam_size: int = 1
+            self,
+            x: torch.Tensor,
+            mask: torch.BoolTensor,
+            beam_size: int = 1
     ) -> List[List[Tuple]]:
         r"""
         Args:
@@ -260,7 +261,8 @@ class AttachJuxtaposeConstituencyModel(Model):
                 span_lens = spans[:, :-1, -1].ge(0).sum(-1)
                 span_mask = span_lens.unsqueeze(-1).gt(x.new_tensor(range(span_lens.max())))
             s_node = self.node_classifier(torch.cat((x_span, x[:, t].unsqueeze(1).expand_as(x_span)), -1)).squeeze(-1)
-            s_node = s_node.masked_fill_(~span_mask, -INF).masked_fill(~span_mask.any(-1).unsqueeze(-1), 0).log_softmax(-1)
+            s_node = s_node.masked_fill_(~span_mask, -INF).masked_fill(~span_mask.any(-1).unsqueeze(-1), 0).log_softmax(
+                -1)
             # we found softmax is slightly better than sigmoid in the original paper
             x_node = torch.bmm(s_node.exp().unsqueeze(1), x_span).squeeze(1)
             s_parent, s_new = self.label_classifier(torch.cat((x[:, t], x_node), -1)).chunk(2, -1)
@@ -283,7 +285,8 @@ class AttachJuxtaposeConstituencyModel(Model):
             beams = cands.div(k_beam, rounding_mode='floor')
             nodes = nodes.view(batch_size, -1).gather(-1, cands.div(k_node, rounding_mode='floor'))
             indices = (batches.unsqueeze(-1) + beams).view(-1)
-            parents = parents[indices].view(batch_size, -1).gather(-1, cands.div(k_parent, rounding_mode='floor') % k_parent)
+            parents = parents[indices].view(batch_size, -1).gather(-1, cands.div(k_parent,
+                                                                                 rounding_mode='floor') % k_parent)
             news = news[indices].view(batch_size, -1).gather(-1, cands % k_parent)
             action = torch.stack((nodes, parents, news)).view(3, -1)
             spans = spans[indices] if spans is not None else None
@@ -300,11 +303,11 @@ class AttachJuxtaposeConstituencyModel(Model):
         return chart_preds
 
     def rightmost_chain(
-        self,
-        x: torch.Tensor,
-        spans: torch.LongTensor,
-        mask: torch.BoolTensor,
-        t: int
+            self,
+            x: torch.Tensor,
+            spans: torch.LongTensor,
+            mask: torch.BoolTensor,
+            t: int
     ) -> torch.Tensor:
         x_p, mask_p = x[:, :t], mask[:, :t]
         lens = mask_p.sum(-1)

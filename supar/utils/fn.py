@@ -16,6 +16,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import torch
 from omegaconf import DictConfig, OmegaConf
+
 from supar.utils.common import CACHE
 from supar.utils.parallel import wait
 
@@ -236,9 +237,9 @@ def expanded_stripe(x: torch.Tensor, n: int, w: int, offset: Tuple = (0, 0)) -> 
 
 
 def binarize(
-    data: Union[List[str], Dict[str, Iterable]],
-    fbin: str = None,
-    merge: bool = False
+        data: Union[List[str], Dict[str, Iterable]],
+        fbin: str = None,
+        merge: bool = False
 ) -> Tuple[str, torch.Tensor]:
     start, meta = 0, defaultdict(list)
     # the binarized file is organized as:
@@ -277,10 +278,10 @@ def binarize(
 
 
 def debinarize(
-    fbin: str,
-    pos_or_key: Optional[Union[Tuple[int, int], str]] = (0, 0),
-    meta: bool = False,
-    unpickle: bool = False
+        fbin: str,
+        pos_or_key: Optional[Union[Tuple[int, int], str]] = (0, 0),
+        meta: bool = False,
+        unpickle: bool = False
 ) -> Union[Any, Iterable[Any]]:
     with open(fbin, 'rb') as f, mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as mm:
         if meta or isinstance(pos_or_key, str):
@@ -303,10 +304,10 @@ def debinarize(
 
 
 def pad(
-    tensors: List[torch.Tensor],
-    padding_value: int = 0,
-    total_length: int = None,
-    padding_side: str = 'right'
+        tensors: List[torch.Tensor],
+        padding_value: int = 0,
+        total_length: int = None,
+        padding_side: str = 'right'
 ) -> torch.Tensor:
     size = [len(tensors)] + [max(tensor.size(i) for tensor in tensors)
                              for i in range(len(tensors[0].size()))]

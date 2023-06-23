@@ -6,6 +6,7 @@ from collections import Counter
 from typing import Callable, Iterable, List, Optional, Union
 
 import torch
+
 from supar.utils.data import Dataset
 from supar.utils.embed import Embedding
 from supar.utils.fn import pad
@@ -79,16 +80,16 @@ class Field(RawField):
     """
 
     def __init__(
-        self,
-        name: str,
-        pad: Optional[str] = None,
-        unk: Optional[str] = None,
-        bos: Optional[str] = None,
-        eos: Optional[str] = None,
-        lower: bool = False,
-        use_vocab: bool = True,
-        tokenize: Optional[Callable] = None,
-        fn: Optional[Callable] = None
+            self,
+            name: str,
+            pad: Optional[str] = None,
+            unk: Optional[str] = None,
+            bos: Optional[str] = None,
+            eos: Optional[str] = None,
+            lower: bool = False,
+            use_vocab: bool = True,
+            tokenize: Optional[Callable] = None,
+            fn: Optional[Callable] = None
     ) -> Field:
         self.name = name
         self.pad = pad
@@ -176,11 +177,11 @@ class Field(RawField):
         return data
 
     def build(
-        self,
-        dataset: Dataset,
-        min_freq: int = 1,
-        embed: Optional[Embedding] = None,
-        norm: Callable = None
+            self,
+            dataset: Dataset,
+            min_freq: int = 1,
+            embed: Optional[Embedding] = None,
+            norm: Callable = None
     ) -> Field:
         r"""
         Constructs a :class:`~supar.utils.vocab.Vocab` object for this field from the dataset.
@@ -209,6 +210,7 @@ class Field(RawField):
                          min_freq=min_freq,
                          specials=self.specials,
                          unk_index=self.unk_index)
+
         self.vocab = build_vocab(dataset)
 
         if not embed:
@@ -304,11 +306,11 @@ class SubwordField(Field):
         super().__init__(*args, **kwargs)
 
     def build(
-        self,
-        dataset: Dataset,
-        min_freq: int = 1,
-        embed: Optional[Embedding] = None,
-        norm: Callable = None
+            self,
+            dataset: Dataset,
+            min_freq: int = 1,
+            embed: Optional[Embedding] = None,
+            norm: Callable = None
     ) -> SubwordField:
         if hasattr(self, 'vocab'):
             return
@@ -322,6 +324,7 @@ class SubwordField(Field):
                          min_freq=min_freq,
                          specials=self.specials,
                          unk_index=self.unk_index)
+
         self.vocab = build_vocab(dataset)
 
         if not embed:
@@ -344,8 +347,9 @@ class SubwordField(Field):
         for seq in sequences:
             seq = [self.preprocess(token) for token in seq]
             if self.use_vocab:
-                seq = [[self.vocab[i] if i in self.vocab else self.unk_index for i in token] if token else [self.unk_index]
-                       for token in seq]
+                seq = [
+                    [self.vocab[i] if i in self.vocab else self.unk_index for i in token] if token else [self.unk_index]
+                    for token in seq]
             if self.bos:
                 seq = [[self.bos_index]] + seq
             if self.eos:
@@ -376,9 +380,9 @@ class ChartField(Field):
     """
 
     def build(
-        self,
-        dataset: Dataset,
-        min_freq: int = 1
+            self,
+            dataset: Dataset,
+            min_freq: int = 1
     ) -> ChartField:
         @wait
         def build_vocab(dataset):
@@ -389,6 +393,7 @@ class ChartField(Field):
                          min_freq=min_freq,
                          specials=self.specials,
                          unk_index=self.unk_index)
+
         self.vocab = build_vocab(dataset)
         return self
 
@@ -398,7 +403,7 @@ class ChartField(Field):
             if self.use_vocab:
                 chart = [[self.vocab[i] if i is not None else -1 for i in row] for row in chart]
             if self.bos:
-                chart = [[self.bos_index]*len(chart[0])] + chart
+                chart = [[self.bos_index] * len(chart[0])] + chart
             if self.eos:
-                chart = chart + [[self.eos_index]*len(chart[0])]
+                chart = chart + [[self.eos_index] * len(chart[0])]
             yield torch.tensor(chart, dtype=torch.long)

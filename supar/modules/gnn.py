@@ -43,12 +43,12 @@ class GraphConvolutionalNetwork(nn.Module):
     """
 
     def __init__(
-        self,
-        n_model: int,
-        n_layers: int = 1,
-        selfloop: bool = True,
-        dropout: float = 0.,
-        norm: bool = True
+            self,
+            n_model: int,
+            n_layers: int = 1,
+            selfloop: bool = True,
+            dropout: float = 0.,
+            norm: bool = True
     ) -> GraphConvolutionalNetwork:
         super().__init__()
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import torch
+
 from supar.models.dep.biaffine.model import BiaffineDependencyModel
 from supar.structs import DependencyCRF, MatrixTree
 

@@ -23,7 +23,8 @@ def main():
     subparser.add_argument('--train', default='data/ptb/train.pid', help='path to train file')
     subparser.add_argument('--dev', default='data/ptb/dev.pid', help='path to dev file')
     subparser.add_argument('--test', default='data/ptb/test.pid', help='path to test file')
-    subparser.add_argument('--embed', default='glove-6b-100', help='file or embeddings available at `supar.utils.Embedding`')
+    subparser.add_argument('--embed', default='glove-6b-100',
+                           help='file or embeddings available at `supar.utils.Embedding`')
     subparser.add_argument('--bert', default='bert-base-cased', help='which BERT model to use')
     # evaluate
     subparser = subparsers.add_parser('evaluate', help='Evaluate the specified parser and dataset.')

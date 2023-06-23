@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from typing import List, Optional, Tuple
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 from supar.structs import DependencyCRF
 from supar.utils.common import MIN
 
@@ -26,10 +28,10 @@ class DependencyMFVI(nn.Module):
 
     @torch.enable_grad()
     def forward(
-        self,
-        scores: List[torch.Tensor],
-        mask: torch.BoolTensor,
-        target: Optional[torch.LongTensor] = None
+            self,
+            scores: List[torch.Tensor],
+            mask: torch.BoolTensor,
+            target: Optional[torch.LongTensor] = None
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         r"""
         Args:
@@ -100,10 +102,10 @@ class DependencyLBP(nn.Module):
 
     @torch.enable_grad()
     def forward(
-        self,
-        scores: List[torch.Tensor],
-        mask: torch.BoolTensor,
-        target: Optional[torch.LongTensor] = None
+            self,
+            scores: List[torch.Tensor],
+            mask: torch.BoolTensor,
+            target: Optional[torch.LongTensor] = None
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         r"""
         Args:
@@ -179,10 +181,10 @@ class ConstituencyMFVI(nn.Module):
 
     @torch.enable_grad()
     def forward(
-        self,
-        scores: List[torch.Tensor],
-        mask: torch.BoolTensor,
-        target: Optional[torch.LongTensor] = None
+            self,
+            scores: List[torch.Tensor],
+            mask: torch.BoolTensor,
+            target: Optional[torch.LongTensor] = None
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         r"""
         Args:
@@ -251,10 +253,10 @@ class ConstituencyLBP(nn.Module):
 
     @torch.enable_grad()
     def forward(
-        self,
-        scores: List[torch.Tensor],
-        mask: torch.BoolTensor,
-        target: Optional[torch.LongTensor] = None
+            self,
+            scores: List[torch.Tensor],
+            mask: torch.BoolTensor,
+            target: Optional[torch.LongTensor] = None
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         r"""
         Args:
@@ -329,10 +331,10 @@ class SemanticDependencyMFVI(nn.Module):
 
     @torch.enable_grad()
     def forward(
-        self,
-        scores: List[torch.Tensor],
-        mask: torch.BoolTensor,
-        target: Optional[torch.LongTensor] = None
+            self,
+            scores: List[torch.Tensor],
+            mask: torch.BoolTensor,
+            target: Optional[torch.LongTensor] = None
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         r"""
         Args:
@@ -388,7 +390,8 @@ class SemanticDependencyMFVI(nn.Module):
         for _ in range(self.max_iter):
             q = q.sigmoid()
             # q(ij) = s(ij) + sum(q(ik)s^sib(ij,ik) + q(kj)s^cop(ij,kj) + q(jk)s^grd(ij,jk)), k != i,j
-            q = s_edge + (q.unsqueeze(1) * s_sib + q.transpose(0, 1).unsqueeze(0) * s_cop + q.unsqueeze(0) * s_grd).sum(2)
+            q = s_edge + (q.unsqueeze(1) * s_sib + q.transpose(0, 1).unsqueeze(0) * s_cop + q.unsqueeze(0) * s_grd).sum(
+                2)
 
         return q.permute(2, 1, 0)
 
@@ -409,10 +412,10 @@ class SemanticDependencyLBP(nn.Module):
 
     @torch.enable_grad()
     def forward(
-        self,
-        scores: List[torch.Tensor],
-        mask: torch.BoolTensor,
-        target: Optional[torch.LongTensor] = None
+            self,
+            scores: List[torch.Tensor],
+            mask: torch.BoolTensor,
+            target: Optional[torch.LongTensor] = None
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         r"""
         Args:
@@ -481,13 +484,16 @@ class SemanticDependencyLBP(nn.Module):
         for _ in range(self.max_iter):
             # sibling factor
             v_sib = q.unsqueeze(2) - m_sib
-            m_sib = torch.stack((v_sib.logsumexp(0), torch.stack((v_sib[0], v_sib[1] + s_sib)).logsumexp(0))).log_softmax(0)
+            m_sib = torch.stack(
+                (v_sib.logsumexp(0), torch.stack((v_sib[0], v_sib[1] + s_sib)).logsumexp(0))).log_softmax(0)
             # coparent factor
             v_cop = q.transpose(1, 2).unsqueeze(1) - m_cop
-            m_cop = torch.stack((v_cop.logsumexp(0), torch.stack((v_cop[0], v_cop[1] + s_cop)).logsumexp(0))).log_softmax(0)
+            m_cop = torch.stack(
+                (v_cop.logsumexp(0), torch.stack((v_cop[0], v_cop[1] + s_cop)).logsumexp(0))).log_softmax(0)
             # grandparent factor
             v_grd = q.unsqueeze(1) - m_grd
-            m_grd = torch.stack((v_grd.logsumexp(0), torch.stack((v_grd[0], v_grd[1] + s_grd)).logsumexp(0))).log_softmax(0)
+            m_grd = torch.stack(
+                (v_grd.logsumexp(0), torch.stack((v_grd[0], v_grd[1] + s_grd)).logsumexp(0))).log_softmax(0)
             # tree factor
             v_tree = q - m_tree
             b_tree = DependencyCRF((v_tree[1] - v_tree[0]).permute(2, 1, 0), lens).marginals.permute(2, 1, 0)

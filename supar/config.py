@@ -81,6 +81,6 @@ class Config(object):
         if unknown is not None:
             parser = argparse.ArgumentParser()
             for name, value in config.items():
-                parser.add_argument('--'+name.replace('_', '-'), type=type(value), default=value)
+                parser.add_argument('--' + name.replace('_', '-'), type=type(value), default=value)
             config.update(vars(parser.parse_args(unknown)))
         return cls(**config).update(kwargs)

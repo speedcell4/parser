@@ -4,6 +4,7 @@ import os
 from typing import Iterable, Union
 
 import torch
+
 from supar.config import Config
 from supar.models.dep.biaffine.transform import CoNLL
 from supar.models.sdp.biaffine import BiaffineSemanticDependencyModel
@@ -35,49 +36,49 @@ class BiaffineSemanticDependencyParser(Parser):
         self.LABEL = self.transform.PHEAD
 
     def train(
-        self,
-        train: Union[str, Iterable],
-        dev: Union[str, Iterable],
-        test: Union[str, Iterable],
-        epochs: int = 1000,
-        patience: int = 100,
-        batch_size: int = 5000,
-        update_steps: int = 1,
-        buckets: int = 32,
-        workers: int = 0,
-        amp: bool = False,
-        cache: bool = False,
-        verbose: bool = True,
-        **kwargs
+            self,
+            train: Union[str, Iterable],
+            dev: Union[str, Iterable],
+            test: Union[str, Iterable],
+            epochs: int = 1000,
+            patience: int = 100,
+            batch_size: int = 5000,
+            update_steps: int = 1,
+            buckets: int = 32,
+            workers: int = 0,
+            amp: bool = False,
+            cache: bool = False,
+            verbose: bool = True,
+            **kwargs
     ):
         return super().train(**Config().update(locals()))
 
     def evaluate(
-        self,
-        data: Union[str, Iterable],
-        batch_size: int = 5000,
-        buckets: int = 8,
-        workers: int = 0,
-        amp: bool = False,
-        cache: bool = False,
-        verbose: bool = True,
-        **kwargs
+            self,
+            data: Union[str, Iterable],
+            batch_size: int = 5000,
+            buckets: int = 8,
+            workers: int = 0,
+            amp: bool = False,
+            cache: bool = False,
+            verbose: bool = True,
+            **kwargs
     ):
         return super().evaluate(**Config().update(locals()))
 
     def predict(
-        self,
-        data: Union[str, Iterable],
-        pred: str = None,
-        lang: str = None,
-        prob: bool = False,
-        batch_size: int = 5000,
-        buckets: int = 8,
-        workers: int = 0,
-        amp: bool = False,
-        cache: bool = False,
-        verbose: bool = True,
-        **kwargs
+            self,
+            data: Union[str, Iterable],
+            pred: str = None,
+            lang: str = None,
+            prob: bool = False,
+            batch_size: int = 5000,
+            buckets: int = 8,
+            workers: int = 0,
+            amp: bool = False,
+            cache: bool = False,
+            verbose: bool = True,
+            **kwargs
     ):
         return super().predict(**Config().update(locals()))
 
@@ -171,7 +172,8 @@ class BiaffineSemanticDependencyParser(Parser):
 
         train = Dataset(transform, args.train, **args)
         if args.encoder != 'bert':
-            WORD.build(train, args.min_freq, (Embedding.load(args.embed) if args.embed else None), lambda x: x / torch.std(x))
+            WORD.build(train, args.min_freq, (Embedding.load(args.embed) if args.embed else None),
+                       lambda x: x / torch.std(x))
             if TAG is not None:
                 TAG.build(train)
             if CHAR is not None:

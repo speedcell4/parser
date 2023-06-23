@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from typing import TYPE_CHECKING, Iterable, List, Optional, Tuple, Union, Sequence
+from typing import Iterable, List, Optional, Sequence, Tuple, TYPE_CHECKING, Union
 
 import nltk
 
@@ -39,12 +39,12 @@ class TetraTaggingTree(Tree):
     fields = ['WORD', 'POS', 'TREE', 'LEAF', 'NODE']
 
     def __init__(
-        self,
-        WORD: Optional[Union[Field, Iterable[Field]]] = None,
-        POS: Optional[Union[Field, Iterable[Field]]] = None,
-        TREE: Optional[Union[Field, Iterable[Field]]] = None,
-        LEAF: Optional[Union[Field, Iterable[Field]]] = None,
-        NODE: Optional[Union[Field, Iterable[Field]]] = None
+            self,
+            WORD: Optional[Union[Field, Iterable[Field]]] = None,
+            POS: Optional[Union[Field, Iterable[Field]]] = None,
+            TREE: Optional[Union[Field, Iterable[Field]]] = None,
+            LEAF: Optional[Union[Field, Iterable[Field]]] = None,
+            NODE: Optional[Union[Field, Iterable[Field]]] = None
     ) -> Tree:
         super().__init__()
 
@@ -126,15 +126,16 @@ class TetraTaggingTree(Tree):
             return tuple(sum(i, []) for i in zip(*[traverse(tree[0]),
                                                    ([], [f'{("L" if left else "R")}/{tree.label()}']),
                                                    traverse(tree[1], False)]))
+
         return traverse(tree[0])
 
     @classmethod
     def action2tree(
-        cls,
-        tree: nltk.Tree,
-        actions: Tuple[Sequence, Sequence],
-        mark: Union[str, Tuple[str]] = ('*', '|<>'),
-        join: str = '::',
+            cls,
+            tree: nltk.Tree,
+            actions: Tuple[Sequence, Sequence],
+            mark: Union[str, Tuple[str]] = ('*', '|<>'),
+            join: str = '::',
     ) -> nltk.Tree:
         r"""
         Recovers a constituency tree from tetra-tagging actions.
@@ -214,13 +215,14 @@ class TetraTaggingTree(Tree):
             for label in reversed(labels[:-1]):
                 tree = nltk.Tree(label, [tree])
             return [tree]
+
         return debinarize(nltk.Tree(tree.label(), [stack[0][0]]))[0]
 
     def load(
-        self,
-        data: Union[str, Iterable],
-        lang: Optional[str] = None,
-        **kwargs
+            self,
+            data: Union[str, Iterable],
+            lang: Optional[str] = None,
+            **kwargs
     ) -> List[TetraTaggingTreeSentence]:
         r"""
         Args:
@@ -274,10 +276,10 @@ class TetraTaggingTreeSentence(Sentence):
     """
 
     def __init__(
-        self,
-        transform: TetraTaggingTree,
-        tree: nltk.Tree,
-        index: Optional[int] = None
+            self,
+            transform: TetraTaggingTree,
+            tree: nltk.Tree,
+            index: Optional[int] = None
     ) -> TetraTaggingTreeSentence:
         super().__init__(transform, index)
 

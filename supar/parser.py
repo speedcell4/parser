@@ -17,7 +17,7 @@ import torch.distributed as dist
 import torch.nn as nn
 from torch.cuda.amp import GradScaler
 from torch.optim import Adam, Optimizer
-from torch.optim.lr_scheduler import ExponentialLR, _LRScheduler
+from torch.optim.lr_scheduler import _LRScheduler, ExponentialLR
 
 import supar
 from supar.config import Config
@@ -27,15 +27,13 @@ from supar.utils.fn import download, get_rng_state, set_rng_state
 from supar.utils.logging import get_logger, init_logger, progress_bar
 from supar.utils.metric import Metric
 from supar.utils.optim import InverseSquareRootLR, LinearLR
-from supar.utils.parallel import DistributedDataParallel as DDP
-from supar.utils.parallel import gather, is_dist, is_master, reduce
+from supar.utils.parallel import DistributedDataParallel as DDP, gather, is_dist, is_master, reduce
 from supar.utils.transform import Batch
 
 logger = get_logger(__name__)
 
 
 class Parser(object):
-
     NAME = None
     MODEL = None
 
@@ -46,8 +44,8 @@ class Parser(object):
 
     def __repr__(self):
         s = f'{self.__class__.__name__}(\n'
-        s += '\n'.join(['  '+i for i in str(self.model).split('\n')]) + '\n'
-        s += '\n'.join(['  '+i for i in str(self.transform).split('\n')]) + '\n)'
+        s += '\n'.join(['  ' + i for i in str(self.model).split('\n')]) + '\n'
+        s += '\n'.join(['  ' + i for i in str(self.transform).split('\n')]) + '\n)'
         return s
 
     @property
@@ -86,21 +84,21 @@ class Parser(object):
                 self.model = dist_model
 
     def train(
-        self,
-        train: Union[str, Iterable],
-        dev: Union[str, Iterable],
-        test: Union[str, Iterable],
-        epochs: int,
-        patience: int,
-        batch_size: int = 5000,
-        update_steps: int = 1,
-        buckets: int = 32,
-        workers: int = 0,
-        clip: float = 5.0,
-        amp: bool = False,
-        cache: bool = False,
-        verbose: bool = True,
-        **kwargs
+            self,
+            train: Union[str, Iterable],
+            dev: Union[str, Iterable],
+            test: Union[str, Iterable],
+            epochs: int,
+            patience: int,
+            batch_size: int = 5000,
+            update_steps: int = 1,
+            buckets: int = 32,
+            workers: int = 0,
+            clip: float = 5.0,
+            amp: bool = False,
+            cache: bool = False,
+            verbose: bool = True,
+            **kwargs
     ) -> None:
         r"""
         Args:
@@ -283,15 +281,15 @@ class Parser(object):
             wandb.finish()
 
     def evaluate(
-        self,
-        data: Union[str, Iterable],
-        batch_size: int = 5000,
-        buckets: int = 8,
-        workers: int = 0,
-        amp: bool = False,
-        cache: bool = False,
-        verbose: bool = True,
-        **kwargs
+            self,
+            data: Union[str, Iterable],
+            batch_size: int = 5000,
+            buckets: int = 8,
+            workers: int = 0,
+            amp: bool = False,
+            cache: bool = False,
+            verbose: bool = True,
+            **kwargs
     ):
         r"""
         Args:
@@ -344,23 +342,23 @@ class Parser(object):
         elapsed = datetime.now() - start
         logger.info(f"{metric}")
         logger.info(f"{elapsed}s elapsed, "
-                    f"{sum(data.sizes)/elapsed.total_seconds():.2f} Tokens/s, "
-                    f"{len(data)/elapsed.total_seconds():.2f} Sents/s")
+                    f"{sum(data.sizes) / elapsed.total_seconds():.2f} Tokens/s, "
+                    f"{len(data) / elapsed.total_seconds():.2f} Sents/s")
 
         return metric
 
     def predict(
-        self,
-        data: Union[str, Iterable],
-        pred: str = None,
-        lang: str = None,
-        prob: bool = False,
-        batch_size: int = 5000,
-        buckets: int = 8,
-        workers: int = 0,
-        cache: bool = False,
-        verbose: bool = True,
-        **kwargs
+            self,
+            data: Union[str, Iterable],
+            pred: str = None,
+            lang: str = None,
+            prob: bool = False,
+            batch_size: int = 5000,
+            buckets: int = 8,
+            workers: int = 0,
+            cache: bool = False,
+            verbose: bool = True,
+            **kwargs
     ):
         r"""
         Args:
@@ -447,8 +445,8 @@ class Parser(object):
             if is_dist():
                 dist.barrier()
         logger.info(f"{elapsed}s elapsed, "
-                    f"{sum(data.sizes)/elapsed.total_seconds():.2f} Tokens/s, "
-                    f"{len(data)/elapsed.total_seconds():.2f} Sents/s")
+                    f"{sum(data.sizes) / elapsed.total_seconds():.2f} Tokens/s, "
+                    f"{len(data) / elapsed.total_seconds():.2f} Sents/s")
 
         if not cache:
             return data
@@ -461,18 +459,18 @@ class Parser(object):
             loss.backward(**kwargs)
 
     def clip_grad_norm_(
-        self,
-        params: Union[Iterable[torch.Tensor], torch.Tensor],
-        max_norm: float,
-        norm_type: float = 2
+            self,
+            params: Union[Iterable[torch.Tensor], torch.Tensor],
+            max_norm: float,
+            norm_type: float = 2
     ) -> torch.Tensor:
         self.scaler.unscale_(self.optimizer)
         return nn.utils.clip_grad_norm_(params, max_norm, norm_type)
 
     def clip_grad_value_(
-        self,
-        params: Union[Iterable[torch.Tensor], torch.Tensor],
-        clip_value: float
+            self,
+            params: Union[Iterable[torch.Tensor], torch.Tensor],
+            clip_value: float
     ) -> None:
         self.scaler.unscale_(self.optimizer)
         return nn.utils.clip_grad_value_(params, clip_value)
@@ -503,24 +501,26 @@ class Parser(object):
         else:
             # we found that Huggingface's AdamW is more robust and empirically better than the native implementation
             from transformers import AdamW
-            optimizer = AdamW(params=[{'params': p, 'lr': self.args.lr * (1 if n.startswith('encoder') else self.args.lr_rate)}
-                                      for n, p in self.model.named_parameters()],
-                              lr=self.args.lr,
-                              betas=(self.args.get('mu', 0.9), self.args.get('nu', 0.999)),
-                              eps=self.args.get('eps', 1e-8),
-                              weight_decay=self.args.get('weight_decay', 0))
+            optimizer = AdamW(
+                params=[{'params': p, 'lr': self.args.lr * (1 if n.startswith('encoder') else self.args.lr_rate)}
+                        for n, p in self.model.named_parameters()],
+                lr=self.args.lr,
+                betas=(self.args.get('mu', 0.9), self.args.get('nu', 0.999)),
+                eps=self.args.get('eps', 1e-8),
+                weight_decay=self.args.get('weight_decay', 0))
         return optimizer
 
     def init_scheduler(self) -> _LRScheduler:
         if self.args.encoder == 'lstm':
             scheduler = ExponentialLR(optimizer=self.optimizer,
-                                      gamma=self.args.decay**(1/self.args.decay_steps))
+                                      gamma=self.args.decay ** (1 / self.args.decay_steps))
         elif self.args.encoder == 'transformer':
             scheduler = InverseSquareRootLR(optimizer=self.optimizer,
                                             warmup_steps=self.args.warmup_steps)
         else:
             scheduler = LinearLR(optimizer=self.optimizer,
-                                 warmup_steps=self.args.get('warmup_steps', int(self.args.steps*self.args.get('warmup', 0))),
+                                 warmup_steps=self.args.get('warmup_steps',
+                                                            int(self.args.steps * self.args.get('warmup', 0))),
                                  steps=self.args.steps)
         return scheduler
 
@@ -530,12 +530,12 @@ class Parser(object):
 
     @classmethod
     def load(
-        cls,
-        path: str,
-        reload: bool = False,
-        src: str = 'github',
-        checkpoint: bool = False,
-        **kwargs
+            cls,
+            path: str,
+            reload: bool = False,
+            src: str = 'github',
+            checkpoint: bool = False,
+            **kwargs
     ) -> Parser:
         r"""
         Loads a parser with data fields and pretrained model parameters.

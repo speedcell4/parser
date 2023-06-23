@@ -6,9 +6,10 @@ import os
 import re
 import tempfile
 from collections import Counter, defaultdict
-from typing import Any, Dict, List, Optional, Union, Iterable
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 import torch.distributed as dist
+
 from supar.utils.parallel import is_dist, is_master
 from supar.utils.vocab import Vocab
 
@@ -99,17 +100,17 @@ class TransformerTokenizer:
 class BPETokenizer:
 
     def __init__(
-        self,
-        path: str = None,
-        files: Optional[List[str]] = None,
-        vocab_size: Optional[int] = 32000,
-        min_freq: Optional[int] = 2,
-        dropout: float = None,
-        backend: str = 'huggingface',
-        pad: Optional[str] = None,
-        unk: Optional[str] = None,
-        bos: Optional[str] = None,
-        eos: Optional[str] = None,
+            self,
+            path: str = None,
+            files: Optional[List[str]] = None,
+            vocab_size: Optional[int] = 32000,
+            min_freq: Optional[int] = 2,
+            dropout: float = None,
+            backend: str = 'huggingface',
+            pad: Optional[str] = None,
+            unk: Optional[str] = None,
+            bos: Optional[str] = None,
+            eos: Optional[str] = None,
     ) -> BPETokenizer:
 
         self.path = path

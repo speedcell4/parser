@@ -5,6 +5,7 @@ from functools import reduce
 from typing import Iterable
 
 import torch
+
 from supar.structs.fn import sampled_logsumexp, sparsemax
 from supar.utils.common import MIN
 

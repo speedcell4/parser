@@ -4,6 +4,7 @@ from typing import List, Tuple
 
 import torch
 import torch.nn as nn
+
 from supar.config import Config
 from supar.model import Model
 from supar.utils.common import INF
@@ -126,9 +127,9 @@ class TetraTaggingConstituencyModel(Model):
         self.criterion = nn.CrossEntropyLoss()
 
     def forward(
-        self,
-        words: torch.LongTensor,
-        feats: List[torch.LongTensor] = None
+            self,
+            words: torch.LongTensor,
+            feats: List[torch.LongTensor] = None
     ) -> torch.Tensor:
         r"""
         Args:
@@ -150,12 +151,12 @@ class TetraTaggingConstituencyModel(Model):
         return s_leaf, s_node
 
     def loss(
-        self,
-        s_leaf: torch.Tensor,
-        s_node: torch.Tensor,
-        leaves: torch.LongTensor,
-        nodes: torch.LongTensor,
-        mask: torch.BoolTensor
+            self,
+            s_leaf: torch.Tensor,
+            s_node: torch.Tensor,
+            leaves: torch.LongTensor,
+            nodes: torch.LongTensor,
+            mask: torch.BoolTensor
     ) -> torch.Tensor:
         r"""
         Args:
@@ -181,12 +182,12 @@ class TetraTaggingConstituencyModel(Model):
         return leaf_loss + node_loss
 
     def decode(
-        self,
-        s_leaf: torch.Tensor,
-        s_node: torch.Tensor,
-        mask: torch.BoolTensor,
-        left_mask: torch.BoolTensor,
-        depth: int = 8
+            self,
+            s_leaf: torch.Tensor,
+            s_node: torch.Tensor,
+            mask: torch.BoolTensor,
+            left_mask: torch.BoolTensor,
+            depth: int = 8
     ) -> List[List[Tuple]]:
         r"""
         Args:
@@ -246,7 +247,8 @@ class TetraTaggingConstituencyModel(Model):
             s[m], labels[1, m, :, t], paths[1, m, :, t], depths[m] = advance(s[m], s_node[m, t], depths[m], changes[1])
 
         lens = lens.tolist()
-        labels, paths = labels.movedim((0, 2), (2, 3))[mask].split(lens), paths.movedim((0, 2), (2, 3))[mask].split(lens)
+        labels, paths = labels.movedim((0, 2), (2, 3))[mask].split(lens), paths.movedim((0, 2), (2, 3))[mask].split(
+            lens)
         leaves, nodes = [], []
         for i, length in enumerate(lens):
             leaf_labels, node_labels = labels[i].transpose(0, 1).tolist()

@@ -4,6 +4,7 @@ import os
 from typing import Iterable, Union
 
 import torch
+
 from supar.config import Config
 from supar.models.dep.biaffine.parser import BiaffineDependencyParser
 from supar.models.dep.biaffine.transform import CoNLL
@@ -33,62 +34,62 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
         super().__init__(*args, **kwargs)
 
     def train(
-        self,
-        train: Union[str, Iterable],
-        dev: Union[str, Iterable],
-        test: Union[str, Iterable],
-        epochs: int = 1000,
-        patience: int = 100,
-        batch_size: int = 5000,
-        update_steps: int = 1,
-        buckets: int = 32,
-        workers: int = 0,
-        amp: bool = False,
-        cache: bool = False,
-        punct: bool = False,
-        mbr: bool = True,
-        tree: bool = False,
-        proj: bool = False,
-        partial: bool = False,
-        verbose: bool = True,
-        **kwargs
+            self,
+            train: Union[str, Iterable],
+            dev: Union[str, Iterable],
+            test: Union[str, Iterable],
+            epochs: int = 1000,
+            patience: int = 100,
+            batch_size: int = 5000,
+            update_steps: int = 1,
+            buckets: int = 32,
+            workers: int = 0,
+            amp: bool = False,
+            cache: bool = False,
+            punct: bool = False,
+            mbr: bool = True,
+            tree: bool = False,
+            proj: bool = False,
+            partial: bool = False,
+            verbose: bool = True,
+            **kwargs
     ):
         return super().train(**Config().update(locals()))
 
     def evaluate(
-        self,
-        data: Union[str, Iterable],
-        batch_size: int = 5000,
-        buckets: int = 8,
-        workers: int = 0,
-        amp: bool = False,
-        cache: bool = False,
-        punct: bool = False,
-        mbr: bool = True,
-        tree: bool = True,
-        proj: bool = True,
-        partial: bool = False,
-        verbose: bool = True,
-        **kwargs
+            self,
+            data: Union[str, Iterable],
+            batch_size: int = 5000,
+            buckets: int = 8,
+            workers: int = 0,
+            amp: bool = False,
+            cache: bool = False,
+            punct: bool = False,
+            mbr: bool = True,
+            tree: bool = True,
+            proj: bool = True,
+            partial: bool = False,
+            verbose: bool = True,
+            **kwargs
     ):
         return super().evaluate(**Config().update(locals()))
 
     def predict(
-        self,
-        data: Union[str, Iterable],
-        pred: str = None,
-        lang: str = None,
-        prob: bool = False,
-        batch_size: int = 5000,
-        buckets: int = 8,
-        workers: int = 0,
-        amp: bool = False,
-        cache: bool = False,
-        mbr: bool = True,
-        tree: bool = True,
-        proj: bool = True,
-        verbose: bool = True,
-        **kwargs
+            self,
+            data: Union[str, Iterable],
+            pred: str = None,
+            lang: str = None,
+            prob: bool = False,
+            batch_size: int = 5000,
+            buckets: int = 8,
+            workers: int = 0,
+            amp: bool = False,
+            cache: bool = False,
+            mbr: bool = True,
+            tree: bool = True,
+            proj: bool = True,
+            verbose: bool = True,
+            **kwargs
     ):
         return super().predict(**Config().update(locals()))
 
@@ -108,8 +109,10 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
         # ignore the first token of each sentence
         mask[:, 0] = 0
         s_arc, s_sib, s_rel = self.model(words, feats)
-        loss, s_arc, s_sib = self.model.loss(s_arc, s_sib, s_rel, arcs, sibs, rels, mask, self.args.mbr, self.args.partial)
-        arc_preds, rel_preds = self.model.decode(s_arc, s_sib, s_rel, mask, self.args.tree, self.args.mbr, self.args.proj)
+        loss, s_arc, s_sib = self.model.loss(s_arc, s_sib, s_rel, arcs, sibs, rels, mask, self.args.mbr,
+                                             self.args.partial)
+        arc_preds, rel_preds = self.model.decode(s_arc, s_sib, s_rel, mask, self.args.tree, self.args.mbr,
+                                                 self.args.proj)
         if self.args.partial:
             mask &= arcs.ge(0)
         # ignore all punctuation if not specified
@@ -125,13 +128,14 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
         mask[:, 0] = 0
         s_arc, s_sib, s_rel = self.model(words, feats)
         s_arc, s_sib = Dependency2oCRF((s_arc, s_sib), lens).marginals if self.args.mbr else (s_arc, s_sib)
-        arc_preds, rel_preds = self.model.decode(s_arc, s_sib, s_rel, mask, self.args.tree, self.args.mbr, self.args.proj)
+        arc_preds, rel_preds = self.model.decode(s_arc, s_sib, s_rel, mask, self.args.tree, self.args.mbr,
+                                                 self.args.proj)
         lens = lens.tolist()
         batch.arcs = [i.tolist() for i in arc_preds[mask].split(lens)]
         batch.rels = [self.REL.vocab[i.tolist()] for i in rel_preds[mask].split(lens)]
         if self.args.prob:
             arc_probs = s_arc if self.args.mbr else s_arc.softmax(-1)
-            batch.probs = [prob[1:i+1, :i+1].cpu() for i, prob in zip(lens, arc_probs.unbind())]
+            batch.probs = [prob[1:i + 1, :i + 1].cpu() for i, prob in zip(lens, arc_probs.unbind())]
         return batch
 
     @classmethod
@@ -188,7 +192,8 @@ class CRF2oDependencyParser(BiaffineDependencyParser):
 
         train = Dataset(transform, args.train, **args)
         if args.encoder != 'bert':
-            WORD.build(train, args.min_freq, (Embedding.load(args.embed) if args.embed else None), lambda x: x / torch.std(x))
+            WORD.build(train, args.min_freq, (Embedding.load(args.embed) if args.embed else None),
+                       lambda x: x / torch.std(x))
             if TAG is not None:
                 TAG.build(train)
             if CHAR is not None:

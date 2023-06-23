@@ -5,9 +5,10 @@ from __future__ import annotations
 from typing import List, Optional
 
 import torch
+from torch.distributions.utils import lazy_property
+
 from supar.structs.dist import StructuredDistribution
 from supar.structs.semiring import LogSemiring, Semiring
-from torch.distributions.utils import lazy_property
 
 
 class LinearChainCRF(StructuredDistribution):
@@ -50,10 +51,10 @@ class LinearChainCRF(StructuredDistribution):
     """
 
     def __init__(
-        self,
-        scores: torch.Tensor,
-        trans: Optional[torch.Tensor] = None,
-        lens: Optional[torch.LongTensor] = None
+            self,
+            scores: torch.Tensor,
+            trans: Optional[torch.Tensor] = None,
+            lens: Optional[torch.LongTensor] = None
     ) -> LinearChainCRF:
         super().__init__(scores, lens=lens)
 
@@ -61,7 +62,8 @@ class LinearChainCRF(StructuredDistribution):
         self.lens = scores.new_full((batch_size,), seq_len).long() if lens is None else lens
         self.mask = self.lens.unsqueeze(-1).gt(self.lens.new_tensor(range(seq_len)))
 
-        self.trans = self.scores.new_full((self.n_tags+1, self.n_tags+1), LogSemiring.one) if trans is None else trans
+        self.trans = self.scores.new_full((self.n_tags + 1, self.n_tags + 1),
+                                          LogSemiring.one) if trans is None else trans
 
     def __repr__(self):
         return f"{self.__class__.__name__}(n_tags={self.n_tags})"
@@ -73,7 +75,8 @@ class LinearChainCRF(StructuredDistribution):
 
     @lazy_property
     def argmax(self):
-        return self.lens.new_zeros(self.mask.shape).masked_scatter_(self.mask, torch.where(self.backward(self.max.sum()))[2])
+        return self.lens.new_zeros(self.mask.shape).masked_scatter_(self.mask,
+                                                                    torch.where(self.backward(self.max.sum()))[2])
 
     def topk(self, k: int) -> torch.LongTensor:
         preds = torch.stack([torch.where(self.backward(i))[2] for i in self.kmax(k).sum(0)], -1)
@@ -86,7 +89,8 @@ class LinearChainCRF(StructuredDistribution):
         alpha = scores.gather(-1, value.unsqueeze(-1)).squeeze(-1)
         # [batch_size]
         alpha = LogSemiring.prod(LogSemiring.one_mask(LogSemiring.mul(alpha, self.trans[prev, succ]), ~mask), 0)
-        alpha = alpha + self.trans[value.gather(0, self.lens.unsqueeze(0) - 1).squeeze(0), torch.full_like(value[0], -1)]
+        alpha = alpha + self.trans[
+            value.gather(0, self.lens.unsqueeze(0) - 1).squeeze(0), torch.full_like(value[0], -1)]
         return alpha
 
     def forward(self, semiring: Semiring) -> torch.Tensor:
@@ -150,10 +154,10 @@ class SemiMarkovCRF(StructuredDistribution):
     """
 
     def __init__(
-        self,
-        scores: torch.Tensor,
-        trans: Optional[torch.Tensor] = None,
-        lens: Optional[torch.LongTensor] = None
+            self,
+            scores: torch.Tensor,
+            trans: Optional[torch.Tensor] = None,
+            lens: Optional[torch.LongTensor] = None
     ) -> SemiMarkovCRF:
         super().__init__(scores, lens=lens)
 
@@ -203,6 +207,6 @@ class SemiMarkovCRF(StructuredDistribution):
         # [batch_size, n_tags]
         for t in range(1, len(scores)):
             # [batch_size, n_tags, ...]
-            s = semiring.dot(semiring.dot(alpha[:t].unsqueeze(3), trans, 2), scores[1:t+1, t], 0)
+            s = semiring.dot(semiring.dot(alpha[:t].unsqueeze(3), trans, 2), scores[1:t + 1, t], 0)
             alpha[t] = semiring.sum(torch.stack((s, scores[0, t])), 0)
         return semiring.unconvert(semiring.sum(alpha[self.lens - 1, range(len(self.lens))], 1))

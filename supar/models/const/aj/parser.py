@@ -4,6 +4,7 @@ import os
 from typing import Dict, Iterable, Set, Union
 
 import torch
+
 from supar.config import Config
 from supar.models.const.aj.model import AttachJuxtaposeConstituencyModel
 from supar.models.const.aj.transform import AttachJuxtaposeTree
@@ -36,56 +37,56 @@ class AttachJuxtaposeConstituencyParser(Parser):
         self.NEW = self.transform.NEW
 
     def train(
-        self,
-        train: Union[str, Iterable],
-        dev: Union[str, Iterable],
-        test: Union[str, Iterable],
-        epochs: int = 1000,
-        patience: int = 100,
-        batch_size: int = 5000,
-        update_steps: int = 1,
-        buckets: int = 32,
-        workers: int = 0,
-        amp: bool = False,
-        cache: bool = False,
-        beam_size: int = 1,
-        delete: Set = {'TOP', 'S1', '-NONE-', ',', ':', '``', "''", '.', '?', '!', ''},
-        equal: Dict = {'ADVP': 'PRT'},
-        verbose: bool = True,
-        **kwargs
+            self,
+            train: Union[str, Iterable],
+            dev: Union[str, Iterable],
+            test: Union[str, Iterable],
+            epochs: int = 1000,
+            patience: int = 100,
+            batch_size: int = 5000,
+            update_steps: int = 1,
+            buckets: int = 32,
+            workers: int = 0,
+            amp: bool = False,
+            cache: bool = False,
+            beam_size: int = 1,
+            delete: Set = {'TOP', 'S1', '-NONE-', ',', ':', '``', "''", '.', '?', '!', ''},
+            equal: Dict = {'ADVP': 'PRT'},
+            verbose: bool = True,
+            **kwargs
     ):
         return super().train(**Config().update(locals()))
 
     def evaluate(
-        self,
-        data: Union[str, Iterable],
-        batch_size: int = 5000,
-        buckets: int = 8,
-        workers: int = 0,
-        amp: bool = False,
-        cache: bool = False,
-        beam_size: int = 1,
-        delete: Set = {'TOP', 'S1', '-NONE-', ',', ':', '``', "''", '.', '?', '!', ''},
-        equal: Dict = {'ADVP': 'PRT'},
-        verbose: bool = True,
-        **kwargs
+            self,
+            data: Union[str, Iterable],
+            batch_size: int = 5000,
+            buckets: int = 8,
+            workers: int = 0,
+            amp: bool = False,
+            cache: bool = False,
+            beam_size: int = 1,
+            delete: Set = {'TOP', 'S1', '-NONE-', ',', ':', '``', "''", '.', '?', '!', ''},
+            equal: Dict = {'ADVP': 'PRT'},
+            verbose: bool = True,
+            **kwargs
     ):
         return super().evaluate(**Config().update(locals()))
 
     def predict(
-        self,
-        data: Union[str, Iterable],
-        pred: str = None,
-        lang: str = None,
-        prob: bool = False,
-        batch_size: int = 5000,
-        buckets: int = 8,
-        workers: int = 0,
-        amp: bool = False,
-        cache: bool = False,
-        beam_size: int = 1,
-        verbose: bool = True,
-        **kwargs
+            self,
+            data: Union[str, Iterable],
+            pred: str = None,
+            lang: str = None,
+            prob: bool = False,
+            batch_size: int = 5000,
+            buckets: int = 8,
+            workers: int = 0,
+            amp: bool = False,
+            cache: bool = False,
+            beam_size: int = 1,
+            verbose: bool = True,
+            **kwargs
     ):
         return super().predict(**Config().update(locals()))
 
@@ -115,8 +116,9 @@ class AttachJuxtaposeConstituencyParser(Parser):
         mask = batch.mask[:, 2:]
         x = self.model(words, feats)[:, 1:-1]
         chart_preds = self.model.decode(x, mask, self.args.beam_size)
-        batch.trees = [AttachJuxtaposeTree.build(tree, [(i, j, self.NEW.vocab[label]) for i, j, label in chart], {UNK, NUL})
-                       for tree, chart in zip(trees, chart_preds)]
+        batch.trees = [
+            AttachJuxtaposeTree.build(tree, [(i, j, self.NEW.vocab[label]) for i, j, label in chart], {UNK, NUL})
+            for tree, chart in zip(trees, chart_preds)]
         if self.args.prob:
             raise NotImplementedError("Returning action probs are currently not supported yet.")
         return batch
@@ -165,15 +167,18 @@ class AttachJuxtaposeConstituencyParser(Parser):
                 ELMO.compose = lambda x: batch_to_ids(x).to(WORD.device)
             if 'bert' in args.feat:
                 t = TransformerTokenizer(args.bert)
-                BERT = SubwordField('bert', pad=t.pad, unk=t.unk, bos=t.bos, eos=t.eos, fix_len=args.fix_len, tokenize=t)
+                BERT = SubwordField('bert', pad=t.pad, unk=t.unk, bos=t.bos, eos=t.eos, fix_len=args.fix_len,
+                                    tokenize=t)
                 BERT.vocab = t.vocab
         TREE = RawField('trees')
         NODE, PARENT, NEW = Field('node', use_vocab=False), Field('parent', unk=UNK), Field('new', unk=UNK)
-        transform = AttachJuxtaposeTree(WORD=(WORD, CHAR, ELMO, BERT), POS=TAG, TREE=TREE, NODE=NODE, PARENT=PARENT, NEW=NEW)
+        transform = AttachJuxtaposeTree(WORD=(WORD, CHAR, ELMO, BERT), POS=TAG, TREE=TREE, NODE=NODE, PARENT=PARENT,
+                                        NEW=NEW)
 
         train = Dataset(transform, args.train, **args)
         if args.encoder != 'bert':
-            WORD.build(train, args.min_freq, (Embedding.load(args.embed) if args.embed else None), lambda x: x / torch.std(x))
+            WORD.build(train, args.min_freq, (Embedding.load(args.embed) if args.embed else None),
+                       lambda x: x / torch.std(x))
             if TAG is not None:
                 TAG.build(train)
             if CHAR is not None:

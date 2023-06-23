@@ -4,6 +4,7 @@ import os
 from typing import Iterable, Union
 
 import torch
+
 from supar.config import Config
 from supar.models.dep.biaffine.model import BiaffineDependencyModel
 from supar.models.dep.biaffine.transform import CoNLL
@@ -35,59 +36,59 @@ class BiaffineDependencyParser(Parser):
         self.ARC, self.REL = self.transform.HEAD, self.transform.DEPREL
 
     def train(
-        self,
-        train: Union[str, Iterable],
-        dev: Union[str, Iterable],
-        test: Union[str, Iterable],
-        epochs: int = 1000,
-        patience: int = 100,
-        batch_size: int = 5000,
-        update_steps: int = 1,
-        buckets: int = 32,
-        workers: int = 0,
-        amp: bool = False,
-        cache: bool = False,
-        punct: bool = False,
-        tree: bool = False,
-        proj: bool = False,
-        partial: bool = False,
-        verbose: bool = True,
-        **kwargs
+            self,
+            train: Union[str, Iterable],
+            dev: Union[str, Iterable],
+            test: Union[str, Iterable],
+            epochs: int = 1000,
+            patience: int = 100,
+            batch_size: int = 5000,
+            update_steps: int = 1,
+            buckets: int = 32,
+            workers: int = 0,
+            amp: bool = False,
+            cache: bool = False,
+            punct: bool = False,
+            tree: bool = False,
+            proj: bool = False,
+            partial: bool = False,
+            verbose: bool = True,
+            **kwargs
     ):
         return super().train(**Config().update(locals()))
 
     def evaluate(
-        self,
-        data: Union[str, Iterable],
-        batch_size: int = 5000,
-        buckets: int = 8,
-        workers: int = 0,
-        amp: bool = False,
-        cache: bool = False,
-        punct: bool = False,
-        tree: bool = True,
-        proj: bool = False,
-        partial: bool = False,
-        verbose: bool = True,
-        **kwargs
+            self,
+            data: Union[str, Iterable],
+            batch_size: int = 5000,
+            buckets: int = 8,
+            workers: int = 0,
+            amp: bool = False,
+            cache: bool = False,
+            punct: bool = False,
+            tree: bool = True,
+            proj: bool = False,
+            partial: bool = False,
+            verbose: bool = True,
+            **kwargs
     ):
         return super().evaluate(**Config().update(locals()))
 
     def predict(
-        self,
-        data: Union[str, Iterable],
-        pred: str = None,
-        lang: str = None,
-        prob: bool = False,
-        batch_size: int = 5000,
-        buckets: int = 8,
-        workers: int = 0,
-        amp: bool = False,
-        cache: bool = False,
-        tree: bool = True,
-        proj: bool = False,
-        verbose: bool = True,
-        **kwargs
+            self,
+            data: Union[str, Iterable],
+            pred: str = None,
+            lang: str = None,
+            prob: bool = False,
+            batch_size: int = 5000,
+            buckets: int = 8,
+            workers: int = 0,
+            amp: bool = False,
+            cache: bool = False,
+            tree: bool = True,
+            proj: bool = False,
+            verbose: bool = True,
+            **kwargs
     ):
         return super().predict(**Config().update(locals()))
 
@@ -127,7 +128,7 @@ class BiaffineDependencyParser(Parser):
         batch.arcs = [i.tolist() for i in arc_preds[mask].split(lens)]
         batch.rels = [self.REL.vocab[i.tolist()] for i in rel_preds[mask].split(lens)]
         if self.args.prob:
-            batch.probs = [prob[1:i+1, :i+1].cpu() for i, prob in zip(lens, s_arc.softmax(-1).unbind())]
+            batch.probs = [prob[1:i + 1, :i + 1].cpu() for i, prob in zip(lens, s_arc.softmax(-1).unbind())]
         return batch
 
     @classmethod
@@ -185,7 +186,8 @@ class BiaffineDependencyParser(Parser):
 
         train = Dataset(transform, args.train, **args)
         if args.encoder != 'bert':
-            WORD.build(train, args.min_freq, (Embedding.load(args.embed) if args.embed else None), lambda x: x / torch.std(x))
+            WORD.build(train, args.min_freq, (Embedding.load(args.embed) if args.embed else None),
+                       lambda x: x / torch.std(x))
             if TAG is not None:
                 TAG.build(train)
             if CHAR is not None:

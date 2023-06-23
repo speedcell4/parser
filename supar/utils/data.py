@@ -59,14 +59,14 @@ class Dataset(torch.utils.data.Dataset):
     """
 
     def __init__(
-        self,
-        transform: Transform,
-        data: Union[str, Iterable],
-        cache: bool = False,
-        binarize: bool = False,
-        bin: str = None,
-        max_len: int = None,
-        **kwargs
+            self,
+            transform: Transform,
+            data: Union[str, Iterable],
+            cache: bool = False,
+            binarize: bool = False,
+            bin: str = None,
+            max_len: int = None,
+            **kwargs
     ) -> Dataset:
         super(Dataset, self).__init__()
 
@@ -141,16 +141,16 @@ class Dataset(torch.utils.data.Dataset):
         return debinarize(self.fbin, 'sizes')
 
     def build(
-        self,
-        batch_size: int,
-        n_buckets: int = 1,
-        shuffle: bool = False,
-        distributed: bool = False,
-        even: bool = True,
-        n_workers: int = 0,
-        seed: int = 1,
-        pin_memory: bool = True,
-        chunk_size: int = 10000
+            self,
+            batch_size: int,
+            n_buckets: int = 1,
+            shuffle: bool = False,
+            distributed: bool = False,
+            even: bool = True,
+            n_workers: int = 0,
+            seed: int = 1,
+            pin_memory: bool = True,
+            chunk_size: int = 10000
     ) -> Dataset:
         # if not forced and the binarized file already exists, directly load the meta file
         if self.cache and os.path.exists(self.fbin) and not self.binarize:
@@ -168,7 +168,7 @@ class Dataset(torch.utils.data.Dataset):
                     global_transform = self.transform
                     sentences = binarize({'sentences': progress_bar(sentences)}, fs)[1]['sentences']
                     try:
-                        yield ((sentences[s:s+chunk_size], fs, f"{fb}.{i}", self.max_len)
+                        yield ((sentences[s:s + chunk_size], fs, f"{fb}.{i}", self.max_len)
                                for i, s in enumerate(range(0, len(sentences), chunk_size)))
                     finally:
                         del global_transform
@@ -226,13 +226,13 @@ class Sampler(torch.utils.data.Sampler):
     """
 
     def __init__(
-        self,
-        buckets: Dict[float, List],
-        batch_size: int,
-        shuffle: bool = False,
-        distributed: bool = False,
-        even: bool = True,
-        seed: int = 1
+            self,
+            buckets: Dict[float, List],
+            batch_size: int,
+            shuffle: bool = False,
+            distributed: bool = False,
+            even: bool = True,
+            seed: int = 1
     ) -> Sampler:
         self.batch_size = batch_size
         self.shuffle = shuffle
@@ -290,7 +290,6 @@ class Sampler(torch.utils.data.Sampler):
 
 
 class DataLoader(torch.utils.data.DataLoader):
-
     r"""
     A wrapper for native :class:`torch.utils.data.DataLoader` enhanced with a data prefetcher.
     See http://stackoverflow.com/questions/7323664/python-generator-pre-fetch and

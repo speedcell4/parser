@@ -9,10 +9,10 @@ from torch.optim.lr_scheduler import _LRScheduler
 class InverseSquareRootLR(_LRScheduler):
 
     def __init__(
-        self,
-        optimizer: Optimizer,
-        warmup_steps: int,
-        last_epoch: int = -1
+            self,
+            optimizer: Optimizer,
+            warmup_steps: int,
+            last_epoch: int = -1
     ) -> InverseSquareRootLR:
         self.warmup_steps = warmup_steps
         self.factor = warmup_steps ** 0.5
@@ -31,12 +31,12 @@ class PolynomialLR(_LRScheduler):
     """
 
     def __init__(
-        self,
-        optimizer: Optimizer,
-        warmup_steps: int = 0,
-        steps: int = 100000,
-        power: float = 1.,
-        last_epoch: int = -1
+            self,
+            optimizer: Optimizer,
+            warmup_steps: int = 0,
+            steps: int = 100000,
+            power: float = 1.,
+            last_epoch: int = -1
     ) -> PolynomialLR:
         self.warmup_steps = warmup_steps
         self.steps = steps

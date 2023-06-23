@@ -13,13 +13,13 @@ import torch.nn.functional as F
 class TransformerWordEmbedding(nn.Module):
 
     def __init__(
-        self,
-        n_vocab: int = None,
-        n_embed: int = None,
-        embed_scale: Optional[int] = None,
-        max_len: Optional[int] = 512,
-        pos: Optional[str] = None,
-        pad_index: Optional[int] = None,
+            self,
+            n_vocab: int = None,
+            n_embed: int = None,
+            embed_scale: Optional[int] = None,
+            max_len: Optional[int] = 512,
+            pos: Optional[str] = None,
+            pad_index: Optional[int] = None,
     ) -> TransformerWordEmbedding:
         super(TransformerWordEmbedding, self).__init__()
 
@@ -78,11 +78,11 @@ class TransformerWordEmbedding(nn.Module):
 class TransformerEncoder(nn.Module):
 
     def __init__(
-        self,
-        layer: nn.Module,
-        n_layers: int = 6,
-        n_model: int = 1024,
-        pre_norm: bool = False,
+            self,
+            layer: nn.Module,
+            n_layers: int = 6,
+            n_model: int = 1024,
+            pre_norm: bool = False,
     ) -> TransformerEncoder:
         super(TransformerEncoder, self).__init__()
 
@@ -105,11 +105,11 @@ class TransformerEncoder(nn.Module):
 class TransformerDecoder(nn.Module):
 
     def __init__(
-        self,
-        layer: nn.Module,
-        n_layers: int = 6,
-        n_model: int = 1024,
-        pre_norm: bool = False,
+            self,
+            layer: nn.Module,
+            n_layers: int = 6,
+            n_model: int = 1024,
+            pre_norm: bool = False,
     ) -> TransformerDecoder:
         super(TransformerDecoder, self).__init__()
 
@@ -121,12 +121,12 @@ class TransformerDecoder(nn.Module):
         self.norm = nn.LayerNorm(n_model) if self.pre_norm else None
 
     def forward(
-        self,
-        x_tgt: torch.Tensor,
-        x_src: torch.Tensor,
-        tgt_mask: torch.BoolTensor,
-        src_mask: torch.BoolTensor,
-        attn_mask: Optional[torch.BoolTensor] = None
+            self,
+            x_tgt: torch.Tensor,
+            x_src: torch.Tensor,
+            tgt_mask: torch.BoolTensor,
+            src_mask: torch.BoolTensor,
+            attn_mask: Optional[torch.BoolTensor] = None
     ) -> torch.Tensor:
         x_tgt, x_src = x_tgt.transpose(0, 1), x_src.transpose(0, 1)
         for layer in self.layers:
@@ -143,22 +143,22 @@ class TransformerDecoder(nn.Module):
 class TransformerEncoderLayer(nn.Module):
 
     def __init__(
-        self,
-        n_heads: int = 8,
-        n_model: int = 1024,
-        n_inner: int = 2048,
-        activation: str = 'relu',
-        bias: bool = True,
-        pre_norm: bool = False,
-        attn_dropout: float = 0.1,
-        ffn_dropout: float = 0.1,
-        dropout: float = 0.1
+            self,
+            n_heads: int = 8,
+            n_model: int = 1024,
+            n_inner: int = 2048,
+            activation: str = 'relu',
+            bias: bool = True,
+            pre_norm: bool = False,
+            attn_dropout: float = 0.1,
+            ffn_dropout: float = 0.1,
+            dropout: float = 0.1
     ) -> TransformerEncoderLayer:
         super(TransformerEncoderLayer, self).__init__()
 
         self.attn = MultiHeadAttention(n_heads=n_heads,
                                        n_model=n_model,
-                                       n_embed=n_model//n_heads,
+                                       n_embed=n_model // n_heads,
                                        dropout=attn_dropout,
                                        bias=bias)
         self.attn_norm = nn.LayerNorm(n_model)
@@ -186,21 +186,21 @@ class TransformerEncoderLayer(nn.Module):
 class RelativePositionTransformerEncoderLayer(TransformerEncoderLayer):
 
     def __init__(
-        self,
-        n_heads: int = 8,
-        n_model: int = 1024,
-        n_inner: int = 2048,
-        activation: str = 'relu',
-        pre_norm: bool = False,
-        attn_dropout: float = 0.1,
-        ffn_dropout: float = 0.1,
-        dropout: float = 0.1
+            self,
+            n_heads: int = 8,
+            n_model: int = 1024,
+            n_inner: int = 2048,
+            activation: str = 'relu',
+            pre_norm: bool = False,
+            attn_dropout: float = 0.1,
+            ffn_dropout: float = 0.1,
+            dropout: float = 0.1
     ) -> RelativePositionTransformerEncoderLayer:
         super(RelativePositionTransformerEncoderLayer, self).__init__()
 
         self.attn = RelativePositionMultiHeadAttention(n_heads=n_heads,
                                                        n_model=n_model,
-                                                       n_embed=n_model//n_heads,
+                                                       n_embed=n_model // n_heads,
                                                        dropout=attn_dropout)
         self.attn_norm = nn.LayerNorm(n_model)
         self.ffn = PositionwiseFeedForward(n_model=n_model,
@@ -216,21 +216,21 @@ class RelativePositionTransformerEncoderLayer(TransformerEncoderLayer):
 class RotaryPositionTransformerEncoderLayer(TransformerEncoderLayer):
 
     def __init__(
-        self,
-        n_heads: int = 8,
-        n_model: int = 1024,
-        n_inner: int = 2048,
-        activation: str = 'relu',
-        pre_norm: bool = False,
-        attn_dropout: float = 0.1,
-        ffn_dropout: float = 0.1,
-        dropout: float = 0.1
+            self,
+            n_heads: int = 8,
+            n_model: int = 1024,
+            n_inner: int = 2048,
+            activation: str = 'relu',
+            pre_norm: bool = False,
+            attn_dropout: float = 0.1,
+            ffn_dropout: float = 0.1,
+            dropout: float = 0.1
     ) -> RotaryPositionTransformerEncoderLayer:
         super(RotaryPositionTransformerEncoderLayer, self).__init__()
 
         self.attn = RotaryPositionMultiHeadAttention(n_heads=n_heads,
                                                      n_model=n_model,
-                                                     n_embed=n_model//n_heads,
+                                                     n_embed=n_model // n_heads,
                                                      dropout=attn_dropout)
         self.attn_norm = nn.LayerNorm(n_model)
         self.ffn = PositionwiseFeedForward(n_model=n_model,
@@ -246,28 +246,28 @@ class RotaryPositionTransformerEncoderLayer(TransformerEncoderLayer):
 class TransformerDecoderLayer(nn.Module):
 
     def __init__(
-        self,
-        n_heads: int = 8,
-        n_model: int = 1024,
-        n_inner: int = 2048,
-        activation: str = 'relu',
-        bias: bool = True,
-        pre_norm: bool = False,
-        attn_dropout: float = 0.1,
-        ffn_dropout: float = 0.1,
-        dropout: float = 0.1
+            self,
+            n_heads: int = 8,
+            n_model: int = 1024,
+            n_inner: int = 2048,
+            activation: str = 'relu',
+            bias: bool = True,
+            pre_norm: bool = False,
+            attn_dropout: float = 0.1,
+            ffn_dropout: float = 0.1,
+            dropout: float = 0.1
     ) -> TransformerDecoderLayer:
         super(TransformerDecoderLayer, self).__init__()
 
         self.self_attn = MultiHeadAttention(n_heads=n_heads,
                                             n_model=n_model,
-                                            n_embed=n_model//n_heads,
+                                            n_embed=n_model // n_heads,
                                             dropout=attn_dropout,
                                             bias=bias)
         self.self_attn_norm = nn.LayerNorm(n_model)
         self.mha_attn = MultiHeadAttention(n_heads=n_heads,
                                            n_model=n_model,
-                                           n_embed=n_model//n_heads,
+                                           n_embed=n_model // n_heads,
                                            dropout=attn_dropout,
                                            bias=bias)
         self.mha_attn_norm = nn.LayerNorm(n_model)
@@ -281,12 +281,12 @@ class TransformerDecoderLayer(nn.Module):
         self.pre_norm = pre_norm
 
     def forward(
-        self,
-        x_tgt: torch.Tensor,
-        x_src: torch.Tensor,
-        tgt_mask: torch.BoolTensor,
-        src_mask: torch.BoolTensor,
-        attn_mask: Optional[torch.BoolTensor] = None
+            self,
+            x_tgt: torch.Tensor,
+            x_src: torch.Tensor,
+            tgt_mask: torch.BoolTensor,
+            src_mask: torch.BoolTensor,
+            attn_mask: Optional[torch.BoolTensor] = None
     ) -> torch.Tensor:
         if self.pre_norm:
             n_tgt = self.self_attn_norm(x_tgt)
@@ -305,26 +305,26 @@ class TransformerDecoderLayer(nn.Module):
 class RelativePositionTransformerDecoderLayer(TransformerDecoderLayer):
 
     def __init__(
-        self,
-        n_heads: int = 8,
-        n_model: int = 1024,
-        n_inner: int = 2048,
-        activation: str = 'relu',
-        pre_norm: bool = False,
-        attn_dropout: float = 0.1,
-        ffn_dropout: float = 0.1,
-        dropout: float = 0.1
+            self,
+            n_heads: int = 8,
+            n_model: int = 1024,
+            n_inner: int = 2048,
+            activation: str = 'relu',
+            pre_norm: bool = False,
+            attn_dropout: float = 0.1,
+            ffn_dropout: float = 0.1,
+            dropout: float = 0.1
     ) -> RelativePositionTransformerDecoderLayer:
         super(RelativePositionTransformerDecoderLayer, self).__init__()
 
         self.self_attn = RelativePositionMultiHeadAttention(n_heads=n_heads,
                                                             n_model=n_model,
-                                                            n_embed=n_model//n_heads,
+                                                            n_embed=n_model // n_heads,
                                                             dropout=attn_dropout)
         self.self_attn_norm = nn.LayerNorm(n_model)
         self.mha_attn = RelativePositionMultiHeadAttention(n_heads=n_heads,
                                                            n_model=n_model,
-                                                           n_embed=n_model//n_heads,
+                                                           n_embed=n_model // n_heads,
                                                            dropout=attn_dropout)
         self.mha_attn_norm = nn.LayerNorm(n_model)
         self.ffn = PositionwiseFeedForward(n_model=n_model,
@@ -340,26 +340,26 @@ class RelativePositionTransformerDecoderLayer(TransformerDecoderLayer):
 class RotaryPositionTransformerDecoderLayer(TransformerDecoderLayer):
 
     def __init__(
-        self,
-        n_heads: int = 8,
-        n_model: int = 1024,
-        n_inner: int = 2048,
-        activation: str = 'relu',
-        pre_norm: bool = False,
-        attn_dropout: float = 0.1,
-        ffn_dropout: float = 0.1,
-        dropout: float = 0.1
+            self,
+            n_heads: int = 8,
+            n_model: int = 1024,
+            n_inner: int = 2048,
+            activation: str = 'relu',
+            pre_norm: bool = False,
+            attn_dropout: float = 0.1,
+            ffn_dropout: float = 0.1,
+            dropout: float = 0.1
     ) -> RotaryPositionTransformerDecoderLayer:
         super(RotaryPositionTransformerDecoderLayer, self).__init__()
 
         self.self_attn = RotaryPositionMultiHeadAttention(n_heads=n_heads,
                                                           n_model=n_model,
-                                                          n_embed=n_model//n_heads,
+                                                          n_embed=n_model // n_heads,
                                                           dropout=attn_dropout)
         self.self_attn_norm = nn.LayerNorm(n_model)
         self.mha_attn = RotaryPositionMultiHeadAttention(n_heads=n_heads,
                                                          n_model=n_model,
-                                                         n_embed=n_model//n_heads,
+                                                         n_embed=n_model // n_heads,
                                                          dropout=attn_dropout)
         self.mha_attn_norm = nn.LayerNorm(n_model)
         self.ffn = PositionwiseFeedForward(n_model=n_model,
@@ -375,20 +375,20 @@ class RotaryPositionTransformerDecoderLayer(TransformerDecoderLayer):
 class MultiHeadAttention(nn.Module):
 
     def __init__(
-        self,
-        n_heads: int = 8,
-        n_model: int = 1024,
-        n_embed: int = 128,
-        dropout: float = 0.1,
-        bias: bool = True,
-        attn: bool = False,
+            self,
+            n_heads: int = 8,
+            n_model: int = 1024,
+            n_embed: int = 128,
+            dropout: float = 0.1,
+            bias: bool = True,
+            attn: bool = False,
     ) -> MultiHeadAttention:
         super(MultiHeadAttention, self).__init__()
 
         self.n_heads = n_heads
         self.n_model = n_model
         self.n_embed = n_embed
-        self.scale = n_embed**0.5
+        self.scale = n_embed ** 0.5
 
         self.wq = nn.Linear(n_model, n_heads * n_embed, bias=bias)
         self.wk = nn.Linear(n_model, n_heads * n_embed, bias=bias)
@@ -409,12 +409,12 @@ class MultiHeadAttention(nn.Module):
         nn.init.xavier_uniform_(self.wo.weight)
 
     def forward(
-        self,
-        q: torch.Tensor,
-        k: torch.Tensor,
-        v: torch.Tensor,
-        mask: torch.BoolTensor,
-        attn_mask: Optional[torch.BoolTensor] = None
+            self,
+            q: torch.Tensor,
+            k: torch.Tensor,
+            v: torch.Tensor,
+            mask: torch.BoolTensor,
+            attn_mask: Optional[torch.BoolTensor] = None
     ) -> torch.Tensor:
         batch_size, _ = mask.shape
         # [seq_len, batch_size * n_heads, n_embed]
@@ -441,19 +441,19 @@ class MultiHeadAttention(nn.Module):
 class RelativePositionMultiHeadAttention(nn.Module):
 
     def __init__(
-        self,
-        n_heads: int = 8,
-        n_model: int = 1024,
-        n_embed: int = 128,
-        dropout: float = 0.1,
-        attn: bool = False
+            self,
+            n_heads: int = 8,
+            n_model: int = 1024,
+            n_embed: int = 128,
+            dropout: float = 0.1,
+            attn: bool = False
     ) -> RelativePositionMultiHeadAttention:
         super(RelativePositionMultiHeadAttention, self).__init__()
 
         self.n_heads = n_heads
         self.n_model = n_model
         self.n_embed = n_embed
-        self.scale = n_embed**0.5
+        self.scale = n_embed ** 0.5
 
         self.pos_embed = RelativePositionalEmbedding(n_model=n_embed)
         self.wq = nn.Parameter(torch.zeros(n_model, n_heads * n_embed))
@@ -476,12 +476,12 @@ class RelativePositionMultiHeadAttention(nn.Module):
         nn.init.xavier_uniform_(self.wo)
 
     def forward(
-        self,
-        q: torch.Tensor,
-        k: torch.Tensor,
-        v: torch.Tensor,
-        mask: torch.BoolTensor,
-        attn_mask: Optional[torch.BoolTensor] = None
+            self,
+            q: torch.Tensor,
+            k: torch.Tensor,
+            v: torch.Tensor,
+            mask: torch.BoolTensor,
+            attn_mask: Optional[torch.BoolTensor] = None
     ) -> torch.Tensor:
         batch_size, _ = mask.shape
         # [seq_len, batch_size, n_heads, n_embed]
@@ -513,20 +513,20 @@ class RelativePositionMultiHeadAttention(nn.Module):
 class RotaryPositionMultiHeadAttention(nn.Module):
 
     def __init__(
-        self,
-        n_heads: int = 8,
-        n_model: int = 1024,
-        n_embed: int = 128,
-        dropout: float = 0.1,
-        bias: bool = True,
-        attn: bool = False
+            self,
+            n_heads: int = 8,
+            n_model: int = 1024,
+            n_embed: int = 128,
+            dropout: float = 0.1,
+            bias: bool = True,
+            attn: bool = False
     ) -> RotaryPositionMultiHeadAttention:
         super(RotaryPositionMultiHeadAttention, self).__init__()
 
         self.n_heads = n_heads
         self.n_model = n_model
         self.n_embed = n_embed
-        self.scale = n_embed**0.5
+        self.scale = n_embed ** 0.5
 
         self.pos_embed = RotaryPositionalEmbedding(n_model=n_embed)
         self.wq = nn.Linear(n_model, n_heads * n_embed, bias=bias)
@@ -547,12 +547,12 @@ class RotaryPositionMultiHeadAttention(nn.Module):
         nn.init.xavier_uniform_(self.wo.weight)
 
     def forward(
-        self,
-        q: torch.Tensor,
-        k: torch.Tensor,
-        v: torch.Tensor,
-        mask: torch.BoolTensor,
-        attn_mask: Optional[torch.BoolTensor] = None
+            self,
+            q: torch.Tensor,
+            k: torch.Tensor,
+            v: torch.Tensor,
+            mask: torch.BoolTensor,
+            attn_mask: Optional[torch.BoolTensor] = None
     ) -> torch.Tensor:
         batch_size, _ = mask.shape
         # [seq_len, batch_size * n_heads, n_embed]
@@ -579,11 +579,11 @@ class RotaryPositionMultiHeadAttention(nn.Module):
 class PositionwiseFeedForward(nn.Module):
 
     def __init__(
-        self,
-        n_model: int = 1024,
-        n_inner: int = 2048,
-        activation: str = 'relu',
-        dropout: float = 0.1
+            self,
+            n_model: int = 1024,
+            n_inner: int = 2048,
+            activation: str = 'relu',
+            dropout: float = 0.1
     ) -> PositionwiseFeedForward:
         super(PositionwiseFeedForward, self).__init__()
 
@@ -612,9 +612,9 @@ class PositionwiseFeedForward(nn.Module):
 class PositionalEmbedding(nn.Embedding):
 
     def __init__(
-        self,
-        n_model: int = 1024,
-        max_len: int = 1024
+            self,
+            n_model: int = 1024,
+            max_len: int = 1024
     ) -> PositionalEmbedding:
         super().__init__(max_len, n_model)
 
@@ -636,9 +636,9 @@ class PositionalEmbedding(nn.Embedding):
 class RelativePositionalEmbedding(nn.Module):
 
     def __init__(
-        self,
-        n_model: int = 1024,
-        max_len: int = 1024
+            self,
+            n_model: int = 1024,
+            max_len: int = 1024
     ) -> RelativePositionalEmbedding:
         super().__init__(max_len, n_model)
 
@@ -648,7 +648,7 @@ class RelativePositionalEmbedding(nn.Module):
     def reset_parameters(self):
         w = self.weight
         max_len, n_model = w.shape
-        pos = torch.cat((w.new_tensor(range(-max_len//2, 0)), w.new_tensor(range(max_len//2))))
+        pos = torch.cat((w.new_tensor(range(-max_len // 2, 0)), w.new_tensor(range(max_len // 2))))
         w = pos.unsqueeze(-1) / 10000 ** (w.new_tensor(range(n_model)).div(2, rounding_mode='floor') * 2 / n_model)
         w[:, 0::2], w[:, 1::2] = w[:, 0::2].sin(), w[:, 1::2].cos()
         self.weight.copy_(w)
@@ -683,9 +683,9 @@ class SinusoidRelativePositionalEmbedding(nn.Module):
 class RotaryPositionalEmbedding(nn.Embedding):
 
     def __init__(
-        self,
-        n_model: int = 1024,
-        max_len: int = 1024
+            self,
+            n_model: int = 1024,
+            max_len: int = 1024
     ) -> RotaryPositionalEmbedding:
         super().__init__(max_len, n_model)
 

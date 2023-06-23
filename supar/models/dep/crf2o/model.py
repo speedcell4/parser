@@ -2,10 +2,11 @@
 
 import torch
 import torch.nn as nn
+
 from supar.config import Config
 from supar.models.dep.biaffine.model import BiaffineDependencyModel
 from supar.models.dep.biaffine.transform import CoNLL
-from supar.modules import MLP, Biaffine, Triaffine
+from supar.modules import Biaffine, MLP, Triaffine
 from supar.structs import Dependency2oCRF, MatrixTree
 from supar.utils.common import MIN
 
@@ -252,7 +253,7 @@ class CRF2oDependencyModel(BiaffineDependencyModel):
 
         lens = mask.sum(1)
         arc_preds = s_arc.argmax(-1)
-        bad = [not CoNLL.istree(seq[1:i+1], proj) for i, seq in zip(lens.tolist(), arc_preds.tolist())]
+        bad = [not CoNLL.istree(seq[1:i + 1], proj) for i, seq in zip(lens.tolist(), arc_preds.tolist())]
         if tree and any(bad):
             if proj:
                 arc_preds[bad] = Dependency2oCRF((s_arc[bad], s_sib[bad]), mask[bad].sum(-1)).argmax

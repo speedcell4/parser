@@ -4,6 +4,7 @@ import os
 from typing import Dict, Iterable, Set, Union
 
 import torch
+
 from supar.config import Config
 from supar.models.const.tt.model import TetraTaggingConstituencyModel
 from supar.models.const.tt.transform import TetraTaggingTree
@@ -38,56 +39,56 @@ class TetraTaggingConstituencyParser(Parser):
                                        *(i.startswith('L') for i in self.NODE.vocab.itos)]).to(self.device)
 
     def train(
-        self,
-        train: Union[str, Iterable],
-        dev: Union[str, Iterable],
-        test: Union[str, Iterable],
-        epochs: int = 1000,
-        patience: int = 100,
-        batch_size: int = 5000,
-        update_steps: int = 1,
-        buckets: int = 32,
-        workers: int = 0,
-        amp: bool = False,
-        cache: bool = False,
-        depth: int = 1,
-        delete: Set = {'TOP', 'S1', '-NONE-', ',', ':', '``', "''", '.', '?', '!', ''},
-        equal: Dict = {'ADVP': 'PRT'},
-        verbose: bool = True,
-        **kwargs
+            self,
+            train: Union[str, Iterable],
+            dev: Union[str, Iterable],
+            test: Union[str, Iterable],
+            epochs: int = 1000,
+            patience: int = 100,
+            batch_size: int = 5000,
+            update_steps: int = 1,
+            buckets: int = 32,
+            workers: int = 0,
+            amp: bool = False,
+            cache: bool = False,
+            depth: int = 1,
+            delete: Set = {'TOP', 'S1', '-NONE-', ',', ':', '``', "''", '.', '?', '!', ''},
+            equal: Dict = {'ADVP': 'PRT'},
+            verbose: bool = True,
+            **kwargs
     ):
         return super().train(**Config().update(locals()))
 
     def evaluate(
-        self,
-        data: Union[str, Iterable],
-        batch_size: int = 5000,
-        buckets: int = 8,
-        workers: int = 0,
-        amp: bool = False,
-        cache: bool = False,
-        depth: int = 1,
-        delete: Set = {'TOP', 'S1', '-NONE-', ',', ':', '``', "''", '.', '?', '!', ''},
-        equal: Dict = {'ADVP': 'PRT'},
-        verbose: bool = True,
-        **kwargs
+            self,
+            data: Union[str, Iterable],
+            batch_size: int = 5000,
+            buckets: int = 8,
+            workers: int = 0,
+            amp: bool = False,
+            cache: bool = False,
+            depth: int = 1,
+            delete: Set = {'TOP', 'S1', '-NONE-', ',', ':', '``', "''", '.', '?', '!', ''},
+            equal: Dict = {'ADVP': 'PRT'},
+            verbose: bool = True,
+            **kwargs
     ):
         return super().evaluate(**Config().update(locals()))
 
     def predict(
-        self,
-        data: Union[str, Iterable],
-        pred: str = None,
-        lang: str = None,
-        prob: bool = False,
-        batch_size: int = 5000,
-        buckets: int = 8,
-        workers: int = 0,
-        amp: bool = False,
-        cache: bool = False,
-        depth: int = 1,
-        verbose: bool = True,
-        **kwargs
+            self,
+            data: Union[str, Iterable],
+            pred: str = None,
+            lang: str = None,
+            prob: bool = False,
+            batch_size: int = 5000,
+            buckets: int = 8,
+            workers: int = 0,
+            amp: bool = False,
+            cache: bool = False,
+            depth: int = 1,
+            verbose: bool = True,
+            **kwargs
     ):
         return super().predict(**Config().update(locals()))
 
@@ -117,8 +118,9 @@ class TetraTaggingConstituencyParser(Parser):
         mask = batch.mask[:, 2:]
         s_leaf, s_node = self.model(words, feats)
         preds = self.model.decode(s_leaf, s_node, mask, self.left_mask, self.args.depth)
-        batch.trees = [TetraTaggingTree.action2tree(tree, (self.LEAF.vocab[i], self.NODE.vocab[j] if len(j) > 0 else []))
-                       for tree, i, j in zip(trees, *preds)]
+        batch.trees = [
+            TetraTaggingTree.action2tree(tree, (self.LEAF.vocab[i], self.NODE.vocab[j] if len(j) > 0 else []))
+            for tree, i, j in zip(trees, *preds)]
         if self.args.prob:
             raise NotImplementedError("Returning action probs are currently not supported yet.")
         return batch
@@ -167,7 +169,8 @@ class TetraTaggingConstituencyParser(Parser):
                 ELMO.compose = lambda x: batch_to_ids(x).to(WORD.device)
             if 'bert' in args.feat:
                 t = TransformerTokenizer(args.bert)
-                BERT = SubwordField('bert', pad=t.pad, unk=t.unk, bos=t.bos, eos=t.eos, fix_len=args.fix_len, tokenize=t)
+                BERT = SubwordField('bert', pad=t.pad, unk=t.unk, bos=t.bos, eos=t.eos, fix_len=args.fix_len,
+                                    tokenize=t)
                 BERT.vocab = t.vocab
         TREE = RawField('trees')
         LEAF, NODE = Field('leaf'), Field('node')
@@ -175,7 +178,8 @@ class TetraTaggingConstituencyParser(Parser):
 
         train = Dataset(transform, args.train, **args)
         if args.encoder != 'bert':
-            WORD.build(train, args.min_freq, (Embedding.load(args.embed) if args.embed else None), lambda x: x / torch.std(x))
+            WORD.build(train, args.min_freq, (Embedding.load(args.embed) if args.embed else None),
+                       lambda x: x / torch.std(x))
             if TAG is not None:
                 TAG.build(train)
             if CHAR is not None:

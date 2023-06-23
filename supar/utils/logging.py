@@ -37,11 +37,11 @@ class TqdmHandler(StreamHandler):
 
 
 def init_logger(
-    logger: Logger,
-    path: Optional[str] = None,
-    mode: str = 'w',
-    handlers: Optional[Iterable[Handler]] = None,
-    verbose: bool = True
+        logger: Logger,
+        path: Optional[str] = None,
+        mode: str = 'w',
+        handlers: Optional[Iterable[Handler]] = None,
+        verbose: bool = True
 ) -> Logger:
     if not handlers:
         if path:
@@ -54,11 +54,11 @@ def init_logger(
 
 
 def progress_bar(
-    iterator: Iterable,
-    ncols: Optional[int] = None,
-    bar_format: str = '{l_bar}{bar:20}| {n_fmt}/{total_fmt} {elapsed}<{remaining}, {rate_fmt}{postfix}',
-    leave: bool = False,
-    **kwargs
+        iterator: Iterable,
+        ncols: Optional[int] = None,
+        bar_format: str = '{l_bar}{bar:20}| {n_fmt}/{total_fmt} {elapsed}<{remaining}, {rate_fmt}{postfix}',
+        leave: bool = False,
+        **kwargs
 ) -> tqdm:
     return tqdm(iterator,
                 ncols=ncols,
@@ -70,7 +70,6 @@ def progress_bar(
 
 
 class ColoredFormatter(Formatter):
-
     BLACK = '\033[30m'
     RED = '\033[31m'
     GREEN = '\033[32m'

@@ -3,6 +3,7 @@
 from typing import Dict, Iterable, Set, Union
 
 import torch
+
 from supar.config import Config
 from supar.models.const.crf.parser import CRFConstituencyParser
 from supar.models.const.crf.transform import Tree
@@ -23,50 +24,50 @@ class VIConstituencyParser(CRFConstituencyParser):
     MODEL = VIConstituencyModel
 
     def train(
-        self,
-        train,
-        dev,
-        test,
-        epochs: int = 1000,
-        patience: int = 100,
-        batch_size: int = 5000,
-        update_steps: int = 1,
-        buckets: int = 32, workers: int = 0, amp: bool = False, cache: bool = False,
-        delete: Set = {'TOP', 'S1', '-NONE-', ',', ':', '``', "''", '.', '?', '!', ''},
-        equal: Dict = {'ADVP': 'PRT'},
-        verbose: bool = True,
-        **kwargs
+            self,
+            train,
+            dev,
+            test,
+            epochs: int = 1000,
+            patience: int = 100,
+            batch_size: int = 5000,
+            update_steps: int = 1,
+            buckets: int = 32, workers: int = 0, amp: bool = False, cache: bool = False,
+            delete: Set = {'TOP', 'S1', '-NONE-', ',', ':', '``', "''", '.', '?', '!', ''},
+            equal: Dict = {'ADVP': 'PRT'},
+            verbose: bool = True,
+            **kwargs
     ):
         return super().train(**Config().update(locals()))
 
     def evaluate(
-        self,
-        data: Union[str, Iterable],
-        batch_size: int = 5000,
-        buckets: int = 8,
-        workers: int = 0,
-        amp: bool = False,
-        cache: bool = False,
-        delete: Set = {'TOP', 'S1', '-NONE-', ',', ':', '``', "''", '.', '?', '!', ''},
-        equal: Dict = {'ADVP': 'PRT'},
-        verbose: bool = True,
-        **kwargs
+            self,
+            data: Union[str, Iterable],
+            batch_size: int = 5000,
+            buckets: int = 8,
+            workers: int = 0,
+            amp: bool = False,
+            cache: bool = False,
+            delete: Set = {'TOP', 'S1', '-NONE-', ',', ':', '``', "''", '.', '?', '!', ''},
+            equal: Dict = {'ADVP': 'PRT'},
+            verbose: bool = True,
+            **kwargs
     ):
         return super().evaluate(**Config().update(locals()))
 
     def predict(
-        self,
-        data: Union[str, Iterable],
-        pred: str = None,
-        lang: str = None,
-        prob: bool = False,
-        batch_size: int = 5000,
-        buckets: int = 8,
-        workers: int = 0,
-        amp: bool = False,
-        cache: bool = False,
-        verbose: bool = True,
-        **kwargs
+            self,
+            data: Union[str, Iterable],
+            pred: str = None,
+            lang: str = None,
+            prob: bool = False,
+            batch_size: int = 5000,
+            buckets: int = 8,
+            workers: int = 0,
+            amp: bool = False,
+            cache: bool = False,
+            verbose: bool = True,
+            **kwargs
     ):
         return super().predict(**Config().update(locals()))
 
@@ -103,5 +104,5 @@ class VIConstituencyParser(CRFConstituencyParser):
         batch.trees = [Tree.build(tree, [(i, j, self.CHART.vocab[label]) for i, j, label in chart])
                        for tree, chart in zip(trees, chart_preds)]
         if self.args.prob:
-            batch.probs = [prob[:i-1, 1:i].cpu() for i, prob in zip(lens, s_span)]
+            batch.probs = [prob[:i - 1, 1:i].cpu() for i, prob in zip(lens, s_span)]
         return batch

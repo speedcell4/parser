@@ -6,12 +6,13 @@ from typing import Iterable, Union
 
 import torch
 import torch.autograd as autograd
+from torch.distributions.distribution import Distribution
+from torch.distributions.utils import lazy_property
+
 from supar.structs.semiring import (CrossEntropySemiring, EntropySemiring,
                                     KLDivergenceSemiring, KMaxSemiring,
                                     LogSemiring, MaxSemiring, SampledSemiring,
                                     Semiring)
-from torch.distributions.distribution import Distribution
-from torch.distributions.utils import lazy_property
 
 
 class StructuredDistribution(Distribution):
@@ -25,7 +26,8 @@ class StructuredDistribution(Distribution):
     """
 
     def __init__(self, scores: torch.Tensor, **kwargs) -> StructuredDistribution:
-        self.scores = scores.requires_grad_() if isinstance(scores, torch.Tensor) else [s.requires_grad_() for s in scores]
+        self.scores = scores.requires_grad_() if isinstance(scores, torch.Tensor) else [s.requires_grad_() for s in
+                                                                                        scores]
         self.kwargs = kwargs
 
     def __repr__(self):

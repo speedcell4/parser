@@ -85,7 +85,7 @@ class Model(nn.Module):
                 n_input += self.bert_embed.n_out
             self.embed_dropout = IndependentDropout(p=self.args.embed_dropout)
             self.encoder = VariationalLSTM(input_size=n_input,
-                                           hidden_size=self.args.n_encoder_hidden//2,
+                                           hidden_size=self.args.n_encoder_hidden // 2,
                                            num_layers=self.args.n_encoder_layers,
                                            bidirectional=True,
                                            dropout=self.args.encoder_dropout)
@@ -169,7 +169,8 @@ class Model(nn.Module):
 
     def encode(self, words, feats=None):
         if self.args.encoder == 'lstm':
-            x = pack_padded_sequence(self.embed(words, feats), words.ne(self.args.pad_index).sum(1).tolist(), True, False)
+            x = pack_padded_sequence(self.embed(words, feats), words.ne(self.args.pad_index).sum(1).tolist(), True,
+                                     False)
             x, _ = self.encoder(x)
             x, _ = pad_packed_sequence(x, True, total_length=words.shape[1])
         elif self.args.encoder == 'transformer':

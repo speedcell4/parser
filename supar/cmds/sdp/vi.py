@@ -12,7 +12,8 @@ def main():
     subparsers = parser.add_subparsers(title='Commands', dest='mode')
     # train
     subparser = subparsers.add_parser('train', help='Train a parser.')
-    subparser.add_argument('--feat', '-f', choices=['tag', 'char', 'lemma', 'elmo', 'bert'], nargs='*', help='features to use')
+    subparser.add_argument('--feat', '-f', choices=['tag', 'char', 'lemma', 'elmo', 'bert'], nargs='*',
+                           help='features to use')
     subparser.add_argument('--build', '-b', action='store_true', help='whether to build the model first')
     subparser.add_argument('--checkpoint', action='store_true', help='whether to load a checkpoint to restore training')
     subparser.add_argument('--encoder', choices=['lstm', 'transformer', 'bert'], default='lstm', help='encoder to use')
@@ -21,7 +22,8 @@ def main():
     subparser.add_argument('--train', default='data/sdp/DM/train.conllu', help='path to train file')
     subparser.add_argument('--dev', default='data/sdp/DM/dev.conllu', help='path to dev file')
     subparser.add_argument('--test', default='data/sdp/DM/test.conllu', help='path to test file')
-    subparser.add_argument('--embed', default='glove-6b-100', help='file or embeddings available at `supar.utils.Embedding`')
+    subparser.add_argument('--embed', default='glove-6b-100',
+                           help='file or embeddings available at `supar.utils.Embedding`')
     subparser.add_argument('--n-embed-proj', default=125, type=int, help='dimension of projected embeddings')
     subparser.add_argument('--bert', default='bert-base-cased', help='which BERT model to use')
     subparser.add_argument('--inference', default='mfvi', choices=['mfvi', 'lbp'], help='approximate inference methods')

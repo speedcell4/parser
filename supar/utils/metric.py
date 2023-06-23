@@ -69,13 +69,13 @@ class Metric(object):
 class AttachmentMetric(Metric):
 
     def __init__(
-        self,
-        loss: Optional[float] = None,
-        preds: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,
-        golds: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,
-        mask: Optional[torch.BoolTensor] = None,
-        reverse: bool = False,
-        eps: float = 1e-12
+            self,
+            loss: Optional[float] = None,
+            preds: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,
+            golds: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,
+            mask: Optional[torch.BoolTensor] = None,
+            reverse: bool = False,
+            eps: float = 1e-12
     ) -> AttachmentMetric:
         super().__init__(reverse=reverse, eps=eps)
 
@@ -89,11 +89,11 @@ class AttachmentMetric(Metric):
             self(loss, preds, golds, mask)
 
     def __call__(
-        self,
-        loss: float,
-        preds: Tuple[torch.Tensor, torch.Tensor],
-        golds: Tuple[torch.Tensor, torch.Tensor],
-        mask: torch.BoolTensor
+            self,
+            loss: float,
+            preds: Tuple[torch.Tensor, torch.Tensor],
+            golds: Tuple[torch.Tensor, torch.Tensor],
+            mask: torch.BoolTensor
     ) -> AttachmentMetric:
         lens = mask.sum(1)
         arc_preds, rel_preds, arc_golds, rel_golds = *preds, *golds
@@ -156,12 +156,12 @@ class AttachmentMetric(Metric):
 class SpanMetric(Metric):
 
     def __init__(
-        self,
-        loss: Optional[float] = None,
-        preds: Optional[List[List[Tuple]]] = None,
-        golds: Optional[List[List[Tuple]]] = None,
-        reverse: bool = False,
-        eps: float = 1e-12
+            self,
+            loss: Optional[float] = None,
+            preds: Optional[List[List[Tuple]]] = None,
+            golds: Optional[List[List[Tuple]]] = None,
+            reverse: bool = False,
+            eps: float = 1e-12
     ) -> SpanMetric:
         super().__init__(reverse=reverse, eps=eps)
 
@@ -176,10 +176,10 @@ class SpanMetric(Metric):
             self(loss, preds, golds)
 
     def __call__(
-        self,
-        loss: float,
-        preds: List[List[Tuple]],
-        golds: List[List[Tuple]]
+            self,
+            loss: float,
+            preds: List[List[Tuple]],
+            golds: List[List[Tuple]]
     ) -> SpanMetric:
         self.n += len(preds)
         self.count += 1
@@ -261,12 +261,12 @@ class SpanMetric(Metric):
 class ChartMetric(Metric):
 
     def __init__(
-        self,
-        loss: Optional[float] = None,
-        preds: Optional[torch.Tensor] = None,
-        golds: Optional[torch.Tensor] = None,
-        reverse: bool = False,
-        eps: float = 1e-12
+            self,
+            loss: Optional[float] = None,
+            preds: Optional[torch.Tensor] = None,
+            golds: Optional[torch.Tensor] = None,
+            reverse: bool = False,
+            eps: float = 1e-12
     ) -> ChartMetric:
         super().__init__(reverse=reverse, eps=eps)
 
@@ -279,10 +279,10 @@ class ChartMetric(Metric):
             self(loss, preds, golds)
 
     def __call__(
-        self,
-        loss: float,
-        preds: torch.Tensor,
-        golds: torch.Tensor
+            self,
+            loss: float,
+            preds: torch.Tensor,
+            golds: torch.Tensor
     ) -> ChartMetric:
         self.n += len(preds)
         self.count += 1

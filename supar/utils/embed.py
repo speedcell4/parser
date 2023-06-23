@@ -6,10 +6,11 @@ import os
 from typing import Iterable, Optional, Union
 
 import torch
+from torch.distributions.utils import lazy_property
+
 from supar.utils.common import CACHE
 from supar.utils.fn import download
 from supar.utils.logging import progress_bar
-from torch.distributions.utils import lazy_property
 
 
 class Embedding(object):
@@ -70,13 +71,13 @@ class Embedding(object):
     CACHE = os.path.join(CACHE, 'data/embeds')
 
     def __init__(
-        self,
-        path: str,
-        unk: Optional[str] = None,
-        skip_first: bool = False,
-        cache: bool = True,
-        sep: str = ' ',
-        **kwargs
+            self,
+            path: str,
+            unk: Optional[str] = None,
+            skip_first: bool = False,
+            cache: bool = True,
+            sep: str = ' ',
+            **kwargs
     ) -> Embedding:
         super().__init__()
 
@@ -174,7 +175,6 @@ class Embedding(object):
 
 
 class GloVeEmbedding(Embedding):
-
     r"""
     `GloVe`_: Global Vectors for Word Representation.
     Training is performed on aggregated global word-word co-occurrence statistics from a corpus,
@@ -210,7 +210,6 @@ class GloVeEmbedding(Embedding):
 
 
 class FasttextEmbedding(Embedding):
-
     r"""
     `Fasttext`_ word embeddings for 157 languages, trained using CBOW, in dimension 300,
     with character n-grams of length 5, a window of size 5 and 10 negatives.
@@ -240,7 +239,6 @@ class FasttextEmbedding(Embedding):
 
 
 class GigaEmbedding(Embedding):
-
     r"""
     `Giga`_ word embeddings, trained on Chinese Gigaword Third Edition for Chinese using word2vec,
     used by :cite:`zhang-etal-2020-efficient` and :cite:`zhang-etal-2020-fast`.
@@ -268,7 +266,6 @@ class GigaEmbedding(Embedding):
 
 
 class TencentEmbedding(Embedding):
-
     r"""
     `Tencent`_ word embeddings.
     The embeddings are trained on large-scale text collected from news, webpages, and novels with Directional Skip-Gram.

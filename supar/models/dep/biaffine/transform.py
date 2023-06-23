@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 from io import StringIO
-from typing import TYPE_CHECKING, Iterable, List, Optional, Tuple, Union
+from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING, Union
 
 from supar.utils.logging import get_logger
 from supar.utils.tokenizer import Tokenizer
@@ -50,17 +50,17 @@ class CoNLL(Transform):
     fields = ['ID', 'FORM', 'LEMMA', 'CPOS', 'POS', 'FEATS', 'HEAD', 'DEPREL', 'PHEAD', 'PDEPREL']
 
     def __init__(
-        self,
-        ID: Optional[Union[Field, Iterable[Field]]] = None,
-        FORM: Optional[Union[Field, Iterable[Field]]] = None,
-        LEMMA: Optional[Union[Field, Iterable[Field]]] = None,
-        CPOS: Optional[Union[Field, Iterable[Field]]] = None,
-        POS: Optional[Union[Field, Iterable[Field]]] = None,
-        FEATS: Optional[Union[Field, Iterable[Field]]] = None,
-        HEAD: Optional[Union[Field, Iterable[Field]]] = None,
-        DEPREL: Optional[Union[Field, Iterable[Field]]] = None,
-        PHEAD: Optional[Union[Field, Iterable[Field]]] = None,
-        PDEPREL: Optional[Union[Field, Iterable[Field]]] = None
+            self,
+            ID: Optional[Union[Field, Iterable[Field]]] = None,
+            FORM: Optional[Union[Field, Iterable[Field]]] = None,
+            LEMMA: Optional[Union[Field, Iterable[Field]]] = None,
+            CPOS: Optional[Union[Field, Iterable[Field]]] = None,
+            POS: Optional[Union[Field, Iterable[Field]]] = None,
+            FEATS: Optional[Union[Field, Iterable[Field]]] = None,
+            HEAD: Optional[Union[Field, Iterable[Field]]] = None,
+            DEPREL: Optional[Union[Field, Iterable[Field]]] = None,
+            PHEAD: Optional[Union[Field, Iterable[Field]]] = None,
+            PDEPREL: Optional[Union[Field, Iterable[Field]]] = None
     ) -> CoNLL:
         super().__init__()
 
@@ -174,7 +174,8 @@ class CoNLL(Transform):
             s = '\n'.join([f"{i}\t{word}\t{lemma}\t{tag}\t" + '\t'.join(['_'] * 6)
                            for i, (word, lemma, tag) in enumerate(tokens, 1)])
         else:
-            raise RuntimeError(f"Invalid sequence {tokens}. Only list of str or list of word/pos/lemma tuples are support.")
+            raise RuntimeError(
+                f"Invalid sequence {tokens}. Only list of str or list of word/pos/lemma tuples are support.")
         return s + '\n'
 
     @classmethod
@@ -248,11 +249,11 @@ class CoNLL(Transform):
         return next(tarjan(sequence), None) is None
 
     def load(
-        self,
-        data: Union[str, Iterable],
-        lang: Optional[str] = None,
-        proj: bool = False,
-        **kwargs
+            self,
+            data: Union[str, Iterable],
+            lang: Optional[str] = None,
+            proj: bool = False,
+            **kwargs
     ) -> Iterable[CoNLLSentence]:
         r"""
         Loads the data in CoNLL-X format.

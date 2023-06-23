@@ -6,11 +6,12 @@ from typing import List, Optional, Tuple, Union
 
 import torch
 import torch.nn as nn
+from torch.distributions.utils import lazy_property
+
 from supar.structs.dist import StructuredDistribution
 from supar.structs.fn import mst
 from supar.structs.semiring import LogSemiring, Semiring
 from supar.utils.fn import diagonal_stripe, expanded_stripe, stripe
-from torch.distributions.utils import lazy_property
 
 
 class MatrixTree(StructuredDistribution):
@@ -49,15 +50,15 @@ class MatrixTree(StructuredDistribution):
     """
 
     def __init__(
-        self,
-        scores: torch.Tensor,
-        lens: Optional[torch.LongTensor] = None,
-        multiroot: bool = False
+            self,
+            scores: torch.Tensor,
+            lens: Optional[torch.LongTensor] = None,
+            multiroot: bool = False
     ) -> MatrixTree:
         super().__init__(scores)
 
         batch_size, seq_len, *_ = scores.shape
-        self.lens = scores.new_full((batch_size,), seq_len-1).long() if lens is None else lens
+        self.lens = scores.new_full((batch_size,), seq_len - 1).long() if lens is None else lens
         self.mask = (self.lens.unsqueeze(-1) + 1).gt(self.lens.new_tensor(range(seq_len)))
         self.mask = self.mask.index_fill(1, self.lens.new_tensor(0), 0)
 
@@ -72,7 +73,8 @@ class MatrixTree(StructuredDistribution):
     @lazy_property
     def max(self):
         arcs = self.argmax
-        return LogSemiring.prod(LogSemiring.one_mask(self.scores.gather(-1, arcs.unsqueeze(-1)).squeeze(-1), ~self.mask), -1)
+        return LogSemiring.prod(
+            LogSemiring.one_mask(self.scores.gather(-1, arcs.unsqueeze(-1)).squeeze(-1), ~self.mask), -1)
 
     @lazy_property
     def argmax(self):
@@ -106,7 +108,8 @@ class MatrixTree(StructuredDistribution):
             arcs = arcs.eq(lens.new_tensor(range(mask.shape[1]))) | arcs.lt(0)
             scores = LogSemiring.zero_mask(self.scores, ~(arcs & mask))
             return self.__class__(scores, lens, **self.kwargs).log_partition
-        return LogSemiring.prod(LogSemiring.one_mask(self.scores.gather(-1, arcs.unsqueeze(-1)).squeeze(-1), ~self.mask), -1)
+        return LogSemiring.prod(
+            LogSemiring.one_mask(self.scores.gather(-1, arcs.unsqueeze(-1)).squeeze(-1), ~self.mask), -1)
 
     @torch.enable_grad()
     def forward(self, semiring: Semiring) -> torch.Tensor:
@@ -172,15 +175,15 @@ class DependencyCRF(StructuredDistribution):
     """
 
     def __init__(
-        self,
-        scores: torch.Tensor,
-        lens: Optional[torch.LongTensor] = None,
-        multiroot: bool = False
+            self,
+            scores: torch.Tensor,
+            lens: Optional[torch.LongTensor] = None,
+            multiroot: bool = False
     ) -> DependencyCRF:
         super().__init__(scores)
 
         batch_size, seq_len, *_ = scores.shape
-        self.lens = scores.new_full((batch_size,), seq_len-1).long() if lens is None else lens
+        self.lens = scores.new_full((batch_size,), seq_len - 1).long() if lens is None else lens
         self.mask = (self.lens.unsqueeze(-1) + 1).gt(self.lens.new_tensor(range(seq_len)))
         self.mask = self.mask.index_fill(1, self.lens.new_tensor(0), 0)
 
@@ -194,7 +197,8 @@ class DependencyCRF(StructuredDistribution):
 
     @lazy_property
     def argmax(self):
-        return self.lens.new_zeros(self.mask.shape).masked_scatter_(self.mask, torch.where(self.backward(self.max.sum()))[2])
+        return self.lens.new_zeros(self.mask.shape).masked_scatter_(self.mask,
+                                                                    torch.where(self.backward(self.max.sum()))[2])
 
     def topk(self, k: int) -> torch.LongTensor:
         preds = torch.stack([torch.where(self.backward(i))[2] for i in self.kmax(k).sum(0)], -1)
@@ -210,7 +214,8 @@ class DependencyCRF(StructuredDistribution):
             arcs = arcs.eq(lens.new_tensor(range(mask.shape[1]))) | arcs.lt(0)
             scores = LogSemiring.zero_mask(self.scores, ~(arcs & mask))
             return self.__class__(scores, lens, **self.kwargs).log_partition
-        return LogSemiring.prod(LogSemiring.one_mask(self.scores.gather(-1, arcs.unsqueeze(-1)).squeeze(-1), ~self.mask), -1)
+        return LogSemiring.prod(
+            LogSemiring.one_mask(self.scores.gather(-1, arcs.unsqueeze(-1)).squeeze(-1), ~self.mask), -1)
 
     def forward(self, semiring: Semiring) -> torch.Tensor:
         s_arc = self.scores
@@ -286,15 +291,15 @@ class Dependency2oCRF(StructuredDistribution):
     """
 
     def __init__(
-        self,
-        scores: Tuple[torch.Tensor, torch.Tensor],
-        lens: Optional[torch.LongTensor] = None,
-        multiroot: bool = False
+            self,
+            scores: Tuple[torch.Tensor, torch.Tensor],
+            lens: Optional[torch.LongTensor] = None,
+            multiroot: bool = False
     ) -> Dependency2oCRF:
         super().__init__(scores)
 
         batch_size, seq_len, *_ = scores[0].shape
-        self.lens = scores[0].new_full((batch_size,), seq_len-1).long() if lens is None else lens
+        self.lens = scores[0].new_full((batch_size,), seq_len - 1).long() if lens is None else lens
         self.mask = (self.lens.unsqueeze(-1) + 1).gt(self.lens.new_tensor(range(seq_len)))
         self.mask = self.mask.index_fill(1, self.lens.new_tensor(0), 0)
 
@@ -304,7 +309,8 @@ class Dependency2oCRF(StructuredDistribution):
         return f"{self.__class__.__name__}(multiroot={self.multiroot})"
 
     def __add__(self, other):
-        return Dependency2oCRF([torch.stack((i, j), -1) for i, j in zip(self.scores, other.scores)], self.lens, self.multiroot)
+        return Dependency2oCRF([torch.stack((i, j), -1) for i, j in zip(self.scores, other.scores)], self.lens,
+                               self.multiroot)
 
     @lazy_property
     def argmax(self):
@@ -352,7 +358,7 @@ class Dependency2oCRF(StructuredDistribution):
             # [n, w, batch_size, ...]
             il = semiring.times(stripe(s_i, n, w, (w, 1)),
                                 stripe(s_s, n, w, (1, 0), 0),
-                                stripe(s_sib[range(w, n+w), range(n), :], n, w, (0, 1)))
+                                stripe(s_sib[range(w, n + w), range(n), :], n, w, (0, 1)))
             il[:, -1] = semiring.mul(stripe(s_c, n, 1, (w, w)), stripe(s_c, n, 1, (0, w - 1))).squeeze(1)
             il = semiring.sum(il, 1)
             s_i.diagonal(-w).copy_(semiring.mul(il, s_arc.diagonal(-w).movedim(-1, 0)).movedim(0, -1))
@@ -361,7 +367,7 @@ class Dependency2oCRF(StructuredDistribution):
             # [n, w, batch_size, ...]
             ir = semiring.times(stripe(s_i, n, w),
                                 stripe(s_s, n, w, (0, w), 0),
-                                stripe(s_sib[range(n), range(w, n+w), :], n, w))
+                                stripe(s_sib[range(n), range(w, n + w), :], n, w))
             if not self.multiroot:
                 semiring.zero_(ir[0])
             ir[:, 0] = semiring.mul(stripe(s_c, n, 1), stripe(s_c, n, 1, (w, 1))).squeeze(1)
@@ -427,15 +433,15 @@ class ConstituencyCRF(StructuredDistribution):
     """
 
     def __init__(
-        self,
-        scores: torch.Tensor,
-        lens: Optional[torch.LongTensor] = None,
-        label: bool = False
+            self,
+            scores: torch.Tensor,
+            lens: Optional[torch.LongTensor] = None,
+            label: bool = False
     ) -> ConstituencyCRF:
         super().__init__(scores)
 
         batch_size, seq_len, *_ = scores.shape
-        self.lens = scores.new_full((batch_size,), seq_len-1).long() if lens is None else lens
+        self.lens = scores.new_full((batch_size,), seq_len - 1).long() if lens is None else lens
         self.mask = (self.lens.unsqueeze(-1) + 1).gt(self.lens.new_tensor(range(seq_len)))
         self.mask = self.mask.unsqueeze(1) & scores.new_ones(scores.shape[:3]).bool().triu_(1)
         self.label = label
@@ -474,7 +480,7 @@ class ConstituencyCRF(StructuredDistribution):
         for w in range(2, seq_len):
             n = seq_len - w
             # [n, batch_size, ...]
-            s_s = semiring.dot(stripe(s, n, w-1, (0, 1)), stripe(s, n, w-1, (1, w), False), 1)
+            s_s = semiring.dot(stripe(s, n, w - 1, (0, 1)), stripe(s, n, w - 1, (1, w), False), 1)
             s.diagonal(w).copy_(semiring.mul(s_s, scores.diagonal(w).movedim(-1, 0)).movedim(0, -1))
         return semiring.unconvert(s)[0][self.lens, range(batch_size)]
 
@@ -542,19 +548,20 @@ class BiLexicalizedConstituencyCRF(StructuredDistribution):
     """
 
     def __init__(
-        self,
-        scores: List[torch.Tensor],
-        lens: Optional[torch.LongTensor] = None
+            self,
+            scores: List[torch.Tensor],
+            lens: Optional[torch.LongTensor] = None
     ) -> BiLexicalizedConstituencyCRF:
         super().__init__(scores)
 
         batch_size, seq_len, *_ = scores[1].shape
-        self.lens = scores[1].new_full((batch_size,), seq_len-1).long() if lens is None else lens
+        self.lens = scores[1].new_full((batch_size,), seq_len - 1).long() if lens is None else lens
         self.mask = (self.lens.unsqueeze(-1) + 1).gt(self.lens.new_tensor(range(seq_len)))
         self.mask = self.mask.unsqueeze(1) & scores[1].new_ones(scores[1].shape[:3]).bool().triu_(1)
 
     def __add__(self, other):
-        return BiLexicalizedConstituencyCRF([torch.stack((i, j), -1) for i, j in zip(self.scores, other.scores)], self.lens)
+        return BiLexicalizedConstituencyCRF([torch.stack((i, j), -1) for i, j in zip(self.scores, other.scores)],
+                                            self.lens)
 
     @lazy_property
     def argmax(self):
@@ -617,10 +624,12 @@ class BiLexicalizedConstituencyCRF(StructuredDistribution):
             n = seq_len - w
             # COMPLETE-L: s_span_l(i, j, h) = <s_span(i, k, h), s_hook(h->k, j)>, i < k < j
             # [n, w, batch_size, ...]
-            s_l = stripe(semiring.dot(stripe(s_span, n, w-1, (0, 1)), stripe(s_hook, n, w-1, (1, w), False), 1), n, w)
+            s_l = stripe(semiring.dot(stripe(s_span, n, w - 1, (0, 1)), stripe(s_hook, n, w - 1, (1, w), False), 1), n,
+                         w)
             # COMPLETE-R: s_span_r(i, j, h) = <s_hook(i, k<-h), s_span(k, j, h)>, i < k < j
             # [n, w, batch_size, ...]
-            s_r = stripe(semiring.dot(stripe(s_hook, n, w-1, (0, 1)), stripe(s_span, n, w-1, (1, w), False), 1), n, w)
+            s_r = stripe(semiring.dot(stripe(s_hook, n, w - 1, (0, 1)), stripe(s_span, n, w - 1, (1, w), False), 1), n,
+                         w)
             # COMPLETE: s_span(i, j, h) = (s_span_l(i, j, h) + s_span_r(i, j, h)) * s(i, j, h)
             # [n, w, batch_size, ...]
             s = semiring.mul(semiring.sum(torch.stack((s_l, s_r)), 0), diagonal_stripe(s_head, w))

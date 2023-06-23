@@ -5,6 +5,7 @@ import os
 import torch
 import torch.distributed as dist
 import torch.multiprocessing as mp
+
 from supar.config import Config
 from supar.utils.logging import init_logger, logger
 from supar.utils.parallel import get_device_count, get_free_port

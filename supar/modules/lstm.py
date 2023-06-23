@@ -6,8 +6,9 @@ from typing import List, Optional, Tuple
 
 import torch
 import torch.nn as nn
+from torch.nn.utils.rnn import pack_padded_sequence, PackedSequence
+
 from supar.modules.dropout import SharedDropout
-from torch.nn.utils.rnn import PackedSequence, pack_padded_sequence
 
 
 class CharLSTM(nn.Module):
@@ -32,13 +33,13 @@ class CharLSTM(nn.Module):
     """
 
     def __init__(
-        self,
-        n_chars: int,
-        n_embed: int,
-        n_hidden: int,
-        n_out: int = 0,
-        pad_index: int = 0,
-        dropout: float = 0
+            self,
+            n_chars: int,
+            n_embed: int,
+            n_hidden: int,
+            n_out: int = 0,
+            pad_index: int = 0,
+            dropout: float = 0
     ) -> CharLSTM:
         super().__init__()
 
@@ -49,9 +50,10 @@ class CharLSTM(nn.Module):
         self.pad_index = pad_index
 
         self.embed = nn.Embedding(num_embeddings=n_chars, embedding_dim=n_embed)
-        self.lstm = nn.LSTM(input_size=n_embed, hidden_size=n_hidden//2, batch_first=True, bidirectional=True)
+        self.lstm = nn.LSTM(input_size=n_embed, hidden_size=n_hidden // 2, batch_first=True, bidirectional=True)
         self.dropout = nn.Dropout(p=dropout)
-        self.projection = nn.Linear(in_features=n_hidden, out_features=self.n_out) if n_hidden != self.n_out else nn.Identity()
+        self.projection = nn.Linear(in_features=n_hidden,
+                                    out_features=self.n_out) if n_hidden != self.n_out else nn.Identity()
 
     def __repr__(self):
         s = f"{self.n_chars}, {self.n_embed}"
@@ -116,12 +118,12 @@ class VariationalLSTM(nn.Module):
     """
 
     def __init__(
-        self,
-        input_size: int,
-        hidden_size: int,
-        num_layers: int = 1,
-        bidirectional: bool = False,
-        dropout: float = .0
+            self,
+            input_size: int,
+            hidden_size: int,
+            num_layers: int = 1,
+            bidirectional: bool = False,
+            dropout: float = .0
     ) -> VariationalLSTM:
         super().__init__()
 
@@ -163,21 +165,21 @@ class VariationalLSTM(nn.Module):
                 nn.init.zeros_(param)
 
     def permute_hidden(
-        self,
-        hx: Tuple[torch.Tensor, torch.Tensor],
-        permutation: torch.LongTensor
+            self,
+            hx: Tuple[torch.Tensor, torch.Tensor],
+            permutation: torch.LongTensor
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         if permutation is None:
             return hx
         return hx[0].index_select(1, permutation), hx[1].index_select(1, permutation)
 
     def layer_forward(
-        self,
-        x: List[torch.Tensor],
-        hx: Tuple[torch.Tensor, torch.Tensor],
-        cell: nn.LSTMCell,
-        batch_sizes: List[int],
-        reverse: bool = False
+            self,
+            x: List[torch.Tensor],
+            hx: Tuple[torch.Tensor, torch.Tensor],
+            cell: nn.LSTMCell,
+            batch_sizes: List[int],
+            reverse: bool = False
     ) -> Tuple[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]:
         hx_0 = hx_i = hx
         hx_n, output = [], []
@@ -207,9 +209,9 @@ class VariationalLSTM(nn.Module):
         return output, hx_n
 
     def forward(
-        self,
-        sequence: PackedSequence,
-        hx: Optional[Tuple[torch.Tensor, torch.Tensor]] = None
+            self,
+            sequence: PackedSequence,
+            hx: Optional[Tuple[torch.Tensor, torch.Tensor]] = None
     ) -> Tuple[PackedSequence, Tuple[torch.Tensor, torch.Tensor]]:
         r"""
         Args:

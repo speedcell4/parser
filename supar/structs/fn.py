@@ -198,7 +198,7 @@ def mst(scores: torch.Tensor, mask: torch.BoolTensor, multiroot: bool = False) -
 
     preds = []
     for i, length in enumerate(mask.sum(1).tolist()):
-        s = scores[i][:length+1, :length+1]
+        s = scores[i][:length + 1, :length + 1]
         tree = chuliu_edmonds(s)
         roots = torch.where(tree[1:].eq(0))[0] + 1
         if not multiroot and len(roots) > 1:
@@ -289,7 +289,6 @@ def levenshtein(x: Iterable, y: Iterable, costs: Tuple = (1, 1, 1), align: bool 
 
 
 class Logsumexp(Function):
-
     r"""
     Safer ``logsumexp`` to cure unnecessary NaN values that arise from inf arguments.
     See discussions at http://github.com/pytorch/pytorch/issues/49724.
@@ -347,7 +346,7 @@ class SampledLogsumexp(Function):
     @torch.cuda.amp.custom_bwd
     def backward(ctx, g: torch.Tensor) -> Union[torch.Tensor, None]:
         from torch.distributions import OneHotCategorical
-        (x, ), dim = ctx.saved_tensors, ctx.dim
+        (x,), dim = ctx.saved_tensors, ctx.dim
         return g.unsqueeze(dim).mul(OneHotCategorical(logits=x.movedim(dim, -1)).sample().movedim(-1, dim)), None
 
 

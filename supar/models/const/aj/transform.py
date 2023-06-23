@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from typing import TYPE_CHECKING, Iterable, List, Optional, Tuple, Union
+from typing import Iterable, List, Optional, Tuple, TYPE_CHECKING, Union
 
 import nltk
 import torch
@@ -44,13 +44,13 @@ class AttachJuxtaposeTree(Tree):
     fields = ['WORD', 'POS', 'TREE', 'NODE', 'PARENT', 'NEW']
 
     def __init__(
-        self,
-        WORD: Optional[Union[Field, Iterable[Field]]] = None,
-        POS: Optional[Union[Field, Iterable[Field]]] = None,
-        TREE: Optional[Union[Field, Iterable[Field]]] = None,
-        NODE: Optional[Union[Field, Iterable[Field]]] = None,
-        PARENT: Optional[Union[Field, Iterable[Field]]] = None,
-        NEW: Optional[Union[Field, Iterable[Field]]] = None
+            self,
+            WORD: Optional[Union[Field, Iterable[Field]]] = None,
+            POS: Optional[Union[Field, Iterable[Field]]] = None,
+            TREE: Optional[Union[Field, Iterable[Field]]] = None,
+            NODE: Optional[Union[Field, Iterable[Field]]] = None,
+            PARENT: Optional[Union[Field, Iterable[Field]]] = None,
+            NEW: Optional[Union[Field, Iterable[Field]]] = None
     ) -> Tree:
         super().__init__()
 
@@ -161,6 +161,7 @@ class AttachJuxtaposeTree(Tree):
                 target_pos = len(last_pos) - 2
             action = target_pos, parent_label, new_label
             return action, last_tree
+
         if tree is None:
             return []
         action, last_tree = detach(tree)
@@ -168,10 +169,10 @@ class AttachJuxtaposeTree(Tree):
 
     @classmethod
     def action2tree(
-        cls,
-        tree: nltk.Tree,
-        actions: List[Tuple[int, str, str]],
-        join: str = '::',
+            cls,
+            tree: nltk.Tree,
+            actions: List[Tuple[int, str, str]],
+            join: str = '::',
     ) -> nltk.Tree:
         r"""
         Recovers a constituency tree from a sequence of AttachJuxtapose actions.
@@ -268,11 +269,11 @@ class AttachJuxtaposeTree(Tree):
 
     @classmethod
     def action2span(
-        cls,
-        action: torch.Tensor,
-        spans: torch.Tensor = None,
-        nul_index: int = -1,
-        mask: torch.BoolTensor = None
+            cls,
+            action: torch.Tensor,
+            spans: torch.Tensor = None,
+            nul_index: int = -1,
+            mask: torch.BoolTensor = None
     ) -> torch.Tensor:
         r"""
         Converts a batch of the tensorized action at a given step into spans.
@@ -350,7 +351,8 @@ class AttachJuxtaposeTree(Tree):
         rightmost_mask = spans[..., -1].ge(0)
         ancestors = rightmost_mask.cumsum(-1).masked_fill_(~rightmost_mask, -1) - 1
         # should not include the target node for the Juxtapose action
-        ancestor_mask = mask.unsqueeze(-1) & ancestors.ge(0) & ancestors.le((target - juxtapose_mask.long()).unsqueeze(-1))
+        ancestor_mask = mask.unsqueeze(-1) & ancestors.ge(0) & ancestors.le(
+            (target - juxtapose_mask.long()).unsqueeze(-1))
         target_pos = torch.where(ancestors.eq(target.unsqueeze(-1))[juxtapose_mask])[-1]
         # the right boundaries of ancestor nodes should be aligned with the new generated terminals
         spans = torch.cat((spans, torch.where(ancestor_mask, spans[..., -1], -1).unsqueeze(-1)), -1)
@@ -362,10 +364,10 @@ class AttachJuxtaposeTree(Tree):
         return spans
 
     def load(
-        self,
-        data: Union[str, Iterable],
-        lang: Optional[str] = None,
-        **kwargs
+            self,
+            data: Union[str, Iterable],
+            lang: Optional[str] = None,
+            **kwargs
     ) -> List[AttachJuxtaposeTreeSentence]:
         r"""
         Args:
@@ -419,10 +421,10 @@ class AttachJuxtaposeTreeSentence(Sentence):
     """
 
     def __init__(
-        self,
-        transform: AttachJuxtaposeTree,
-        tree: nltk.Tree,
-        index: Optional[int] = None
+            self,
+            transform: AttachJuxtaposeTree,
+            tree: nltk.Tree,
+            index: Optional[int] = None
     ) -> AttachJuxtaposeTreeSentence:
         super().__init__(transform, index)
 
